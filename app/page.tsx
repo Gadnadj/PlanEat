@@ -1,3 +1,5 @@
+"use client"
+import { useState } from "react";
 
 export default function Home() {
 
@@ -11,6 +13,8 @@ export default function Home() {
   const ingredientli = 'text-[#b0b0b0] mb-[0.3rem] pl-4 relative before:content-[\'•\'] before:text-[#7cb342] before:absolute before:left-0';
   const addToList = 'bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white border-none py-3 px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out w-full hover:-translate-y-0.5 hover:bg-gradient-to-br hover:from-green-600 hover:to-green-700';
   const shoppingItem = 'bg-[#3a3a3a] p-4 mb-2 rounded-lg border-l-4 border-l-[#7cb342] transition-all duration-300 ease-out hover:bg-[#404040] hover:-translate-x-[5px]'
+
+  const [empty, setEmpty] = useState(true);
 
   return (
     <div className="max-w-6xl mx-auto p-8 grid grid-cols-[1fr_350px] gap-8">
@@ -106,16 +110,21 @@ export default function Home() {
           <span className="text-2xl">🛒</span>
           Liste de courses
         </h2>
-        <ul className="list-none">
-          <li className={shoppingItem}>Tomates Cerises</li>
-          <li className={shoppingItem}>Concombres</li>
-          <li className={shoppingItem}>Olives noires</li>
-        </ul>
 
-        <div>
-          Votre liste de courses est vide.<br />
-          Ajoutez des recettes pour commencer!
-        </div>
+        {
+          empty ? (
+            <div className="text-center text-[#888] italic p-8">
+              Votre liste de courses est vide.<br />
+              Ajoutez des recettes pour commencer!
+            </div>
+          ) : (
+            <ul className="list-none">
+              <li className={shoppingItem}>Tomates Cerises</li>
+              <li className={shoppingItem}>Concombres</li>
+              <li className={shoppingItem}>Olives noires</li>
+            </ul>
+          )
+        }
       </aside>
     </div >
   );
