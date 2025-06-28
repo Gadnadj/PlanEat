@@ -3,14 +3,14 @@ import { useState } from "react";
 
 export default function Home() {
 
-  const recipeCard = 'bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl overflow-hidden transition-all duration-300 ease-out border border-gray-600 hover:-translate-y-1 hover:shadow-2xl';
+  const recipeCard = 'bg-gradient-to-br from-[#3a3a3a] to-gray-[#2d2d2d] rounded-xl overflow-hidden transition-all duration-300 ease-out border border-gray-600 hover:-translate-y-1 hover:shadow-2xl';
   const recipeImage = 'w-full h-50 bg-gradient-to-br from-[#7cb342] to-[#558b2f] flex items-center justify-center text-9xl text-white';
   const recipeInfo = 'p-6';
-  const recipeInfoH3 = 'text-[#7cb342] mb-4 text-xl';
+  const recipeInfoH3 = 'text-[#7cb342] mb-4 text-xl font-bold';
   const ingredients = 'mb-6';
-  const ingredientsH4 = 'text-gray-300 mb-2 text-base';
+  const ingredientsH4 = 'text-gray-300 mb-2 text-base font-bold';
   const ingredientsul = 'list-none pl-0';
-  const ingredientli = 'text-[#b0b0b0] mb-[0.3rem] pl-4 relative before:content-[\'•\'] before:text-[#7cb342] before:absolute before:left-0';
+  const ingredientli = "text-[#b0b0b0] mb-[0.3rem] pl-4 relative before:content-['•'] before:text-[#7cb342] before:absolute before:left-0";
   const addToList = 'bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white border-none py-3 px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out w-full hover:-translate-y-0.5 hover:bg-gradient-to-br hover:from-green-600 hover:to-green-700';
   const shoppingItem = 'bg-[#3a3a3a] p-4 mb-2 rounded-lg border-l-4 border-l-[#7cb342] transition-all duration-300 ease-out hover:bg-[#404040] hover:-translate-x-[5px]'
 
@@ -20,12 +20,12 @@ export default function Home() {
     <div className="max-w-6xl mx-auto p-8 grid grid-cols-[1fr_350px] gap-8 max-md:grid-cols-1 max-md:gap-4">
       <main className="flex flex-col gap-8">
         {/* MAIN CONTAINER */}
-        <section className="bg-gradient-to-br from-[#2d5016] to-[#1a3009] p-12 text-center shadow-xl rounded-lg max-md:p-8">
+        <section className="bg-gradient-to-br from-[#2d5016] to-[#1a3009] p-12 text-center shadow-xl rounded-lg max-md:p-8 max-sm:p-6">
           <h1 className="welcome-title">
             Planifier Vos Repas avec IA
           </h1>
 
-          <p className="text-2xl mb-8 opacity-90 max-w-[600px] ml-auto mr-auto">
+          <p className="text-xl mb-8 opacity-90 max-w-[600px] ml-auto mr-auto max-sm:text-base">
             Decouvez une nouvelle facon de planifier vos repas grace a notre Intelligence Artificielle.
             Obtenez des suggestions personnalisees, optimisez vos courses et savourez chaque repas.
           </p>
