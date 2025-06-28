@@ -25,3 +25,11 @@ body {
   font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
   line-height: 1.6;
 }
+
+.nav-link::after {
+  @apply content-[''] absolute -bottom-[5px] left-0 w-0 h-0.5 bg-[#7cb342] transition-all duration-300 ease-in-out;
+}
+
+.nav-link:hover::after {
+  @apply w-full;
+}
