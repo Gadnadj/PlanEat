@@ -2,16 +2,21 @@
 export default function Home() {
 
   const recipeCard = 'bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl overflow-hidden transition-all duration-300 ease-out border border-gray-600 hover:-translate-y-1 hover:shadow-2xl';
-  const recipeImage = 'w-full h-50 bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-9xl text-white';
+  const recipeImage = 'w-full h-50 bg-gradient-to-br from-[#7cb342] to-[#558b2f] flex items-center justify-center text-9xl text-white';
   const recipeInfo = 'p-6';
   const recipeInfoH3 = 'text-[#7cb342] mb-4 text-xl';
-  const ingredients = 'mb-6'
+  const ingredients = 'mb-6';
+  const ingredientsH4 = 'text-gray-300 mb-2 text-base';
+  const ingredientsul = 'list-none pl-0';
+  const ingredientli = 'text-[#b0b0b0] mb-[0.3rem] pl-4 relative before:content-[\'•\'] before:text-[#7cb342] before:absolute before:left-0';
+  const addToList = 'bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white border-none py-3 px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out w-full hover:-translate-y-0.5 hover:bg-gradient-to-br hover:from-green-600 hover:to-green-700';
+  const shoppingItem = 'bg-[#3a3a3a] p-4 mb-2 rounded-lg border-l-4 border-l-[#7cb342] transition-all duration-300 ease-out hover:bg-[#404040] hover:-translate-x-[5px]'
 
   return (
     <div className="max-w-6xl mx-auto p-8 grid grid-cols-[1fr_350px] gap-8">
       <main className="flex flex-col gap-8">
         {/* MAIN CONTAINER */}
-        <section className="bg-gradient-to-br from-[#2d5016] to-[#1a3009] p-12 text-center shadow-xl">
+        <section className="bg-gradient-to-br from-[#2d5016] to-[#1a3009] p-12 text-center shadow-xl rounded-lg">
           <h1 className="welcome-title">
             Planifier Vos Repas avec IA
           </h1>
@@ -40,18 +45,18 @@ export default function Home() {
               <div className={recipeInfo}>
                 <h3 className={recipeInfoH3}>Salade Mediterraneenne</h3>
                 <div className={ingredients}>
-                  <h4>Ingredients: </h4>
-                  <ul>
-                    <li>Tomates Cerises</li>
-                    <li>Concombre</li>
-                    <li>Olives noires</li>
-                    <li>Fetas</li>
-                    <li>Huile d olive</li>
+                  <h4 className={ingredientsH4}> Ingredients: </h4>
+                  <ul className={ingredientsul}>
+                    <li className={ingredientli}>Tomates Cerises</li>
+                    <li className={ingredientli}>Concombre</li>
+                    <li className={ingredientli}>Olives noires</li>
+                    <li className={ingredientli}>Fetas</li>
+                    <li className={ingredientli}>Huile d olive</li>
                   </ul>
                 </div>
-                <button>Ajouter a la liste</button>
-              </div>
-            </div>
+                <button className={addToList}>Ajouter a la liste</button>
+              </div >
+            </div >
 
             <div className={recipeCard}>
               <div className={recipeImage}>
@@ -60,16 +65,16 @@ export default function Home() {
               <div className={recipeInfo}>
                 <h3 className={recipeInfoH3}>Pates au Pesto</h3>
                 <div className={ingredients}>
-                  <h4>Ingredients: </h4>
-                  <ul>
-                    <li>Pâtes pennes</li>
-                    <li>Basilic frais</li>
-                    <li>Pignons de pin</li>
-                    <li>Parmesan</li>
-                    <li>Ail</li>
+                  <h4 className={ingredientsH4}> Ingredients: </h4>
+                  <ul className={ingredientsul}>
+                    <li className={ingredientli}>Pâtes pennes</li>
+                    <li className={ingredientli}>Basilic frais</li>
+                    <li className={ingredientli}>Pignons de pin</li>
+                    <li className={ingredientli}>Parmesan</li>
+                    <li className={ingredientli}>Ail</li>
                   </ul>
                 </div>
-                <button>Ajouter a la liste</button>
+                <button className={addToList}>Ajouter a la liste</button>
               </div>
             </div>
 
@@ -80,31 +85,31 @@ export default function Home() {
               <div className={recipeInfo}>
                 <h3 className={recipeInfoH3}>Saumon Grillé</h3>
                 <div className={ingredients}>
-                  <h4>Ingredients: </h4>
-                  <ul>
-                    <li>Filet de saumon</li>
-                    <li>Citron</li>
-                    <li>Herbes de Provenc</li>
-                    <li>Brocolis</li>
-                    <li>Huile d olive</li>
+                  <h4 className={ingredientsH4}> Ingredients: </h4>
+                  <ul className={ingredientsul}>
+                    <li className={ingredientli}>Filet de saumon</li>
+                    <li className={ingredientli}>Citron</li>
+                    <li className={ingredientli}>Herbes de Provenc</li>
+                    <li className={ingredientli}>Brocolis</li>
+                    <li className={ingredientli}>Huile d olive</li>
                   </ul>
                 </div>
-                <button>Ajouter a la liste</button>
+                <button className={addToList}>Ajouter a la liste</button>
               </div>
             </div>
-          </div>
-        </section>
-      </main>
+          </div >
+        </section >
+      </main >
 
-      <aside>
-        <h2>
-          <span>🛒</span>
+      <aside className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl h-fit sticky top-[120px]">
+        <h2 className="text-[#7cb342] mb-6 text-2xl font-bold flex items-center gap-2">
+          <span className="text-2xl">🛒</span>
           Liste de courses
         </h2>
-        <ul>
-          <li>Tomates Cerises</li>
-          <li>Concombres</li>
-          <li>Olives noires</li>
+        <ul className="list-none">
+          <li className={shoppingItem}>Tomates Cerises</li>
+          <li className={shoppingItem}>Concombres</li>
+          <li className={shoppingItem}>Olives noires</li>
         </ul>
 
         <div>
@@ -112,6 +117,6 @@ export default function Home() {
           Ajoutez des recettes pour commencer!
         </div>
       </aside>
-    </div>
+    </div >
   );
 }
