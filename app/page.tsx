@@ -17,10 +17,10 @@ export default function Home() {
   const [empty, setEmpty] = useState(true);
 
   return (
-    <div className="max-w-6xl mx-auto p-8 grid grid-cols-[1fr_350px] gap-8">
+    <div className="max-w-6xl mx-auto p-8 grid grid-cols-[1fr_350px] gap-8 max-md:grid-cols-1 max-md:gap-4">
       <main className="flex flex-col gap-8">
         {/* MAIN CONTAINER */}
-        <section className="bg-gradient-to-br from-[#2d5016] to-[#1a3009] p-12 text-center shadow-xl rounded-lg">
+        <section className="bg-gradient-to-br from-[#2d5016] to-[#1a3009] p-12 text-center shadow-xl rounded-lg max-md:p-8">
           <h1 className="welcome-title">
             Planifier Vos Repas avec IA
           </h1>
@@ -41,7 +41,7 @@ export default function Home() {
             Suggestions de recettes.
           </h2>
 
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6 max-md:grid-cols-1">
             <div className={recipeCard}>
               <div className={recipeImage}>
                 🥗
@@ -105,7 +105,7 @@ export default function Home() {
         </section >
       </main >
 
-      <aside className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl h-fit sticky top-[120px]">
+      <aside className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl h-fit sticky top-[120px] max-md:static">
         <h2 className="text-[#7cb342] mb-6 text-2xl font-bold flex items-center gap-2">
           <span className="text-2xl">🛒</span>
           Liste de courses

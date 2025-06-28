@@ -6,25 +6,25 @@ const navbar = () => {
 
     return (
         <nav className='bg-gradient-to-br from-[#2d5016] to-[#1a3009] px-4 py-4 sm:px-8 sm:py-4 shadow-lg sticky top-0 z-[100]'>
-            <div className='max-w-6xl mx-auto flex flex-col gap-4 sm:flex-row sm:gap-0 justify-between items-center'>
+            <div className='max-w-6xl mx-auto flex flex-col gap-4 md:flex-row md:gap-0 justify-between items-center'>
                 <Link className='text-3xl font-bold text-[#7cb342] no-underline' href={'/'}>
                     🍽️ PlanEat
                 </Link>
-                <ul className='hidden md:flex list-none gap-8'>
+                <ul className='flex flex-row max-md:hidden list-none gap-8'>
                     <li>
                         <Link className={linkClasses} href={'/'}>Home</Link>
                     </li>
                     <li>
-                        <Link className={linkClasses} href={'/home'}>Recipes</Link>
+                        <Link className={linkClasses} href={'/recipe'}>Recipes</Link>
                     </li>
                     <li>
-                        <Link className={linkClasses} href={'/home'}>Planification</Link>
+                        <Link className={linkClasses} href={'/planification'}>Planification</Link>
                     </li>
                     <li>
-                        <Link className={linkClasses} href={'/home'}>Shopping List</Link>
+                        <Link className={linkClasses} href={'/shopping-list'}>Shopping List</Link>
                     </li>
                     <li>
-                        <Link className={linkClasses} href={'/home'}>Account</Link>
+                        <Link className={linkClasses} href={'/login'}>Login</Link>
                     </li>
                 </ul>
             </div>
