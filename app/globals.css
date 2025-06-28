@@ -33,3 +33,9 @@ body {
 .nav-link:hover::after {
   @apply w-full;
 }
+
+.welcome-title {
+  @apply text-4xl mb-4 text-[#7cb342];
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
