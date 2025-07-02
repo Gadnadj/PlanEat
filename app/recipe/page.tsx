@@ -93,6 +93,153 @@ const page = () => {
 
                 <div>
                     {/* Recette 1 */}
+                    <article>
+                        <div>
+                            🥗
+                            <span>Facile</span>
+                            <span>⏱️ 15 min</span>
+                        </div>
+                        <div>
+                            <h3>Salade Mediteraneenne</h3>
+                            <p>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
+                            <div>
+                                <span>Vegetarien</span>
+                                <span>Healthy</span>
+                                <span>Rapide</span>
+                            </div>
+                            <div>
+                                <div>
+                                    <div>4.8</div>
+                                    <div>Note</div>
+                                </div>
+                                <div>
+                                    <div>2</div>
+                                    <div>Portions</div>
+                                </div>
+                                <div>
+                                    <div>285</div>
+                                    <div>Calories</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button>Voir la recette</button>
+                                <button>+ Liste</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    {/* Recette 2 */}
+                    <article>
+                        <div>
+                            🥗
+                            <span>Facile</span>
+                            <span>⏱️ 15 min</span>
+                        </div>
+                        <div>
+                            <h3>Salade Mediteraneenne</h3>
+                            <p>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
+                            <div>
+                                <span>Vegetarien</span>
+                                <span>Healthy</span>
+                                <span>Rapide</span>
+                            </div>
+                            <div>
+                                <div>
+                                    <div>4.8</div>
+                                    <div>Note</div>
+                                </div>
+                                <div>
+                                    <div>2</div>
+                                    <div>Portions</div>
+                                </div>
+                                <div>
+                                    <div>285</div>
+                                    <div>Calories</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button>Voir la recette</button>
+                                <button>+ Liste</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    {/* Recette 3 */}
+                    <article>
+                        <div>
+                            🥗
+                            <span>Facile</span>
+                            <span>⏱️ 15 min</span>
+                        </div>
+                        <div>
+                            <h3>Salade Mediteraneenne</h3>
+                            <p>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
+                            <div>
+                                <span>Vegetarien</span>
+                                <span>Healthy</span>
+                                <span>Rapide</span>
+                            </div>
+                            <div>
+                                <div>
+                                    <div>4.8</div>
+                                    <div>Note</div>
+                                </div>
+                                <div>
+                                    <div>2</div>
+                                    <div>Portions</div>
+                                </div>
+                                <div>
+                                    <div>285</div>
+                                    <div>Calories</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button>Voir la recette</button>
+                                <button>+ Liste</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    {/* Recette 4 */}
+                    <article>
+                        <div>
+                            🥗
+                            <span>Facile</span>
+                            <span>⏱️ 15 min</span>
+                        </div>
+                        <div>
+                            <h3>Salade Mediteraneenne</h3>
+                            <p>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
+                            <div>
+                                <span>Vegetarien</span>
+                                <span>Healthy</span>
+                                <span>Rapide</span>
+                            </div>
+                            <div>
+                                <div>
+                                    <div>4.8</div>
+                                    <div>Note</div>
+                                </div>
+                                <div>
+                                    <div>2</div>
+                                    <div>Portions</div>
+                                </div>
+                                <div>
+                                    <div>285</div>
+                                    <div>Calories</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button>Voir la recette</button>
+                                <button>+ Liste</button>
+                            </div>
+                        </div>
+                    </article>
+
                 </div>
             </main>
         </div>
