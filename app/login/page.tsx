@@ -17,7 +17,12 @@ const Page = () => {
 
 
     return (
-        <div className='flex items-center justify-center'>
+        <div className='flex flex-col items-center justify-center'>
+            <nav className="w-full bg-gradient-to-br from-[#2d5016] to-[#1a3009] px-4 py-4 sm:px-8 sm:py-4 shadow-lg sticky top-0 z-[100]">
+                <div className="max-w-7xl mx-auto flex justify-center">
+                    <Link className='text-3xl font-bold text-[#7cb342] no-underline' href={'/'}>🍽️ PlanEat</Link>
+                </div>
+            </nav>
             <div className="bg-[rgb(42,42,42)]/95 backdrop-blur-xl p-12 shadow-2xl w-full max-w-md m-8 relative overflow-hidden rounded-lg max-md:py-8 max-md:px-6 max-md:m-4 max-sm:py-6 max-sm:px-4">
                 {/* Barre shimmer */}
                 <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#7cb342] to-transparent animate-shimmer"></div>
