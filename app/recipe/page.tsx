@@ -11,6 +11,16 @@ const page = () => {
     const recipeDifficulty = 'absolute top-4 right-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] font-bold';
     const recipeTime = 'absolute bottom-4 left-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] flex items-center gap-[0.3rem]';
     const articleInfo = 'p-6';
+    const recipeTitle = '';
+    const recipeDescription = '';
+    const recipeTags = '';
+    const recipeStats = '';
+    const statItem = '';
+    const statValue = '';
+    const statLabel = '';
+    const recipeAction = '';
+    const recipeButton = '';
+
 
     return (
         <div>
