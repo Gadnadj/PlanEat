@@ -1,29 +1,40 @@
 import React from 'react'
 
 const page = () => {
+
+    const label = 'text-[0.8rem] text-[#b0b0b0] font-medium';
+    const select = 'px-4 py-3 bg-[#3a3a3a] border border-[#404040] rounded-lg text-[#e0e0e0] cursor-pointer transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#7cb342]'
+    const filterTag = 'bg-[#7cb342] text-white py-2 px-4 rounded-[20px] text-sm cursor-pointer transition-all duration-300 ease-in-out hover:bg-[#558b2f]'
+    // const activeCLass = 'bg-[#558b2f] shadow-[0_2px_8px_rgba(124,179,66,0.3)]';
+    const recipeTag = 'bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-[15px] overflow-hidden transition-all duration-300 ease-in-out border border-[#404040] relative hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:border-[#7cb342]';
+    const recipeImage = 'w-full h-[220px] bg-gradient-to-br from-[#7cb342] to-[#558b2f] flex items-center justify-center text-6xl text-white relative'
+    const recipeDifficulty = 'absolute top-4 right-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] font-bold';
+    const recipeTime = 'absolute bottom-4 left-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] flex items-center gap-[0.3rem]';
+    const articleInfo = 'p-6';
+
     return (
         <div>
-            <header>
-                <h1>
+            <header className='max-w-[1400px] mx-auto p-8 text-center'>
+                <h1 className='text-[2.5rem] text-[#7cb342] mb-4'>
                     Decouvrez nos recettes
                 </h1>
 
-                <p>
+                <p className='text-lg text-[#b0b0b0] max-w-[600px] mx-auto'>
                     Plus de 1000 recettes créées par notre IA et validées par nos chefs. Trouvez l inspiration pour vos prochains repas.
                 </p>
             </header>
 
             {/* Recherche et Filtrer */}
-            <section>
-                <div>
-                    <input type="text" placeholder='Rechercher une recette, un ingredient...' />
-                    <button>🔍 Rechercher</button>
+            <section className='max-w-[1400px] mx-auto px-8 pb-8 bg-[#2a2a2a] rounded-[15px] mb-8 shadow-[0_4px_15px_rgba(0,0,0,0.2)]'>
+                <div className='py-8 pt-8 pb-4 flex gap-4 items-center'>
+                    <input className='flex px-6 py-4 bg-[#3a3a3a] border-2 border-[#404040] rounded-[10px] text-[#e0e0e0] text-base transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#7cb342]' type="text" placeholder='Rechercher une recette, un ingredient...' />
+                    <button className='bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white border-none px-8 py-4 rounded-[10px] font-bold cursor-pointer transition-all duration-300 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'>🔍 Rechercher</button>
                 </div>
 
-                <div>
-                    <div>
-                        <label>Categorie</label>
-                        <select>
+                <div className='flex gap-4 flex-wrap pb-4'>
+                    <div className='flex flex-col gap-2'>
+                        <label className={label}>Categorie</label>
+                        <select className={select}>
                             <option>Toutes</option>
                             <option>Entrees</option>
                             <option>Plats principaux</option>
@@ -32,9 +43,9 @@ const page = () => {
                         </select>
                     </div>
 
-                    <div>
-                        <label>Temps de preparation</label>
-                        <select>
+                    <div className='flex flex-col gap-2'>
+                        <label className={label}>Temps de preparation</label>
+                        <select className={select}>
                             <option>Tous</option>
                             <option>Moins de 15 min</option>
                             <option>15-30 min</option>
@@ -43,9 +54,9 @@ const page = () => {
                         </select>
                     </div>
 
-                    <div>
-                        <label>Difficulte</label>
-                        <select>
+                    <div className='flex flex-col gap-2'>
+                        <label className={label}>Difficulte</label>
+                        <select className={select}>
                             <option>Toutes</option>
                             <option>Facile</option>
                             <option>Moyen</option>
@@ -53,9 +64,9 @@ const page = () => {
                         </select>
                     </div>
 
-                    <div>
-                        <label>Régime</label>
-                        <select>
+                    <div className='flex flex-col gap-2'>
+                        <label className={label}>Régime</label>
+                        <select className={select}>
                             <option>Tous</option>
                             <option>Végétarien</option>
                             <option>Vegan</option>
@@ -65,23 +76,23 @@ const page = () => {
                     </div>
                 </div>
 
-                <div>
-                    <span>Populaire</span>
-                    <span>Rapide</span>
-                    <span>Healthy</span>
-                    <span>Economique</span>
-                    <span>Famililial</span>
-                    <span>Gourmet</span>
+                <div className='flex gap-2 flex-wrap mt-4'>
+                    <span className={filterTag}>Populaire</span>
+                    <span className={filterTag}>Rapide</span>
+                    <span className={filterTag}>Healthy</span>
+                    <span className={filterTag}>Economique</span>
+                    <span className={filterTag}>Famililial</span>
+                    <span className={filterTag}>Gourmet</span>
                 </div>
             </section>
 
             {/* Grille de recettes */}
-            <main>
-                <div>
-                    <span>248 recettes trouvees</span>
-                    <div>
-                        <span>Trier par:</span>
-                        <select>
+            <main className='max-w-[1400px] mx-auto pt-0 px-8 pb-8'>
+                <div className='flex justify-between items-center mb-8 py-4 border-b border-[#404040]'>
+                    <span className='text-[#b0b0b0] text-base'>248 recettes trouvees</span>
+                    <div className='flex gap-4 items-center'>
+                        <span className='text-[#b0b0b0] text-base'>Trier par:</span>
+                        <select className={select}>
                             <option>Popularite</option>
                             <option>Date d ajout</option>
                             <option>Temps de preparation</option>
@@ -91,155 +102,43 @@ const page = () => {
                     </div>
                 </div>
 
-                <div>
+                <div className='grid gap-8 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]'>
                     {/* Recette 1 */}
-                    <article>
-                        <div>
+                    <article className={recipeTag}>
+                        <div className={recipeImage}>
                             🥗
-                            <span>Facile</span>
-                            <span>⏱️ 15 min</span>
+                            <span className={recipeDifficulty}>Facile</span>
+                            <span className={recipeTime}>⏱️ 15 min</span>
                         </div>
-                        <div>
-                            <h3>Salade Mediteraneenne</h3>
-                            <p>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
-                            <div>
-                                <span>Vegetarien</span>
-                                <span>Healthy</span>
-                                <span>Rapide</span>
+                        <div className={articleInfo}>
+                            <h3 className={recipeTitle}>alade Mediteraneenne</h3>
+                            <p className={recipeDescription}>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
+                            <div className={recipeTags}>
+                                <span className={recipeTag}>Vegetarien</span>
+                                <span className={recipeTag}>Healthy</span>
+                                <span className={recipeTag}>Rapide</span>
                             </div>
-                            <div>
-                                <div>
-                                    <div>4.8</div>
-                                    <div>Note</div>
+                            <div className={recipeStats}>
+                                <div className={statItem}>
+                                    <div className={statValue}>4.8</div>
+                                    <div className={statLabel}>Note</div>
+                                </div>
+                                <div className={statItem}>
+                                    <div className={statValue}>2</div>
+                                    <div className={statLabel}>Portions</div>
                                 </div>
                                 <div>
-                                    <div>2</div>
-                                    <div>Portions</div>
-                                </div>
-                                <div>
-                                    <div>285</div>
-                                    <div>Calories</div>
+                                    <div className={statValue}>285</div>
+                                    <div className={statLabel}>Calories</div>
                                 </div>
                             </div>
 
-                            <div>
-                                <button>Voir la recette</button>
-                                <button>+ Liste</button>
+                            <div className={recipeAction}>
+                                <button className={recipeButton}>Voir la recette</button>
+                                <button className={recipeButton}>+ Liste</button>
                             </div>
                         </div>
                     </article>
-
-                    {/* Recette 2 */}
-                    <article>
-                        <div>
-                            🥗
-                            <span>Facile</span>
-                            <span>⏱️ 15 min</span>
-                        </div>
-                        <div>
-                            <h3>Salade Mediteraneenne</h3>
-                            <p>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
-                            <div>
-                                <span>Vegetarien</span>
-                                <span>Healthy</span>
-                                <span>Rapide</span>
-                            </div>
-                            <div>
-                                <div>
-                                    <div>4.8</div>
-                                    <div>Note</div>
-                                </div>
-                                <div>
-                                    <div>2</div>
-                                    <div>Portions</div>
-                                </div>
-                                <div>
-                                    <div>285</div>
-                                    <div>Calories</div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <button>Voir la recette</button>
-                                <button>+ Liste</button>
-                            </div>
-                        </div>
-                    </article>
-
-                    {/* Recette 3 */}
-                    <article>
-                        <div>
-                            🥗
-                            <span>Facile</span>
-                            <span>⏱️ 15 min</span>
-                        </div>
-                        <div>
-                            <h3>Salade Mediteraneenne</h3>
-                            <p>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
-                            <div>
-                                <span>Vegetarien</span>
-                                <span>Healthy</span>
-                                <span>Rapide</span>
-                            </div>
-                            <div>
-                                <div>
-                                    <div>4.8</div>
-                                    <div>Note</div>
-                                </div>
-                                <div>
-                                    <div>2</div>
-                                    <div>Portions</div>
-                                </div>
-                                <div>
-                                    <div>285</div>
-                                    <div>Calories</div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <button>Voir la recette</button>
-                                <button>+ Liste</button>
-                            </div>
-                        </div>
-                    </article>
-
-                    {/* Recette 4 */}
-                    <article>
-                        <div>
-                            🥗
-                            <span>Facile</span>
-                            <span>⏱️ 15 min</span>
-                        </div>
-                        <div>
-                            <h3>Salade Mediteraneenne</h3>
-                            <p>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
-                            <div>
-                                <span>Vegetarien</span>
-                                <span>Healthy</span>
-                                <span>Rapide</span>
-                            </div>
-                            <div>
-                                <div>
-                                    <div>4.8</div>
-                                    <div>Note</div>
-                                </div>
-                                <div>
-                                    <div>2</div>
-                                    <div>Portions</div>
-                                </div>
-                                <div>
-                                    <div>285</div>
-                                    <div>Calories</div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <button>Voir la recette</button>
-                                <button>+ Liste</button>
-                            </div>
-                        </div>
-                    </article>
-
                 </div>
             </main>
         </div>
