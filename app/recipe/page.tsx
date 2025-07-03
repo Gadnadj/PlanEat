@@ -10,22 +10,21 @@ const page = () => {
     const recipeImage = 'w-full h-[220px] bg-gradient-to-br from-[#7cb342] to-[#558b2f] flex items-center justify-center text-6xl text-white relative'
     const recipeDifficulty = 'absolute top-4 right-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] font-bold';
     const recipeTime = 'absolute bottom-4 left-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] flex items-center gap-[0.3rem]';
-    const articleInfo = 'p-6';
-    const recipeTitle = '';
-    const recipeDescription = '';
-    const recipeTags = '';
-    const recipeStats = '';
-    const statItem = '';
-    const statValue = '';
-    const statLabel = '';
-    const recipeAction = '';
-    const recipeButton = '';
-
+    const recipeInfo = 'p-6';
+    const recipeTitle = 'text-[#7cb342] mb-[0.8rem] text-[1.4rem] font-bold';
+    const recipeDescription = 'text-[#b0b0b0] mb-4 text-base leading-relaxed';
+    const recipeTags = 'flex gap-2 mb-[1.5rem] wrap';
+    const recipeTagss = 'bg-[#404040] text-[#e0e0e0] py-[0.3rem] px-[0.8rem] rounded-[12px] text-[0.8rem]'
+    const recipeStats = 'flex justify-between items-center mb-6 p-4 bg-[rgba(124,179,66,0.1)] rounded-[8px]';
+    const statItem = 'text-center';
+    const statValue = 'font-bold text-[#7cb342] text-[1.1rem]';
+    const statLabel = 'text-[0.8rem] text-[#b0b0b0]';
+    const recipeAction = 'flex gap-2';
 
     return (
         <div>
             <header className='max-w-[1400px] mx-auto p-8 text-center'>
-                <h1 className='text-[2.5rem] text-[#7cb342] mb-4'>
+                <h1 className='text-[2.5rem] text-[#7cb342] mb-4 max-md:text-[2rem]'>
                     Decouvrez nos recettes
                 </h1>
 
@@ -120,13 +119,13 @@ const page = () => {
                             <span className={recipeDifficulty}>Facile</span>
                             <span className={recipeTime}>⏱️ 15 min</span>
                         </div>
-                        <div className={articleInfo}>
-                            <h3 className={recipeTitle}>alade Mediteraneenne</h3>
+                        <div className={recipeInfo}>
+                            <h3 className={recipeTitle}>Salade Mediteraneenne</h3>
                             <p className={recipeDescription}>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.</p>
                             <div className={recipeTags}>
-                                <span className={recipeTag}>Vegetarien</span>
-                                <span className={recipeTag}>Healthy</span>
-                                <span className={recipeTag}>Rapide</span>
+                                <span className={recipeTagss}>Vegetarien</span>
+                                <span className={recipeTagss}>Healthy</span>
+                                <span className={recipeTagss}>Rapide</span>
                             </div>
                             <div className={recipeStats}>
                                 <div className={statItem}>
@@ -137,15 +136,15 @@ const page = () => {
                                     <div className={statValue}>2</div>
                                     <div className={statLabel}>Portions</div>
                                 </div>
-                                <div>
+                                <div className={statItem}>
                                     <div className={statValue}>285</div>
                                     <div className={statLabel}>Calories</div>
                                 </div>
                             </div>
 
                             <div className={recipeAction}>
-                                <button className={recipeButton}>Voir la recette</button>
-                                <button className={recipeButton}>+ Liste</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#558b2f] hover:to-[#33691e] bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white'>Voir la recette</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                             </div>
                         </div>
                     </article>
