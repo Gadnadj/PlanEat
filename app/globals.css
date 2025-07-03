@@ -29,7 +29,7 @@ body {
 }
 
 .nav-link::after {
-  @apply content-[''] absolute -bottom-[5px] left-0 w-0 h-0.5 bg-[#7cb342] transition-all duration-300 ease-in-out;
+  @apply content-[''] absolute -bottom-[5px] left-0 w-0 h-0.5 bg-[#3b82f6] transition-all duration-300 ease-in-out;
 }
 
 .nav-link:hover::after {
@@ -37,7 +37,7 @@ body {
 }
 
 .welcome-title {
-  @apply text-4xl mb-4 text-[#7cb342] max-md:text-3xl max-sm:text-[1.8rem] font-bold;
+  @apply text-4xl mb-4 text-[#3b82f6] max-md:text-3xl max-sm:text-[1.8rem] font-bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 

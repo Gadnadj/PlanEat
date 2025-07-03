@@ -3,28 +3,28 @@ import React from 'react'
 const page = () => {
 
     const label = 'text-[0.8rem] text-[#b0b0b0] font-medium';
-    const select = 'px-4 py-3 bg-[#3a3a3a] border border-[#404040] rounded-lg text-[#e0e0e0] cursor-pointer transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#7cb342]'
-    const filterTag = 'bg-[#7cb342] text-white py-2 px-4 rounded-[20px] text-sm cursor-pointer transition-all duration-300 ease-in-out hover:bg-[#558b2f]'
-    // const activeCLass = 'bg-[#558b2f] shadow-[0_2px_8px_rgba(124,179,66,0.3)]';
-    const recipeTag = 'bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-[15px] overflow-hidden transition-all duration-300 ease-in-out border border-[#404040] relative hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:border-[#7cb342]';
-    const recipeImage = 'w-full h-[220px] bg-gradient-to-br from-[#7cb342] to-[#558b2f] flex items-center justify-center text-6xl text-white relative'
+    const select = 'px-4 py-3 bg-[#3a3a3a] border border-[#404040] rounded-lg text-[#e0e0e0] cursor-pointer transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]'
+    const filterTag = 'bg-[#3b82f6] text-white py-2 px-4 rounded-[20px] text-sm cursor-pointer transition-all duration-300 ease-in-out hover:bg-[#64748b]'
+    // const activeCLass = 'bg-[#64748b] shadow-[0_2px_8px_rgba(124,179,66,0.3)]';
+    const recipeTag = 'bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-[15px] overflow-hidden transition-all duration-300 ease-in-out border border-[#404040] relative hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:border-[#3b82f6]';
+    const recipeImage = 'w-full h-[220px] bg-gradient-to-br from-[#3b82f6] to-[#64748b] flex items-center justify-center text-6xl text-white relative'
     const recipeDifficulty = 'absolute top-4 right-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] font-bold';
     const recipeTime = 'absolute bottom-4 left-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] flex items-center gap-[0.3rem]';
     const recipeInfo = 'p-6';
-    const recipeTitle = 'text-[#7cb342] mb-[0.8rem] text-[1.4rem] font-bold';
+    const recipeTitle = 'text-[#3b82f6] mb-[0.8rem] text-[1.4rem] font-bold';
     const recipeDescription = 'text-[#b0b0b0] mb-4 text-base leading-relaxed';
     const recipeTags = 'flex gap-2 mb-[1.5rem] wrap';
     const recipeTagss = 'bg-[#404040] text-[#e0e0e0] py-[0.3rem] px-[0.8rem] rounded-[12px] text-[0.8rem]'
     const recipeStats = 'flex justify-between items-center mb-6 p-4 bg-[rgba(124,179,66,0.1)] rounded-[8px]';
     const statItem = 'text-center';
-    const statValue = 'font-bold text-[#7cb342] text-[1.1rem]';
+    const statValue = 'font-bold text-[#3b82f6] text-[1.1rem]';
     const statLabel = 'text-[0.8rem] text-[#b0b0b0]';
     const recipeAction = 'flex gap-2 max-md:flex-col';
 
     return (
         <div>
             <header className='max-w-[1400px] mx-auto p-8 text-center max-sm:pl-4 max-sm:pr-4'>
-                <h1 className='text-[2.5rem] text-[#7cb342] mb-4 max-md:text-[2rem] font-bold'>
+                <h1 className='text-[2.5rem] text-[#3b82f6] mb-4 max-md:text-[2rem] font-bold'>
                     🍳 Decouvrez nos recettes
                 </h1>
 
@@ -36,8 +36,8 @@ const page = () => {
             {/* Recherche et Filtrer */}
             <section className='max-w-[1400px] mx-auto px-8 pb-8 bg-[#2a2a2a] rounded-[15px] mb-8 shadow-[0_4px_15px_rgba(0,0,0,0.2)] max-sm:pl-4 max-sm:pr-4'>
                 <div className='py-8 pt-8 pb-4 flex gap-4 items-center max-md:flex-col'>
-                    <input className='flex-1 px-6 py-4 bg-[#3a3a3a] border-2 border-[#404040] rounded-[10px] text-[#e0e0e0] text-base transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#7cb342]' type="text" placeholder='Rechercher une recette, un ingredient...' />
-                    <button className='bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white border-none px-8 py-4 rounded-[10px] font-bold cursor-pointer transition-all duration-300 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'>🔍 Rechercher</button>
+                    <input className='flex-1 px-6 py-4 bg-[#3a3a3a] border-2 border-[#404040] rounded-[10px] text-[#e0e0e0] text-base transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]' type="text" placeholder='Rechercher une recette, un ingredient...' />
+                    <button className='bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white border-none px-8 py-4 rounded-[10px] font-bold cursor-pointer transition-all duration-300 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'>🔍 Rechercher</button>
                 </div>
 
                 <div className='flex gap-4 flex-wrap pb-4 max-md:flex-col max-md:gap-4'>
@@ -143,7 +143,7 @@ const page = () => {
                             </div>
 
                             <div className={recipeAction}>
-                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#558b2f] hover:to-[#33691e] bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white'>Voir la recette</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#64748b] hover:to-[#33691e] bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
                                 <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                             </div>
                         </div>
@@ -180,7 +180,7 @@ const page = () => {
                             </div>
 
                             <div className={recipeAction}>
-                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#558b2f] hover:to-[#33691e] bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white'>Voir la recette</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#64748b] hover:to-[#33691e] bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
                                 <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                             </div>
                         </div>
@@ -217,7 +217,7 @@ const page = () => {
                             </div>
 
                             <div className={recipeAction}>
-                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#558b2f] hover:to-[#33691e] bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white'>Voir la recette</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#64748b] hover:to-[#33691e] bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
                                 <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                             </div>
                         </div>
@@ -254,7 +254,7 @@ const page = () => {
                             </div>
 
                             <div className={recipeAction}>
-                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#558b2f] hover:to-[#33691e] bg-gradient-to-br from-[#7cb342] to-[#558b2f] text-white'>Voir la recette</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#64748b] hover:to-[#33691e] bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
                                 <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                             </div>
                         </div>
