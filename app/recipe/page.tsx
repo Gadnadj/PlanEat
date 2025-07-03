@@ -15,7 +15,7 @@ const page = () => {
     const recipeDescription = 'text-[#b0b0b0] mb-4 text-base leading-relaxed';
     const recipeTags = 'flex gap-2 mb-[1.5rem] wrap';
     const recipeTagss = 'bg-[#404040] text-[#e0e0e0] py-[0.3rem] px-[0.8rem] rounded-[12px] text-[0.8rem]'
-    const recipeStats = 'flex justify-between items-center mb-6 p-4 bg-[rgba(124,179,66,0.1)] rounded-[8px]';
+    const recipeStats = 'flex justify-between items-center mb-6 p-4 bg-[rgba(30,41,59,0.4)] rounded-[8px]';
     const statItem = 'text-center';
     const statValue = 'font-bold text-[#3b82f6] text-[1.1rem]';
     const statLabel = 'text-[0.8rem] text-[#b0b0b0]';
@@ -143,7 +143,7 @@ const page = () => {
                             </div>
 
                             <div className={recipeAction}>
-                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#64748b] hover:to-[#33691e] bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:to-blue-700 bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
                                 <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                             </div>
                         </div>
@@ -180,7 +180,7 @@ const page = () => {
                             </div>
 
                             <div className={recipeAction}>
-                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#64748b] hover:to-[#33691e] bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:to-blue-700 bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
                                 <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                             </div>
                         </div>
@@ -217,7 +217,7 @@ const page = () => {
                             </div>
 
                             <div className={recipeAction}>
-                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#64748b] hover:to-[#33691e] bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:to-blue-700 bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
                                 <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                             </div>
                         </div>
@@ -254,7 +254,7 @@ const page = () => {
                             </div>
 
                             <div className={recipeAction}>
-                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-gradient-to-br hover:from-[#64748b] hover:to-[#33691e] bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
+                                <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:to-blue-700 bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white'>Voir la recette</button>
                                 <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                             </div>
                         </div>

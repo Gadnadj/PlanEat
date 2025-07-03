@@ -14,7 +14,7 @@ export default function Home() {
   const addToList = 'bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white border-none py-3 px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out w-full hover:-translate-y-0.5 hover:bg-gradient-to-br hover:blue-blue-600 hover:to-blue-700';
   const shoppingItem = 'bg-[#3a3a3a] p-4 mb-2 rounded-lg border-l-4 border-l-[#3b82f6] transition-all duration-300 ease-out hover:bg-[#404040] hover:-translate-x-[5px]'
 
-  const [empty, setEmpty] = useState(true);
+  const [empty] = useState(true);
 
   return (
     <div className="max-w-6xl mx-auto p-8 grid grid-cols-[1fr_350px] gap-8 max-md:grid-cols-1 max-md:gap-4">
