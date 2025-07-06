@@ -1,58 +1,64 @@
 import React from 'react'
 
+const statItem = 'text-center bg-[rgba(124,179,66,0.1)] p-4 rounded-[12px] border border-[rgba(124,179,66,0.2)]';
+const statValue = 'font-bold text-[#3b82f6] text-[1.3rem] block';
+const statLabel = 'text-[0.85rem] text-[#b0b0b0] mt-[0.3rem]';
+const buttonAction = 'flex-1 py-4 px-6 border-none font-bold cursor-pointer transition-all duration-300 ease-in-out text-[1rem] hover:-translate-y-(2px) hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)]';
+const buttonPrimary = 'bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white hover:bg-linear-to-br hover:from-[#558b2f] hover:to-[#33691e]'
+const buttonSecondary = 'bg-[#404040] text-[#e0e0e0] border-2 border-[#505050] hover:bg-[#505050] hover:border-[#606060]'
 
 const page = () => {
     return (
-        <div>
+        <div className='max-w-[1400px] mx-auto px-8 py-12 grid [grid-template-columns:1fr_350px] gap-12'>
             <main>
-                <header>
-                    <div>
+                <header className='bg-linear-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-[20px] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)] mb-8'>
+                    <div className='relative h-[400px] bg-linear-to-br from-[#3b82f6] to-[#64748b] flex justify-center items-center text-[8rem] text-white'>
                         🥗
-                        <span>Facile</span>
-                        <span>15 min</span>
+                        <span className='absolute top-6 right-6 bg-[rgba(76,89,175,0.9)] text-white px-4 py-2 rounded-[20px] text-[0.9rem] font-bold '>Facile</span>
+                        <span className='absolute bottom-6 left-6 bg-black/80 text-white px-4 py-2 rounded-[20px] text-[0.9rem] flex items-center gap-2'>15 min</span>
                     </div>
 
-                    <div>
-                        <h1>Salade Mediterraneenne</h1>
-                        <p>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.
+                    <div className='p-8'>
+                        <h1 className='text-[2.5rem] text-[#3b82f6] mb-4 font-bold'>Salade Mediterraneenne</h1>
+                        <p className='text-[1.1rem] text-[#b0b0b0] mb-8 leading-[1.7]'>Une salade fraîche et colorée aux saveurs méditerranéennes, parfaite pour l été.
                             Cette recette combine les meilleurs ingrédients de la cuisine méditerranéenne pour
                             un plat sain, savoureux et rafraîchissant qui vous transportera directement sur les
                             côtes ensoleillées de la Méditerranée.
                         </p>
 
-                        <div>
-                            <span>Vegetarien</span>
-                            <span>Healthy</span>
-                            <span>Rapide</span>
-                            <span>Sans cussion</span>
+                        <div className='flex gap-[0.7rem] mb-8 flex-wrap'>
+                            <span className='bg-[#404040] text-[#b0b0b0] px-4 py-2 rounded-[15px] text-[0.9rem] font-medium'>Vegetarien</span>
+                            <span className='bg-[#404040] text-[#b0b0b0] px-4 py-2 rounded-[15px] text-[0.9rem] font-medium'>Healthy</span>
+                            <span className='bg-[#404040] text-[#b0b0b0] px-4 py-2 rounded-[15px] text-[0.9rem] font-medium'>Rapide</span>
+                            <span className='bg-[#404040] text-[#b0b0b0] px-4 py-2 rounded-[15px] text-[0.9rem] font-medium'>Sans cussion</span>
                         </div>
 
-                        <div>
-                            <div>
-                                <span>4.8</span>
-                                <span>Note</span>
+                        <div className='grid [grid-template-columns:1fr_1fr_1fr_1fr] gap-4 mb-8'>
+                            <div className={statItem}>
+                                <span className={statValue}>4.8</span>
+                                <span className={statLabel}>Note</span>
                             </div>
 
-                            <div>
-                                <span>2</span>
-                                <span>Portions</span>
+                            <div className={statItem}>
+                                <span className={statValue}>2</span>
+                                <span className={statLabel}>Portions</span>
                             </div>
 
-                            <div>
-                                <span>285</span>
-                                <span>Calories</span>
+                            <div className={statItem}>
+                                <span className={statValue}>285</span>
+                                <span className={statLabel}>Calories</span>
                             </div>
 
-                            <div>
-                                <span>15 min</span>
-                                <span>Preparation</span>
+                            <div className={statItem}>
+                                <span className={statValue}>15 min</span>
+                                <span className={statLabel}>Preparation</span>
                             </div>
                         </div>
 
-                        <div>
-                            <button>Ajouter au planing</button>
-                            <button>❤️ Favoris</button>
-                            <button>📤 Partager</button>
+                        <div className='flex gap-4'>
+                            <button className={`${buttonAction} ${buttonPrimary}`}>Ajouter au planing</button>
+                            <button className={`${buttonAction} ${buttonSecondary}`}>❤️ Favoris</button>
+                            <button className={`${buttonAction} ${buttonSecondary}`}>📤 Partager</button>
                         </div>
                     </div>
                 </header>
