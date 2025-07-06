@@ -1,0 +1,20 @@
+export const styles = {
+    label: 'text-[0.8rem] text-[#b0b0b0] font-medium',
+    select: 'px-4 py-3 bg-[#3a3a3a] border border-[#404040] rounded-lg text-[#e0e0e0] cursor-pointer transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]',
+    filterTag: 'bg-[#3b82f6] text-white py-2 px-4 rounded-[20px] text-sm cursor-pointer transition-all duration-300 ease-in-out hover:bg-[#64748b]',
+    recipeTag: 'bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-[15px] overflow-hidden transition-all duration-300 ease-in-out border border-[#404040] relative hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:border-[#3b82f6]',
+    recipeImage: 'w-full h-[220px] bg-gradient-to-br from-[#3b82f6] to-[#64748b] flex items-center justify-center text-6xl text-white relative',
+    recipeDifficulty: 'absolute top-4 right-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] font-bold',
+    recipeTime: 'absolute bottom-4 left-4 bg-[rgba(0,0,0,0.7)] text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] flex items-center gap-[0.3rem]',
+    recipeInfo: 'p-6',
+    recipeTitle: 'text-[#3b82f6] mb-[0.8rem] text-[1.4rem] font-bold',
+    recipeDescription: 'text-[#b0b0b0] mb-4 text-base leading-relaxed',
+    recipeTags: 'flex gap-2 mb-[1.5rem] wrap',
+    recipeTagss: 'bg-[#404040] text-[#e0e0e0] py-[0.3rem] px-[0.8rem] rounded-[12px] text-[0.8rem]',
+    recipeStats: 'flex justify-between items-center mb-6 p-4 bg-[rgba(30,41,59,0.4)] rounded-[8px]',
+    statItem: 'text-center',
+    statValue: 'font-bold text-[#3b82f6] text-[1.1rem]',
+    statLabel: 'text-[0.8rem] text-[#b0b0b0]',
+    recipeAction: 'flex gap-2 max-md:flex-col',
+    // const activeCLass = 'bg-[#64748b] shadow-[0_2px_8px_rgba(124,179,66,0.3)]';
+}
