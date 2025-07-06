@@ -4,10 +4,6 @@ import Search from '@/components/ReceipePage/Search'
 import React from 'react'
 
 const page = () => {
-
-
-
-
     return (
         <div>
             <Header />
@@ -16,5 +12,4 @@ const page = () => {
         </div>
     )
 }
-
 export default page
