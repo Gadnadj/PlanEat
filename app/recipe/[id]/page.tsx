@@ -1,5 +1,6 @@
 import Header from '@/components/RecipeIdPage/Headers';
 import Ingredients from '@/components/RecipeIdPage/Ingredients';
+import Nutrition from '@/components/RecipeIdPage/Nutrition';
 import Preparation from '@/components/RecipeIdPage/Preparation';
 import React from 'react'
 
@@ -17,7 +18,7 @@ const page = () => {
             </main>
 
             <aside className='flex flex-col gap-6 max-sm:p-4'>
-                
+                <Nutrition />
             </aside>
         </div>
     )
