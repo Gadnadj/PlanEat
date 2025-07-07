@@ -4,7 +4,7 @@ const statItem = 'text-center bg-[rgba(124,179,66,0.1)] p-4 rounded-[12px] borde
 const statValue = 'font-bold text-[#3b82f6] text-[1.3rem] block';
 const statLabel = 'text-[0.85rem] text-[#b0b0b0] mt-[0.3rem]';
 const buttonAction = 'flex-1 py-4 px-6 border-none font-bold cursor-pointer transition-all duration-300 ease-in-out text-[1rem] hover:-translate-y-(2px) hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)]';
-const buttonPrimary = 'bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white hover:bg-linear-to-br hover:from-[#558b2f] hover:to-[#33691e]'
+const buttonPrimary = 'bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white hover:bg-linear-to-br hover:from-blue-500 hover:to-blue-600'
 const buttonSecondary = 'bg-[#404040] text-[#e0e0e0] border-2 border-[#505050] hover:bg-[#505050] hover:border-[#606060]'
 
 const page = () => {
