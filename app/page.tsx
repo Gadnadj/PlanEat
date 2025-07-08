@@ -17,7 +17,7 @@ export default function Home() {
   const [empty] = useState(true);
 
   return (
-    <div className="max-w-6xl mx-auto p-8 grid grid-cols-[1fr_350px] gap-8 max-md:grid-cols-1 max-md:gap-4">
+    <div className="max-w-6xl mx-auto p-8 grid grid-cols-[1fr] gap-8 max-md:grid-cols-1 max-md:gap-4">
       <main className="flex flex-col gap-8">
         {/* MAIN CONTAINER */}
         <section className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-12 text-center shadow-xl rounded-lg max-md:p-8 max-sm:p-6">
