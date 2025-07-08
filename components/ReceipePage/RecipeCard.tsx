@@ -1,5 +1,10 @@
+"use client"
+import { useRouter } from 'next/navigation'
 import { styles } from "./styles";
 const RecipeCard = () => {
+
+    const router = useRouter();
+
     return (
         <div className='grid gap-8 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))] max-md:grid-cols-1  max-sm:pl-4 max-sm:pr-4'>
             {/* Recette 1 */}
@@ -33,7 +38,7 @@ const RecipeCard = () => {
                     </div>
 
                     <div className={styles.recipeAction}>
-                        <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] bg-gradient-to-br from-[#3b82f6] to-[#64748b] hover:to-blue-700 text-white'>Voir la recette</button>
+                        <button onClick={() => router.push('/recipe/555')} className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] bg-gradient-to-br from-[#3b82f6] to-[#64748b] hover:to-blue-700 text-white'>Voir la recette</button>
                         <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>+ Liste</button>
                     </div>
                 </div>
