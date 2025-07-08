@@ -5,7 +5,7 @@ const page = () => {
     const statItem = 'text-center';
     const statValue = 'text-[1.5rem] font-bold text-[#3b82f6]';
     const statLabel = 'text-[0.9rem] text-[#b0b0b0]';
-    const actionButton = 'bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white border-none py-[0.8rem] px-6 rounded-[10px] cursor-pointer font-bold transition-all duration-300 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(30,56,59,0.4)]';
+    const actionButton = 'bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white border-none py-[0.8rem] px-6 rounded-[10px] cursor-pointer font-bold transition-all duration-300 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(30,56,59,0.4)] max-sm:w-full';
     const actionButtonSecondary = 'bg-linear-to-br from-[#404040] to-[#2a2a2a] hover:bg-linear-to-br hover:from-[#505050] hover:to-[#3a3a3a]';
     const actionButtonDanger = 'bg-linear-to-br from-[#d32d2d] to-[#b71c1c] hover:bg-linear-to-br hover:from-[#f44336] hover:to-[#d32d2d]';
     const categoryButton = 'bg-[#3a3a3a] text-[#b0b0b0] border-none py-2 px-4 border-[20px] cursor-pointer text-[0.8rem] transition-all duration-300 ease-in-out hover:bg-linear-to-br hover:from-[#3b82f6] hover:to-[#64748b]';
@@ -33,7 +33,7 @@ const page = () => {
     return (
         <>
             <header className='max-w-[1400px] mx-auto p-8 text-center max-sm:pl-4 max-sm:pr-4'>
-                <h1 className='text-[2.5rem] text-[#3b82f6] mb-4 max-md:text-[2rem]'>🛒 Liste de courses</h1>
+                <h1 className='text-[2.5rem] text-[#3b82f6] mb-4 max-md:text-[2rem] max-sm:text-[1.8rem]'>🛒 Liste de courses</h1>
                 <p className='text-[1.2rem] text-[#b0b0b0] max-w-[600px] mx-auto'>Organisez vos achats efficacement et ne manquez plus jamais d ingrédients.</p>
             </header>
 
@@ -60,7 +60,7 @@ const page = () => {
                     </div>
                 </div>
 
-                <div className='flex gap-4 max-md:justify-center max-md:flex-wrap'>
+                <div className='flex gap-4 max-md:justify-center max-md:flex-wrap max-sm:flex-col max-sm:w-full'>
                     <button className={actionButton}>📱 Partager</button>
                     <button className={`${actionButton} ${actionButtonSecondary}`}>📄 Imprimer</button>
                     <button className={`${actionButton} ${actionButtonDanger}`}>🗑️ Vider</button>
@@ -73,7 +73,7 @@ const page = () => {
                         <h2 className='text-[#3b82f6] text-[1.5rem] font-bold'>Ma liste de courses</h2>
                     </div>
 
-                    <div className='flex gap-2 mb-8'>
+                    <div className='flex gap-2 mb-8 max-sm:flex-col'>
                         <input className='flex-1 bg-[#3a3a3a] border-2 border-[#505050] rounded-[10px] p-[0.8rem] text-[#e0e0e0] text-[1rem] transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]' type="text" placeholder='Ajouter un article...' />
                         <button className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white border-none py-[0.8rem] px-6 rounded-[10px] cursor-pointer font-bold transition-all duration-300 ease-in-out hover:scale-105'>➕ Ajouter</button>
                     </div>
@@ -129,7 +129,7 @@ const page = () => {
                                 <div className={itemName}>Olives noire</div>
                                 <div className={itemDetails}>
                                     <span className={itemCategory}>Épicerie</span>
-                                    <span>1 pot • ~4€</span>
+                                    <span>1 pot • ~4$</span>
                                 </div>
                             </div>
 
@@ -163,7 +163,7 @@ const page = () => {
                                 <div className={itemName}>Pâtes penne</div>
                                 <div className={itemDetails}>
                                     <span className={itemCategory}>Épicerie</span>
-                                    <span>500g • ~2€</span>
+                                    <span>500g • ~2$</span>
                                 </div>
                             </div>
 
@@ -181,7 +181,7 @@ const page = () => {
                                 <div className={itemName}>Basilic frais</div>
                                 <div className={itemDetails}>
                                     <span className={itemCategory}>Fruits & Legumes</span>
-                                    <span>1 bouquet • ~2€</span>
+                                    <span>1 bouquet • ~2$</span>
                                 </div>
                             </div>
 
