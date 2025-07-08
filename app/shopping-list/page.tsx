@@ -17,12 +17,14 @@ const page = () => {
     const checkmark = 'text-white font-bold text-[0.8rem]';
     const itemContent = 'flex-1 flex flex-col';
     const itemName = 'font-bold text-[#e0e0e0] mb-[0.2rem]';
-    const itemDetails = 'text-[0.8rem] text-[#b0b0b0] flex gap-4';
+    const itemDetails = 'text-[0.8rem] text-[#b0b0b0] flex gap-4 max-md:flex-col max-md:gap-2';
     const itemCategory = 'bg-[rgba(124, 179, 66, 0.2)] text-[#3b82f6] py-[0.1rem] px-2 rounded-[10px] text-[0.7rem]';
     const itemActions = 'flex gap-2';
     const itemActionButton = 'bg-[#505050] text-white border-none py-[0.4rem] px-[0.6rem] rounded-[5px] cursor-pointer text-[0.7rem] transition-all duration-300 ease-in-out hover:bg-[#3b82f6]';
     const itemDeleteButton = 'hover:bg-[#d32f2f]';
     const summaryStat = 'flex justify-between items-center py-2 px-0 border-b-1 border-b-[#404040]';
+    const summaryLabel = 'text-[#b0b0b0] text-[0.9rem]';
+    const summaryValue = 'text-[#3b82f6] font-bold';
 
 
 
@@ -30,13 +32,13 @@ const page = () => {
 
     return (
         <>
-            <header className='max-w-[1400px] mx-auto p-8 text-center'>
-                <h1 className='text-[2.5rem] text-[#3b82f6] mb-4'>🛒 Liste de courses</h1>
+            <header className='max-w-[1400px] mx-auto p-8 text-center max-sm:pl-4 max-sm:pr-4'>
+                <h1 className='text-[2.5rem] text-[#3b82f6] mb-4 max-md:text-[2rem]'>🛒 Liste de courses</h1>
                 <p className='text-[1.2rem] text-[#b0b0b0] max-w-[600px] mx-auto'>Organisez vos achats efficacement et ne manquez plus jamais d ingrédients.</p>
             </header>
 
-            <section className='max-w-[1400px] mx-auto pt-0 px-8 pb-8 flex gap-4 items-center justify-between flex-wrap'>
-                <div className='flex gap-8 items-center bg-[#2a2a2a] py-4 px-8 rounded-[15px] shadow-[0_4px_15px_rgba(0,0,0,0.2)]'>
+            <section className='max-w-[1400px] mx-auto pt-0 px-8 pb-8 flex gap-4 items-center justify-between flex-wrap max-md:flex-col max-md:gap-4  max-sm:pl-4 max-sm:pr-4'>
+                <div className='flex gap-8 items-center bg-[#2a2a2a] py-4 px-8 rounded-[15px] shadow-[0_4px_15px_rgba(0,0,0,0.2)] max-md:flex-col max-md:gap-4 max-md:text-center'>
                     <div className={statItem}>
                         <div className={statValue}>12</div>
                         <div className={statLabel}>Articles</div>
@@ -58,14 +60,14 @@ const page = () => {
                     </div>
                 </div>
 
-                <div className='flex gap-4'>
+                <div className='flex gap-4 max-md:justify-center max-md:flex-wrap'>
                     <button className={actionButton}>📱 Partager</button>
                     <button className={`${actionButton} ${actionButtonSecondary}`}>📄 Imprimer</button>
                     <button className={`${actionButton} ${actionButtonDanger}`}>🗑️ Vider</button>
                 </div>
             </section>
 
-            <div className='max-w-[1400px] mx-auto pt-0 py-8 px-8 grid grid-cols-[1fr_300px] gap-8'>
+            <div className='max-w-[1400px] mx-auto pt-0 py-8 px-8 grid grid-cols-[1fr_300px] gap-8 max-lg:grid-cols-1 max-md:pt-0 max-md:px-4 max-md:pb-8  max-sm:pl-4 max-sm:pr-4'>
                 <section className='bg-[#2a2a2a] rounded-[15px] p-8 shadow-[0_4px_15px_rgba(0,0,0,0.2)]'>
                     <div className='flex justify-between items-center mb-2'>
                         <h2 className='text-[#3b82f6] text-[1.5rem] font-bold'>Ma liste de courses</h2>
@@ -76,7 +78,7 @@ const page = () => {
                         <button className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white border-none py-[0.8rem] px-6 rounded-[10px] cursor-pointer font-bold transition-all duration-300 ease-in-out hover:scale-105'>➕ Ajouter</button>
                     </div>
 
-                    <div className='flex gap-2 mb-8 flex-wrap'>
+                    <div className='flex gap-2 mb-8 flex-wrap max-md:justify-center'>
                         <button className={categoryButton}>Tout</button>
                         <button className={categoryButton}>🥕 Fruits & Légumes</button>
                         <button className={categoryButton}>🥩 Viandes</button>
@@ -239,7 +241,7 @@ const page = () => {
                     </div>
                 </section>
 
-                <aside className='flex flex-col gap-6'>
+                <aside className='flex flex-col gap-6 max-lg:grid max-lg:grid-cols-[repaeat(auto-fit,_minmax(250px,_1fr))] max-md:grid-cols-1'>
                     <div className='bg-[#2a2a2a] rounded-[15px] p-6 shadow-[0_4px_15px_rgba(0.0.0.0.2)]'>
                         <h3 className='text-[#3b82f6] text-[1.2rem] font-bold mb-4'>📊 Résumé</h3>
                         <div className='flex flex-col gap-4'>
