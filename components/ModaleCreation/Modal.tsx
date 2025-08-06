@@ -1,4 +1,3 @@
-import { div } from 'framer-motion/client';
 import React from 'react'
 
 type Props = {
@@ -8,12 +7,12 @@ type Props = {
 const Modal = ({ onClose }: Props) => {
 
     const formSection = 'mb-8';
-    const formRow = '';
-    const formGroup = '';
-    const formLabel = '';
-    const formInput = '';
-    const formSelect = '';
-    const formTextArea = '';
+    const formRow = 'flex gap-4 mb-4';
+    const formGroup = 'flex-1';
+    const formLabel = 'block mb-2 text-[#b0b0b0] font-medium';
+    const formInput = 'w-full px-4 py-[0.8rem] bg-[#3a3a3a] border-2 border-solid border-[#404040] rounded-[10px] text-[#e0e0e0] text-[1rem] transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]';
+    const formSelect = 'w-full px-4 py-[0.8rem] bg-[#3a3a3a] border-2 border-solid border-[#404040] rounded-[10px] text-[#e0e0e0] text-[1rem] transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]';
+    const formTextArea = 'w-full px-4 py-[0.8rem] bg-[#3a3a3a] border-2 border-solid border-[#404040] rounded-[10px] text-[#e0e0e0] text-[1rem] transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]';
 
 
     return (
@@ -31,7 +30,7 @@ const Modal = ({ onClose }: Props) => {
                 <div className='p-8 text-[#e0e0e0]'>
                     <form>
                         <div className={formSection}>
-                            <h3 className='text-[#7cb342]'>
+                            <h3 className='text-[#3b82f6] mb-4 text-[1.2rem] flex items-center gap-2'>
                                 📝 Informations générales
                             </h3>
 
@@ -114,48 +113,51 @@ const Modal = ({ onClose }: Props) => {
                                 <label className={formLabel}>
                                     Ajoutez des tags (appuyez sur Entree pour valider)
                                 </label>
-                                <div>
-                                    <input type="text" placeholder='Tapez un tag...' />
+                                <div className='flex flex-wrap gap-2 px-4 py-2 bg-[#3a3a3a] border-2 border-solid border-[#404040] rounded-[10px] min-h-[40px] cursor-text focus-within:border-[#3b82f6]'>
+                                    <input className={formInput} type="text" placeholder='Tapez un tag...' />
                                 </div>
                             </div>
                         </div>
 
                         <div className={formSection}>
-                            <h3>
+                            <h3 className='text-[#3b82f6] mb-4 text-[1.2rem] flex items-center gap-2'>
                                 🥕 Ingrédients
                             </h3>
 
                             <div className={formRow}>
                                 <div className={formGroup}>
-                                    <input type="text" placeholder='Nom de l ingredient' />
+                                    <input className={formInput} type="text" placeholder='Nom de l ingredient' />
                                 </div>
 
 
                                 <div className={formGroup}>
-                                    <input type="text" placeholder='Quantite' />
+                                    <input className={formInput} type="text" placeholder='Quantite' />
                                 </div>
                             </div>
 
-                            <button>
+                            <button className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white border-none px-6 py-[0.8rem] rounded-[10px] font-bold cursor-pointer transition-all duration-300 ease-in-out flex items-center gap-2 mt-4 hover:-translate-y-[-2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'>
                                 + Ajouter l ingredient
                             </button>
 
-                            <div>
+                            <div className='bg-[#3a3a3a] border-2 border-solid border-[#404040] rounded-[10px] p-4 max-h-[200px] overflow-y-auto'>
 
                             </div>
                         </div>
 
                         <div className={formSection}>
-                            <h3>
+                            <h3 className='text-[#3b82f6] mb-4 text-[1.2rem] flex items-center gap-2'>
                                 📋 Étapes de préparation
                             </h3>
                             <div className={formGroup}>
-                                <textarea placeholder='Décrivez l étape de préparation...'></textarea>
+                                <textarea className={formTextArea} placeholder='Décrivez l étape de préparation...'></textarea>
                             </div>
 
-                            <button>+ Ajouter l etape</button>
+                            <button className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white border-none px-6 py-[0.8rem] rounded-[10px] font-bold cursor-pointer transition-all duration-300 ease-in-out flex items-center gap-2 mt-4 hover:-translate-y-[-2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'>
 
-                            <div>
+                                + Ajouter l etape
+                            </button>
+
+                            <div className='bg-[#3a3a3a] border-2 border-solid border-[#404040] rounded-[10px] p-4 max-h-[300px] overflow-y-auto'>
 
                             </div>
 
@@ -164,9 +166,9 @@ const Modal = ({ onClose }: Props) => {
                 </div>
 
 
-                <div>
-                    <button>Annuler</button>
-                    <button>💾 Sauvegarder la recette</button>
+                <div className='px-8 py-6 border-t-1 border-solid border-[#404040] flex gap-4 justify-end'>
+                    <button className='bg-[#404040] text-[#e0e0e0] border-none px-8 py-4 rounded-[10px] font-bold cursor-pointer transition-all duration-300 ease-in-out hover:bg-[#505050]'>Annuler</button>
+                    <button className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white border-none px-8 py-4 rounded-[10px] font-bold cursor-pointer transition-all duration-300 ease-in-out hover:bg-linear-to-br hover:from-[#3b82f6] hover:to-[#64748b] hover:-translate-y-[-2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'>💾 Sauvegarder la recette</button>
                 </div>
             </div>
         </div>
