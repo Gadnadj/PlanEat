@@ -35,7 +35,8 @@ const UserSchema = new Schema<IUser>({
   timestamps: true, // Ajoute automatiquement createdAt et updatedAt
   toJSON: {
     transform: function(doc, ret) {
-      delete ret.password;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (ret as any).password;
       return ret;
     }
   }
@@ -47,7 +48,8 @@ UserSchema.index({ email: 1 });
 // Middleware pour supprimer le mot de passe des réponses JSON
 UserSchema.methods.toJSON = function() {
   const userObject = this.toObject();
-  delete userObject.password;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  delete (userObject as any).password;
   return userObject;
 };
 
