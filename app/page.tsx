@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
 
@@ -30,9 +31,11 @@ export default function Home() {
             Obtenez des suggestions personnalisees, optimisez vos courses et savourez chaque repas.
           </p>
 
-          <button className="bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white px-8 py-4 border-none rounded-full text-lg font-bold cursor-pointer transition-all duration-300 ease-in-out shadow-xs hover:-translate-y-0.5 hover:shadow-lg shadow-blue-900 hover:to-blue-700">
-            Commencer
-          </button>
+          <Link href="/preferences">
+            <button className="bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white px-8 py-4 border-none rounded-full text-lg font-bold cursor-pointer transition-all duration-300 ease-in-out shadow-xs hover:-translate-y-0.5 hover:shadow-lg shadow-blue-900 hover:to-blue-700">
+              Commencer
+            </button>
+          </Link>
         </section>
 
         {/* RECEIPE SECTION */}
