@@ -1,15 +1,18 @@
+"use client"
 import ActionButton from '@/components/ShoppingList/ActionButtons'
 import Headers from '@/components/ShoppingList/Headers'
 import CategoryFilters from '@/components/ShoppingList/ShoppingList/CategoryFilters'
 import ShoppingItem from '@/components/ShoppingList/ShoppingList/ShoppingItem'
 import StatSection from '@/components/ShoppingList/StatSection'
 import Summary from '@/components/ShoppingList/Summary'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import React from 'react'
 
 const page = () => {
 
     return (
-        <>
+        <ProtectedRoute>
+            <>
             <Headers />
 
             <section className='max-w-[1400px] mx-auto pt-0 px-8 pb-8 flex gap-4 items-center justify-between flex-wrap max-md:flex-col max-md:gap-4  max-sm:pl-4 max-sm:pr-4'>
@@ -47,7 +50,8 @@ const page = () => {
                     <Summary />
                 </aside>
             </div>
-        </>
+            </>
+        </ProtectedRoute>
     )
 }
 

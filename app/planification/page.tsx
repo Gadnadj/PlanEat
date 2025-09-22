@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function PlanificationPage() {
   const [selectedDay, setSelectedDay] = useState<string>("lundi");
@@ -222,7 +223,8 @@ export default function PlanificationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] py-8">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] py-8">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
@@ -310,6 +312,7 @@ export default function PlanificationPage() {
           </Link>
         </div>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }

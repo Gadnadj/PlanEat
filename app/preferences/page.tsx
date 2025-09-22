@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function PreferencesPage() {
   const router = useRouter();
@@ -86,7 +87,8 @@ export default function PreferencesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] py-8">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
@@ -355,6 +357,7 @@ export default function PreferencesPage() {
           </Link>
         </div>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }
