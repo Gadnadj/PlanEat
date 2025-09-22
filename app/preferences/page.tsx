@@ -17,6 +17,7 @@ export default function PreferencesPage() {
 
   const [customAllergy, setCustomAllergy] = useState("");
   const [customDislike, setCustomDislike] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const dietTypes = [
     { value: "omnivore", label: "🥩 Omnivore", description: "Mange de tout" },
@@ -79,11 +80,39 @@ export default function PreferencesPage() {
     }
   };
 
-  const handleSubmit = () => {
-    // Stocker les préférences dans localStorage
-    localStorage.setItem('mealPreferences', JSON.stringify(preferences));
-    // Rediriger vers la page de planification
-    router.push('/planification');
+  const handleSubmit = async () => {
+    if (!preferences.dietType) return;
+    
+    setIsGenerating(true);
+    
+    try {
+      // Générer le plan avec l'IA
+      const response = await fetch('/api/generate-meal-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ preferences }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.mealPlan) {
+        // Sauvegarder les préférences et le plan généré
+        localStorage.setItem('mealPreferences', JSON.stringify(preferences));
+        localStorage.setItem('generatedMealPlan', JSON.stringify(data.mealPlan));
+        
+        // Rediriger vers la page de planification
+        router.push('/planification');
+      } else {
+        alert('Erreur lors de la génération du plan: ' + (data.message || 'Erreur inconnue'));
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur de connexion à l\'API');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -344,10 +373,17 @@ export default function PreferencesPage() {
         <div className="flex flex-wrap justify-center gap-4 mt-8">
           <button
             onClick={handleSubmit}
-            disabled={!preferences.dietType}
+            disabled={!preferences.dietType || isGenerating}
             className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
-            🚀 Générer mon Planning
+            {isGenerating ? (
+              <span className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Génération en cours...
+              </span>
+            ) : (
+              '🚀 Générer mon Planning'
+            )}
           </button>
           <Link 
             href="/" 

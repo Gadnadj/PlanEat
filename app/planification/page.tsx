@@ -13,13 +13,56 @@ export default function PlanificationPage() {
     budget: string;
     cookingTime: string;
   } | null>(null);
+  const [generatedPlan, setGeneratedPlan] = useState<any>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const savedPreferences = localStorage.getItem('mealPreferences');
     if (savedPreferences) {
       setPreferences(JSON.parse(savedPreferences));
     }
+    
+    // Charger le plan généré par l'IA s'il existe
+    const savedGeneratedPlan = localStorage.getItem('generatedMealPlan');
+    if (savedGeneratedPlan) {
+      setGeneratedPlan(JSON.parse(savedGeneratedPlan));
+    }
   }, []);
+
+  const generateMealPlanWithAI = async () => {
+    if (!preferences) return;
+    
+    setIsGenerating(true);
+    
+    try {
+      const response = await fetch('/api/generate-meal-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ preferences }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.mealPlan) {
+        // Sauvegarder le plan généré par l'IA
+        localStorage.setItem('generatedMealPlan', JSON.stringify(data.mealPlan));
+        setGeneratedPlan(data.mealPlan);
+        
+        if (data.message) {
+          alert(data.message);
+        }
+      } else {
+        alert('Erreur lors de la génération du plan');
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur de connexion à l\'API');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const generateMealPlan = (dietType: string) => {
     const mealPlans = {
@@ -176,29 +219,40 @@ export default function PlanificationPage() {
     return mealPlans[dietType as keyof typeof mealPlans] || mealPlans.omnivore;
   };
 
-  const weeklyMealPlan = preferences ? generateMealPlan(preferences.dietType) : generateMealPlan('omnivore');
+  const weeklyMealPlan = generatedPlan || (preferences ? generateMealPlan(preferences.dietType) : generateMealPlan('omnivore'));
 
   const days = Object.keys(weeklyMealPlan) as Array<keyof typeof weeklyMealPlan>;
 
-  const getMealCard = (meal: { name: string; emoji: string; ingredients: string[] }, time: string) => (
-    <div key={time} className="bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-xl p-4 border border-gray-600 hover:border-[#3b82f6] transition-all duration-300">
-      <div className="flex items-center gap-3 mb-3">
-        <span className="text-2xl">{meal.emoji}</span>
-        <h4 className="text-[#3b82f6] font-bold text-lg">{meal.name}</h4>
+  const getMealCard = (meal: any, time: string) => {
+    // Gérer les deux formats : plan par défaut et plan généré par IA
+    const mealName = meal.name || meal.nom || `Repas ${time}`;
+    const mealEmoji = meal.emoji || '🍽️';
+    const mealIngredients = meal.ingredients || [];
+    const mealTime = meal.temps || '30 min';
+    
+    return (
+      <div key={time} className="bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-xl p-4 border border-gray-600 hover:border-[#3b82f6] transition-all duration-300">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{mealEmoji}</span>
+            <h4 className="text-[#3b82f6] font-bold text-lg">{mealName}</h4>
+          </div>
+          {mealTime && <span className="text-xs bg-[#3b82f6] text-white px-2 py-1 rounded">{mealTime}</span>}
+        </div>
+        <div className="space-y-1">
+          <p className="text-gray-400 text-sm font-medium">Ingrédients:</p>
+          <ul className="space-y-1">
+            {mealIngredients.map((ingredient: string, index: number) => (
+              <li key={index} className="text-[#b0b0b0] text-sm flex items-center gap-2">
+                <span className="text-[#3b82f6] text-xs">•</span>
+                {ingredient}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-      <div className="space-y-1">
-        <p className="text-gray-400 text-sm font-medium">Ingrédients:</p>
-        <ul className="space-y-1">
-          {meal.ingredients.map((ingredient: string, index: number) => (
-            <li key={index} className="text-[#b0b0b0] text-sm flex items-center gap-2">
-              <span className="text-[#3b82f6] text-xs">•</span>
-              {ingredient}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
+    );
+  };
 
   // Si pas de préférences, rediriger vers la page de préférences
   if (!preferences) {
@@ -231,9 +285,25 @@ export default function PlanificationPage() {
           <h1 className="text-4xl font-bold text-white mb-4">
             🍽️ Planning des Repas IA
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-6">
             Votre planning hebdomadaire personnalisé avec des repas équilibrés pour chaque jour
           </p>
+          
+          <button
+            onClick={generateMealPlanWithAI}
+            disabled={isGenerating}
+            className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed mb-6"
+          >
+            {isGenerating ? (
+              <span className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Génération en cours...
+              </span>
+            ) : (
+              '🤖 Générer avec l\'IA'
+            )}
+          </button>
+          
           {preferences && (
             <div className="mt-4 bg-[#2a2a2a] rounded-lg p-4 max-w-2xl mx-auto">
               <p className="text-[#3b82f6] font-medium">

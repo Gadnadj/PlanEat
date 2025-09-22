@@ -27,5 +27,4 @@ const page = () => {
         </ProtectedRoute>
     )
 }
-
 export default page
