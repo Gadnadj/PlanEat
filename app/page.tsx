@@ -13,10 +13,38 @@ interface ShoppingItemData {
   updatedAt: string;
 }
 
+interface RecipeData {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  emoji: string;
+  ingredients: {
+    name: string;
+    amount: string;
+    unit?: string;
+  }[];
+  instructions: string[];
+  prepTime: number;
+  cookTime: number;
+  servings: number;
+  difficulty: 'facile' | 'moyen' | 'difficile';
+  category: string;
+  tags: string[];
+  nutrition: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+}
+
 export default function Home() {
   const { user, loading, token } = useAuth();
   const [shoppingItems, setShoppingItems] = useState<ShoppingItemData[]>([]);
   const [shoppingLoading, setShoppingLoading] = useState(false);
+  const [recipes, setRecipes] = useState<RecipeData[]>([]);
+  const [recipesLoading, setRecipesLoading] = useState(false);
 
   const loadShoppingItems = useCallback(async () => {
     if (!token) return;
@@ -42,11 +70,30 @@ export default function Home() {
     }
   }, [token]);
 
+  const loadRecipes = useCallback(async () => {
+    setRecipesLoading(true);
+    try {
+      const response = await fetch('/api/recipes?limit=6&sortBy=createdAt&sortOrder=desc');
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setRecipes(data.recipes);
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des recettes:', error);
+    } finally {
+      setRecipesLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (user && token) {
       loadShoppingItems();
     }
-  }, [user, token, loadShoppingItems]);
+    loadRecipes();
+  }, [user, token, loadShoppingItems, loadRecipes]);
 
   // Rafraîchir la liste quand l'utilisateur revient sur la page
   useEffect(() => {
@@ -59,6 +106,42 @@ export default function Home() {
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, [user, token, loadShoppingItems]);
+
+  const addRecipeToShoppingList = async (recipe: RecipeData) => {
+    if (!token) {
+      alert('Veuillez vous connecter pour ajouter des articles à votre liste de courses');
+      return;
+    }
+
+    try {
+      // Ajouter chaque ingrédient de la recette à la shopping list
+      for (const ingredient of recipe.ingredients) {
+        const response = await fetch('/api/shopping-list', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            name: ingredient.name,
+            category: 'Épicerie',
+            quantity: ingredient.amount + (ingredient.unit ? ` ${ingredient.unit}` : '')
+          })
+        });
+
+        if (!response.ok) {
+          console.error(`Erreur lors de l'ajout de ${ingredient.name}`);
+        }
+      }
+
+      // Recharger la shopping list
+      await loadShoppingItems();
+      alert(`Ingrédients de "${recipe.title}" ajoutés à votre liste de courses !`);
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout à la liste de courses:', error);
+      alert('Erreur lors de l\'ajout à la liste de courses');
+    }
+  };
 
   const handleStartWithAI = async () => {
     // Rediriger vers la page de préférences
@@ -188,72 +271,80 @@ export default function Home() {
 
         {/* RECEIPE SECTION */}
         <section className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl">
-          <h2 className="text-[#3b82f6] mb-6 text-3xl">
-            Suggestions de recettes.
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-[#3b82f6] text-3xl">
+              Suggestions de recettes
+            </h2>
+            <Link 
+              href="/recipe"
+              className="text-[#3b82f6] hover:text-[#60a5fa] text-sm font-medium transition-colors"
+            >
+              Voir toutes les recettes
+            </Link>
+          </div>
 
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6 max-md:grid-cols-1">
-            <div className={recipeCard}>
-              <div className={recipeImage}>
-                🥗
-              </div>
-              <div className={recipeInfo}>
-                <h3 className={recipeInfoH3}>Salade Mediterraneenne</h3>
-                <div className={ingredients}>
-                  <h4 className={ingredientsH4}> Ingredients: </h4>
-                  <ul className={ingredientsul}>
-                    <li className={ingredientli}>Tomates Cerises</li>
-                    <li className={ingredientli}>Concombre</li>
-                    <li className={ingredientli}>Olives noires</li>
-                    <li className={ingredientli}>Fetas</li>
-                    <li className={ingredientli}>Huile d olive</li>
-                  </ul>
-                </div>
-                <button className={addToList}>Ajouter a la liste</button>
-              </div >
-            </div >
-
-            <div className={recipeCard}>
-              <div className={recipeImage}>
-                🥗
-              </div>
-              <div className={recipeInfo}>
-                <h3 className={recipeInfoH3}>Pates au Pesto</h3>
-                <div className={ingredients}>
-                  <h4 className={ingredientsH4}> Ingredients: </h4>
-                  <ul className={ingredientsul}>
-                    <li className={ingredientli}>Pâtes pennes</li>
-                    <li className={ingredientli}>Basilic frais</li>
-                    <li className={ingredientli}>Pignons de pin</li>
-                    <li className={ingredientli}>Parmesan</li>
-                    <li className={ingredientli}>Ail</li>
-                  </ul>
-                </div>
-                <button className={addToList}>Ajouter a la liste</button>
-              </div>
+          {recipesLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3b82f6] mx-auto mb-4"></div>
+              <p className="text-gray-300">Chargement des recettes...</p>
             </div>
-
-            <div className={recipeCard}>
-              <div className={recipeImage}>
-                🥗
-              </div>
-              <div className={recipeInfo}>
-                <h3 className={recipeInfoH3}>Saumon Grillé</h3>
-                <div className={ingredients}>
-                  <h4 className={ingredientsH4}> Ingredients: </h4>
-                  <ul className={ingredientsul}>
-                    <li className={ingredientli}>Filet de saumon</li>
-                    <li className={ingredientli}>Citron</li>
-                    <li className={ingredientli}>Herbes de Provenc</li>
-                    <li className={ingredientli}>Brocolis</li>
-                    <li className={ingredientli}>Huile d olive</li>
-                  </ul>
-                </div>
-                <button className={addToList}>Ajouter a la liste</button>
-              </div>
+          ) : recipes.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🍽️</div>
+              <p className="text-gray-300 mb-4">Aucune recette disponible pour le moment</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="text-[#3b82f6] hover:text-[#60a5fa] text-sm font-medium transition-colors"
+              >
+                Recharger
+              </button>
             </div>
-          </div >
-        </section >
+          ) : (
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6 max-md:grid-cols-1">
+              {recipes.map((recipe) => (
+                <div key={recipe.id} className={recipeCard}>
+                  <div className={recipeImage} style={{ backgroundImage: `url(${recipe.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                    <div className="text-6xl">{recipe.emoji}</div>
+                  </div>
+                  <div className={recipeInfo}>
+                    <h3 className={recipeInfoH3}>{recipe.title}</h3>
+                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">{recipe.description}</p>
+                    <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
+                      <span>⏱️ {recipe.prepTime + recipe.cookTime} min</span>
+                      <span>👥 {recipe.servings} pers.</span>
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        recipe.difficulty === 'facile' ? 'bg-green-900 text-green-300' :
+                        recipe.difficulty === 'moyen' ? 'bg-yellow-900 text-yellow-300' :
+                        'bg-red-900 text-red-300'
+                      }`}>
+                        {recipe.difficulty}
+                      </span>
+                    </div>
+                    <div className={ingredients}>
+                      <h4 className={ingredientsH4}>Ingrédients:</h4>
+                      <ul className={ingredientsul}>
+                        {recipe.ingredients.slice(0, 5).map((ingredient, index) => (
+                          <li key={index} className={ingredientli}>
+                            {ingredient.name} {ingredient.amount} {ingredient.unit || ''}
+                          </li>
+                        ))}
+                        {recipe.ingredients.length > 5 && (
+                          <li className={ingredientli}>... et {recipe.ingredients.length - 5} autres</li>
+                        )}
+                      </ul>
+                    </div>
+                    <button 
+                      className={addToList}
+                      onClick={() => addRecipeToShoppingList(recipe)}
+                    >
+                      Ajouter à la liste
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </main >
 
       <aside className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl h-fit sticky top-[120px] max-md:static">
