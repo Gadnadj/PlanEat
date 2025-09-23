@@ -274,7 +274,7 @@ export default function Home() {
                 onClick={handleStartWithAI}
                 className="bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white px-8 py-4 border-none rounded-full text-lg font-bold cursor-pointer transition-all duration-300 ease-in-out shadow-xs hover:-translate-y-0.5 hover:shadow-lg shadow-blue-900 hover:to-blue-700"
               >
-                Commencer
+                Get Started
               </button>
         </section>
 
@@ -282,13 +282,13 @@ export default function Home() {
         <section className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-[#3b82f6] text-3xl">
-              Suggestions de recettes
+              Recipe Suggestions
             </h2>
             <Link 
               href="/recipe"
               className="text-[#3b82f6] hover:text-[#60a5fa] text-sm font-medium transition-colors"
             >
-              Voir toutes les recettes
+              View All Recipes
             </Link>
           </div>
 
