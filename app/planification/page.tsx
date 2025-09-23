@@ -55,6 +55,20 @@ export default function PlanificationPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // Translation function for day names (display only)
+  const translateDayForDisplay = (frenchDay: string): string => {
+    const dayTranslations: { [key: string]: string } = {
+      'lundi': 'Monday',
+      'mardi': 'Tuesday', 
+      'mercredi': 'Wednesday',
+      'jeudi': 'Thursday',
+      'vendredi': 'Friday',
+      'samedi': 'Saturday',
+      'dimanche': 'Sunday'
+    };
+    return dayTranslations[frenchDay] || frenchDay;
+  };
+
   const loadUserData = useCallback(async () => {
     if (!token) {
       setIsLoading(false);
@@ -62,7 +76,7 @@ export default function PlanificationPage() {
     }
     
     try {
-      // Charger les préférences depuis la base de données
+      // Load preferences from database
       const preferencesResponse = await fetch('/api/user-preferences', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -75,7 +89,7 @@ export default function PlanificationPage() {
         }
       }
 
-      // Charger le plan généré par l'IA depuis la base de données
+      // Load AI-generated plan from database
       const mealPlanResponse = await fetch('/api/meal-plans', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -84,12 +98,12 @@ export default function PlanificationPage() {
       if (mealPlanResponse.ok) {
         const mealPlanData = await mealPlanResponse.json();
         if (mealPlanData.success) {
-          console.log('Planning chargé:', mealPlanData.mealPlan);
+          console.log('Meal plan loaded:', mealPlanData.mealPlan);
           setGeneratedPlan(mealPlanData.mealPlan);
         }
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
+      console.error('Error loading data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -99,18 +113,18 @@ export default function PlanificationPage() {
     loadUserData();
   }, [loadUserData, refreshTrigger]);
 
-  // Écouter les changements de planning depuis d'autres pages
+  // Listen for meal plan changes from other pages
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'planningUpdated') {
-        console.log('Planning mis à jour via storage');
+        console.log('Meal plan updated via storage');
         setRefreshTrigger(prev => prev + 1);
         localStorage.removeItem('planningUpdated');
       }
     };
 
     const handlePlanningUpdate = () => {
-      console.log('Planning mis à jour via événement');
+      console.log('Meal plan updated via event');
       setRefreshTrigger(prev => prev + 1);
     };
 
@@ -141,7 +155,7 @@ export default function PlanificationPage() {
       const data = await response.json();
       
       if (data.success && data.mealPlan) {
-        // Sauvegarder le nouveau plan généré par l'IA en base de données
+        // Save the new AI-generated plan to database
         const saveResponse = await fetch('/api/meal-plans', {
           method: 'POST',
           headers: {
@@ -153,16 +167,16 @@ export default function PlanificationPage() {
 
         if (saveResponse.ok) {
           setGeneratedPlan(data.mealPlan);
-          alert('Planning mis à jour avec succès !');
+          alert('Meal plan updated successfully!');
         } else {
-          alert('Erreur lors de la mise à jour du planning');
+          alert('Error updating meal plan');
         }
       } else {
-        alert('Erreur lors de la régénération du plan');
+        alert('Error regenerating meal plan');
       }
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur de connexion à l\'API');
+      console.error('Error:', error);
+      alert('API connection error');
     } finally {
       setIsGenerating(false);
     }
@@ -173,8 +187,8 @@ export default function PlanificationPage() {
   const days = weeklyMealPlan ? Object.keys(weeklyMealPlan) as string[] : [];
 
   const getMealCard = (meal: Meal, time: string, day: string) => {
-    // Gérer les deux formats : plan par défaut et plan généré par IA
-    const mealName = meal.name || meal.nom || `Repas ${time}`;
+    // Handle both formats: default plan and AI-generated plan
+    const mealName = meal.name || meal.nom || `Meal ${time}`;
     const mealEmoji = meal.emoji || '🍽️';
     const mealIngredients = meal.ingredients || [];
     const mealTime = meal.temps || meal.time || '30 min';
@@ -197,38 +211,38 @@ export default function PlanificationPage() {
           {mealTime && <span className="text-xs bg-[#3b82f6] text-white px-2 py-1 rounded">{mealTime}</span>}
         </div>
         <div className="space-y-1 flex-grow">
-          <p className="text-gray-400 text-sm font-medium">Ingrédients:</p>
+          <p className="text-gray-400 text-sm font-medium">Ingredients:</p>
           <ul className="space-y-1">
-            {Array.isArray(mealIngredients) ? mealIngredients.slice(0, 3).map((ingredient: any, index: number) => (
+            {Array.isArray(mealIngredients) ? mealIngredients.slice(0, 3).map((ingredient: string | { amount?: string; unit?: string; name?: string }, index: number) => (
               <li key={index} className="text-[#b0b0b0] text-sm flex items-center gap-2">
                 <span className="text-[#3b82f6] text-xs">•</span>
                 {typeof ingredient === 'string' ? ingredient : `${ingredient.amount || ''} ${ingredient.unit || ''} ${ingredient.name || ''}`.trim()}
               </li>
             )) : (
-              <li className="text-[#b0b0b0] text-sm">Aucun ingrédient disponible</li>
+              <li className="text-[#b0b0b0] text-sm">No ingredients available</li>
             )}
             {Array.isArray(mealIngredients) && mealIngredients.length > 3 && (
               <li className="text-[#3b82f6] text-sm font-medium">
-                +{mealIngredients.length - 3} autres ingrédients...
+                +{mealIngredients.length - 3} more ingredients...
               </li>
             )}
           </ul>
         </div>
         <div className="mt-3 text-center border-t border-gray-600 pt-3">
-          <span className="text-[#3b82f6] text-sm font-medium">Cliquez pour voir les détails</span>
+          <span className="text-[#3b82f6] text-sm font-medium">Click to view details</span>
         </div>
       </div>
     );
   };
 
-  // État de chargement
+  // Loading state
   if (isLoading) {
     return (
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3b82f6] mx-auto mb-4"></div>
-            <p className="text-[#b0b0b0] text-lg">Chargement de vos données...</p>
+            <p className="text-[#b0b0b0] text-lg">Loading your data...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -243,10 +257,10 @@ export default function PlanificationPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">
-            🍽️ Planning des Repas IA
+            🍽️ AI Meal Planning
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-6">
-            Votre planning hebdomadaire personnalisé avec des repas équilibrés pour chaque jour
+            Your personalized weekly meal plan with balanced meals for every day
           </p>
           
             <div className="flex gap-4 justify-center mb-6">
@@ -254,57 +268,57 @@ export default function PlanificationPage() {
                 href="/preferences"
                 className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 inline-block"
               >
-                🤖 Configurer et générer avec l&apos;IA
+                🤖 Configure and Generate with AI
               </Link>
               <button
                 onClick={() => setRefreshTrigger(prev => prev + 1)}
                 className="bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 inline-block"
               >
-                🔄 Actualiser
+                🔄 Refresh
               </button>
             </div>
           
           {preferences && (
             <div className="mt-4 bg-[#2a2a2a] rounded-lg p-4 max-w-2xl mx-auto">
               <p className="text-[#3b82f6] font-medium">
-                🎯 Régime: {preferences.dietType.charAt(0).toUpperCase() + preferences.dietType.slice(1)} • 
-                👥 {preferences.numberOfPeople} personne{preferences.numberOfPeople > 1 ? 's' : ''} • 
+                🎯 Diet: {preferences.dietType.charAt(0).toUpperCase() + preferences.dietType.slice(1)} • 
+                👥 {preferences.numberOfPeople} person{preferences.numberOfPeople > 1 ? 's' : ''} • 
                 💰 Budget {preferences.budget} • 
-                ⏱️ Cuisine {preferences.cookingTime}
+                ⏱️ Cooking {preferences.cookingTime}
               </p>
             </div>
           )}
         </div>
 
-        {/* État vide si pas de plan généré */}
+        {/* Empty state if no generated plan */}
         {!weeklyMealPlan ? (
           <div className="bg-[#2a2a2a] rounded-2xl p-12 shadow-xl text-center">
             <div className="text-6xl mb-6">🍽️</div>
             <h2 className="text-3xl font-bold text-white mb-4">
-              Aucun planning généré
+              No Meal Plan Generated
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Cliquez sur &quot;🤖 Configurer et générer avec l&apos;IA&quot; pour configurer vos préférences alimentaires et créer votre planning personnalisé.
+              Click on &quot;🤖 Configure and Generate with AI&quot; to set up your dietary preferences and create your personalized meal plan.
             </p>
             <div className="bg-[#1a1a1a] rounded-lg p-6 max-w-md mx-auto mb-6">
-              <h3 className="text-lg font-bold text-[#3b82f6] mb-3">💡 Comment ça marche ?</h3>
+              <h3 className="text-lg font-bold text-[#3b82f6] mb-3">💡 How does it work?</h3>
               <ul className="text-gray-300 text-sm space-y-2 text-left">
-                <li>• Configurez vos préférences alimentaires</li>
-                <li>• L&apos;IA génère un planning personnalisé</li>
-                <li>• Régénérez autant de fois que souhaité</li>
-                <li>• Vos plannings sont sauvegardés</li>
+                <li>• Configure your dietary preferences</li>
+                <li>• AI generates a personalized meal plan</li>
+                <li>• Regenerate as many times as you want</li>
+                <li>• Your meal plans are saved</li>
               </ul>
             </div>
             <Link
               href="/preferences"
               className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 inline-block"
             >
-              🚀 Commencer la configuration
+              🚀 Start Configuration
             </Link>
           </div>
         ) : (
           <>
-            {/* Navigation des jours */}
+            {/* Day navigation */}
             <div className="flex flex-wrap justify-center gap-2 mb-8">
               {days.map((day) => (
                 <button
@@ -316,42 +330,42 @@ export default function PlanificationPage() {
                       : "bg-[#2a2a2a] text-gray-300 hover:bg-[#3a3a3a] hover:text-white"
                   }`}
                 >
-                  {String(day).charAt(0).toUpperCase() + String(day).slice(1)}
+                  {translateDayForDisplay(day)}
                 </button>
               ))}
             </div>
 
-            {/* Planning du jour sélectionné */}
+            {/* Selected day meal plan */}
             <div className="bg-[#2a2a2a] rounded-2xl p-8 shadow-xl">
               <h2 className="text-2xl font-bold text-[#3b82f6] mb-6 text-center">
-                {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
+                📅 {translateDayForDisplay(selectedDay)}
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={{ gridTemplateRows: '1fr' }}>
-                {/* Petit-déjeuner */}
+                {/* Breakfast */}
                 <div className="flex flex-col">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    🌅 Petit-déjeuner
+                    🌅 Breakfast
                   </h3>
                   <div className="flex-grow">
                     {getMealCard(weeklyMealPlan[selectedDay]?.matin, "matin", selectedDay)}
                   </div>
                 </div>
 
-                {/* Déjeuner */}
+                {/* Lunch */}
                 <div className="flex flex-col">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    ☀️ Déjeuner
+                    ☀️ Lunch
                   </h3>
                   <div className="flex-grow">
                     {getMealCard(weeklyMealPlan[selectedDay]?.midi, "midi", selectedDay)}
                   </div>
                 </div>
 
-                {/* Dîner */}
+                {/* Dinner */}
                 <div className="flex flex-col">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    🌙 Dîner
+                    🌙 Dinner
                   </h3>
                   <div className="flex-grow">
                     {getMealCard(weeklyMealPlan[selectedDay]?.soir, "soir", selectedDay)}
@@ -373,10 +387,10 @@ export default function PlanificationPage() {
               {isGenerating ? (
                 <span className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Régénération...
+                  Regenerating...
                 </span>
               ) : (
-                '🔄 Régénérer le planning'
+                '🔄 Regenerate Meal Plan'
               )}
             </button>
           )}
@@ -384,7 +398,7 @@ export default function PlanificationPage() {
             href="/" 
             className="bg-gradient-to-r from-[#6b7280] to-[#4b5563] text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
           >
-            ← Retour à l accueil
+            ← Back to Home
           </Link>
         </div>
       </div>
