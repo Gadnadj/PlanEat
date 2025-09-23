@@ -20,6 +20,9 @@ export default function PreferencesPage() {
   const [customAllergy, setCustomAllergy] = useState("");
   const [customDislike, setCustomDislike] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [generationTime, setGenerationTime] = useState(0);
+  const [generationStatus, setGenerationStatus] = useState('');
 
   const dietTypes = [
     { value: "omnivore", label: "🥩 Omnivore", description: "Mange de tout" },
@@ -84,8 +87,20 @@ export default function PreferencesPage() {
     if (!preferences.dietType) return;
     
     setIsGenerating(true);
+    setGenerationProgress(0);
+    setGenerationTime(0);
+    setGenerationStatus('Initialisation...');
+
+    // Démarrer le timer
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+      setGenerationTime(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
     
     try {
+      setGenerationStatus('Sauvegarde des préférences...');
+      setGenerationProgress(10);
+      
       // Sauvegarder les préférences en base de données
       const preferencesResponse = await fetch('/api/user-preferences', {
         method: 'POST',
@@ -100,8 +115,11 @@ export default function PreferencesPage() {
         throw new Error('Erreur lors de la sauvegarde des préférences');
       }
 
-      // Générer le plan avec l'IA
-      const response = await fetch('/api/generate-meal-plan', {
+      setGenerationStatus('Génération du planning avec l\'IA...');
+      setGenerationProgress(30);
+
+      // Générer le plan détaillé avec l'IA
+      const response = await fetch('/api/generate-detailed-meal-plan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,9 +127,15 @@ export default function PreferencesPage() {
         body: JSON.stringify({ preferences }),
       });
 
+      setGenerationStatus('Traitement de la réponse de l\'IA...');
+      setGenerationProgress(70);
+
       const data = await response.json();
       
       if (data.success && data.mealPlan) {
+        setGenerationStatus('Sauvegarde du planning...');
+        setGenerationProgress(90);
+
         // Sauvegarder le plan généré en base de données
         const saveResponse = await fetch('/api/meal-plans', {
           method: 'POST',
@@ -123,8 +147,13 @@ export default function PreferencesPage() {
         });
 
         if (saveResponse.ok) {
-          // Rediriger vers la page de planification
-          router.push('/planification');
+          setGenerationStatus('Planning généré avec succès !');
+          setGenerationProgress(100);
+          
+          // Attendre un peu pour que l'utilisateur voie le 100%
+          setTimeout(() => {
+            router.push('/planification');
+          }, 1000);
         } else {
           alert('Erreur lors de la sauvegarde du plan');
         }
@@ -133,8 +162,10 @@ export default function PreferencesPage() {
       }
     } catch (error) {
       console.error('Erreur:', error);
+      setGenerationStatus('Erreur lors de la génération');
       alert('Erreur de connexion à l\'API');
     } finally {
+      clearInterval(timer);
       setIsGenerating(false);
     }
   };
@@ -416,6 +447,45 @@ export default function PreferencesPage() {
             ← Retour à l accueil
           </Link>
         </div>
+
+        {/* Indicateur de progression détaillé */}
+        {isGenerating && (
+          <div className="mt-8 bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-white mb-4">
+                {generationStatus}
+              </h3>
+              
+              {/* Barre de progression */}
+              <div className="w-full bg-gray-700 rounded-full h-3 mb-4">
+                <div 
+                  className="bg-gradient-to-r from-[#3b82f6] to-[#10b981] h-3 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${generationProgress}%` }}
+                ></div>
+              </div>
+              
+              {/* Pourcentage et temps */}
+              <div className="flex justify-between items-center text-sm text-gray-300">
+                <span>{generationProgress}%</span>
+                <span className="flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {generationTime}s
+                </span>
+              </div>
+              
+              {/* Message d'information */}
+              <p className="text-gray-400 text-sm mt-3">
+                {generationProgress < 30 && "L'IA analyse vos préférences..."}
+                {generationProgress >= 30 && generationProgress < 70 && "L'IA génère votre planning personnalisé..."}
+                {generationProgress >= 70 && generationProgress < 90 && "Traitement des données..."}
+                {generationProgress >= 90 && generationProgress < 100 && "Finalisation en cours..."}
+                {generationProgress === 100 && "Terminé ! Redirection..."}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
       </div>
     </ProtectedRoute>

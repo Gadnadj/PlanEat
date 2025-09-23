@@ -1,15 +1,33 @@
 "use client"
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Meal {
   name?: string;
   nom?: string;
+  description?: string;
   emoji?: string;
-  ingredients: string[];
+  ingredients?: {
+    name: string;
+    amount: string;
+    unit?: string;
+  }[];
+  instructions?: string[];
   temps?: string;
+  time?: string;
+  servings?: number;
+  difficulty?: 'facile' | 'moyen' | 'difficile';
+  category?: string;
+  tags?: string[];
+  nutrition?: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
 }
 
 interface MealPlan {
@@ -22,6 +40,7 @@ interface MealPlan {
 
 export default function PlanificationPage() {
   const { token } = useAuth();
+  const router = useRouter();
   const [selectedDay, setSelectedDay] = useState<string>("lundi");
   const [preferences, setPreferences] = useState<{
     dietType: string;
@@ -153,15 +172,23 @@ export default function PlanificationPage() {
 
   const days = weeklyMealPlan ? Object.keys(weeklyMealPlan) as string[] : [];
 
-  const getMealCard = (meal: Meal, time: string) => {
+  const getMealCard = (meal: Meal, time: string, day: string) => {
     // Gérer les deux formats : plan par défaut et plan généré par IA
     const mealName = meal.name || meal.nom || `Repas ${time}`;
     const mealEmoji = meal.emoji || '🍽️';
     const mealIngredients = meal.ingredients || [];
-    const mealTime = meal.temps || '30 min';
+    const mealTime = meal.temps || meal.time || '30 min';
+    
+    const handleMealClick = () => {
+      router.push(`/planning-recipe/${day}-${time}`);
+    };
     
     return (
-      <div key={time} className="bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-xl p-4 border border-gray-600 hover:border-[#3b82f6] transition-all duration-300">
+      <div 
+        key={time} 
+        onClick={handleMealClick}
+        className="bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-xl p-4 border border-gray-600 hover:border-[#3b82f6] transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-1"
+      >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{mealEmoji}</span>
@@ -172,13 +199,23 @@ export default function PlanificationPage() {
         <div className="space-y-1">
           <p className="text-gray-400 text-sm font-medium">Ingrédients:</p>
           <ul className="space-y-1">
-            {mealIngredients.map((ingredient: string, index: number) => (
+            {Array.isArray(mealIngredients) ? mealIngredients.slice(0, 3).map((ingredient: any, index: number) => (
               <li key={index} className="text-[#b0b0b0] text-sm flex items-center gap-2">
                 <span className="text-[#3b82f6] text-xs">•</span>
-                {ingredient}
+                {typeof ingredient === 'string' ? ingredient : `${ingredient.amount || ''} ${ingredient.unit || ''} ${ingredient.name || ''}`.trim()}
               </li>
-            ))}
+            )) : (
+              <li className="text-[#b0b0b0] text-sm">Aucun ingrédient disponible</li>
+            )}
+            {Array.isArray(mealIngredients) && mealIngredients.length > 3 && (
+              <li className="text-[#3b82f6] text-sm font-medium">
+                +{mealIngredients.length - 3} autres ingrédients...
+              </li>
+            )}
           </ul>
+        </div>
+        <div className="mt-3 text-center">
+          <span className="text-[#3b82f6] text-sm font-medium">Cliquez pour voir les détails</span>
         </div>
       </div>
     );
@@ -296,7 +333,7 @@ export default function PlanificationPage() {
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     🌅 Petit-déjeuner
                   </h3>
-                  {getMealCard(weeklyMealPlan[selectedDay]?.matin, "matin")}
+                  {getMealCard(weeklyMealPlan[selectedDay]?.matin, "matin", selectedDay)}
                 </div>
 
                 {/* Déjeuner */}
@@ -304,7 +341,7 @@ export default function PlanificationPage() {
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     ☀️ Déjeuner
                   </h3>
-                  {getMealCard(weeklyMealPlan[selectedDay]?.midi, "midi")}
+                  {getMealCard(weeklyMealPlan[selectedDay]?.midi, "midi", selectedDay)}
                 </div>
 
                 {/* Dîner */}
@@ -312,7 +349,7 @@ export default function PlanificationPage() {
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     🌙 Dîner
                   </h3>
-                  {getMealCard(weeklyMealPlan[selectedDay]?.soir, "soir")}
+                  {getMealCard(weeklyMealPlan[selectedDay]?.soir, "soir", selectedDay)}
                 </div>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import RecipeCard from "./RecipeCard";
-import { styles } from "./styles";
+// import { styles } from "./styles";
 import Link from "next/link";
 
 interface RecipeData {
