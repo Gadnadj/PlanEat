@@ -22,7 +22,7 @@ export const styles = {
         'bg-[#3a3a3a] rounded-[10px] p-4 flex items-center gap-4 transition-all duration-300 ease-in-out border-l-4 border-l-transparent hover:bg-[$404040] hover:-translate-x-[5px]',
 
     itemCompleted: 'opacity-60 bg-[#2d2d2d] border-l-4 border-l-[#7cb342]',
-    itemCompleteLine: 'line-through',
+    itemCompleteLine: 'line-through text-decoration-line-through',
 
     itemCheckbox:
         'w-[20px] h-[20px] border-2 border-[#3b82f6] rounded-[50%] cursor-pointer flex items-center justify-center transition-all duration-300 ease-in-out',

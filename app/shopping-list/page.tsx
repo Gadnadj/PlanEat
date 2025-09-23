@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import React, { useState, useEffect, useCallback } from 'react'
 
 interface ShoppingItemData {
-  _id: string;
+  id: string;
   name: string;
   category: string;
   quantity?: string;
@@ -93,7 +93,7 @@ const ShoppingListPage = () => {
     };
 
     const toggleItem = async (id: string, isCompleted: boolean) => {
-        if (!token) return;
+        if (!token || !id) return;
 
         try {
             const response = await fetch(`/api/shopping-list/${id}`, {
@@ -107,7 +107,7 @@ const ShoppingListPage = () => {
 
             if (response.ok) {
                 setItems(prev => prev.map(item => 
-                    item._id === id ? { ...item, isCompleted: !isCompleted } : item
+                    item.id === id ? { ...item, isCompleted: !isCompleted } : item
                 ));
             }
         } catch (error) {
@@ -127,7 +127,7 @@ const ShoppingListPage = () => {
             });
 
             if (response.ok) {
-                setItems(prev => prev.filter(item => item._id !== id));
+                setItems(prev => prev.filter(item => item.id !== id));
             }
         } catch (error) {
             console.error('Erreur lors de la suppression de l\'article:', error);
@@ -154,7 +154,7 @@ const ShoppingListPage = () => {
     };
 
     const startEdit = (item: ShoppingItemData) => {
-        setEditingItem(item._id);
+        setEditingItem(item.id);
         setEditQuantity(item.quantity || '');
     };
 
@@ -173,7 +173,7 @@ const ShoppingListPage = () => {
 
             if (response.ok) {
                 setItems(prev => prev.map(item => 
-                    item._id === id ? { ...item, quantity: editQuantity.trim() || undefined } : item
+                    item.id === id ? { ...item, quantity: editQuantity.trim() || undefined } : item
                 ));
                 setEditingItem(null);
                 setEditQuantity('');
@@ -186,6 +186,180 @@ const ShoppingListPage = () => {
     const cancelEdit = () => {
         setEditingItem(null);
         setEditQuantity('');
+    };
+
+    const printList = () => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        const completedItems = items.filter(item => item.isCompleted);
+        const remainingItems = items.filter(item => !item.isCompleted);
+
+        const printContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Liste de Courses - Plan Eat</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                        background: white;
+                        color: black;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        border-bottom: 2px solid #3b82f6;
+                        padding-bottom: 20px;
+                    }
+                    .header h1 {
+                        color: #3b82f6;
+                        margin: 0;
+                        font-size: 28px;
+                    }
+                    .header p {
+                        color: #666;
+                        margin: 10px 0 0 0;
+                    }
+                    .stats {
+                        display: flex;
+                        justify-content: space-around;
+                        margin-bottom: 30px;
+                        padding: 15px;
+                        background: #f5f5f5;
+                        border-radius: 8px;
+                    }
+                    .stat {
+                        text-align: center;
+                    }
+                    .stat-value {
+                        font-size: 24px;
+                        font-weight: bold;
+                        color: #3b82f6;
+                    }
+                    .stat-label {
+                        font-size: 14px;
+                        color: #666;
+                    }
+                    .section {
+                        margin-bottom: 30px;
+                    }
+                    .section-title {
+                        font-size: 20px;
+                        font-weight: bold;
+                        margin-bottom: 15px;
+                        padding: 10px;
+                        background: #3b82f6;
+                        color: white;
+                        border-radius: 5px;
+                    }
+                    .item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 8px 0;
+                        border-bottom: 1px solid #eee;
+                    }
+                    .item-name {
+                        font-weight: bold;
+                    }
+                    .item-quantity {
+                        color: #666;
+                        font-style: italic;
+                    }
+                    .item-category {
+                        background: #e3f2fd;
+                        color: #1976d2;
+                        padding: 2px 8px;
+                        border-radius: 12px;
+                        font-size: 12px;
+                        margin-right: 10px;
+                    }
+                    .completed {
+                        text-decoration: line-through;
+                        opacity: 0.6;
+                    }
+                    .footer {
+                        margin-top: 40px;
+                        text-align: center;
+                        color: #666;
+                        font-size: 12px;
+                    }
+                    @media print {
+                        body { margin: 0; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>🛒 Ma Liste de Courses</h1>
+                    <p>Générée le ${new Date().toLocaleDateString('fr-FR', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}</p>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value">${items.length}</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${completedItems.length}</div>
+                        <div class="stat-label">Achetés</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${remainingItems.length}</div>
+                        <div class="stat-label">Restants</div>
+                    </div>
+                </div>
+
+                ${remainingItems.length > 0 ? `
+                <div class="section">
+                    <div class="section-title">📝 À acheter (${remainingItems.length})</div>
+                    ${remainingItems.map(item => `
+                        <div class="item">
+                            <div>
+                                <span class="item-category">${item.category}</span>
+                                <span class="item-name">${item.name}</span>
+                            </div>
+                            ${item.quantity ? `<span class="item-quantity">${item.quantity}</span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                ${completedItems.length > 0 ? `
+                <div class="section">
+                    <div class="section-title">✅ Déjà achetés (${completedItems.length})</div>
+                    ${completedItems.map(item => `
+                        <div class="item completed">
+                            <div>
+                                <span class="item-category">${item.category}</span>
+                                <span class="item-name">${item.name}</span>
+                            </div>
+                            ${item.quantity ? `<span class="item-quantity">${item.quantity}</span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                <div class="footer">
+                    <p>Générée par Plan Eat - Votre assistant nutrition personnel</p>
+                </div>
+            </body>
+            </html>
+        `;
+
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
     };
 
     const filteredItems = selectedCategory === 'Toutes' 
@@ -219,7 +393,7 @@ const ShoppingListPage = () => {
                     completedItems={completedCount}
                     remainingItems={remainingCount}
                 />
-                <ActionButton onDeleteAll={deleteAllItems} />
+                <ActionButton onDeleteAll={deleteAllItems} onPrint={printList} />
             </section>
 
             <div className='max-w-[1400px] mx-auto pt-0 py-8 px-8 grid grid-cols-[1fr_300px] gap-8 max-lg:grid-cols-1 max-md:pt-0 max-md:px-4 max-md:pb-8  max-sm:pl-4 max-sm:pr-4'>
@@ -279,15 +453,15 @@ const ShoppingListPage = () => {
                         ) : (
                             filteredItems.map((item) => (
                                 <ShoppingItem 
-                                    key={item._id}
+                                    key={item.id}
                                     item={item}
-                                    onToggle={() => toggleItem(item._id, item.isCompleted)}
-                                    onDelete={() => deleteItem(item._id)}
+                                    onToggle={() => toggleItem(item.id, item.isCompleted)}
+                                    onDelete={() => deleteItem(item.id)}
                                     onEdit={() => startEdit(item)}
-                                    isEditing={editingItem === item._id}
+                                    isEditing={editingItem === item.id}
                                     editQuantity={editQuantity}
                                     onEditQuantityChange={setEditQuantity}
-                                    onSaveEdit={() => saveEdit(item._id)}
+                                    onSaveEdit={() => saveEdit(item.id)}
                                     onCancelEdit={cancelEdit}
                                 />
                             ))

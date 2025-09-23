@@ -2,7 +2,7 @@ import { styles } from '../styles'
 
 interface ShoppingItemProps {
     item: {
-        _id: string;
+        id: string;
         name: string;
         category: string;
         quantity?: string;
@@ -30,7 +30,7 @@ const ShoppingItem = ({
     onCancelEdit 
 }: ShoppingItemProps) => {
     return (
-        <div className={`${styles.shoppingItem} ${item.isCompleted ? 'opacity-60 line-through' : ''}`}>
+        <div className={`${styles.shoppingItem} ${item.isCompleted ? 'opacity-60' : ''}`}>
             <div className={styles.itemCheckbox}>
                 <input 
                     type="checkbox" 
@@ -40,7 +40,12 @@ const ShoppingItem = ({
                 />
             </div>
             <div className={styles.itemContent}>
-                <div className={styles.itemName}>{item.name}</div>
+                <div 
+                    className={`${styles.itemName} ${item.isCompleted ? styles.itemCompleteLine : ''}`}
+                    style={item.isCompleted ? { textDecoration: 'line-through' } : {}}
+                >
+                    {item.name}
+                </div>
                 <div className={styles.itemDetails}>
                     <span className={styles.itemCategory}>{item.category}</span>
                     {isEditing ? (
