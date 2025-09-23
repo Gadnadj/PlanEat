@@ -13,8 +13,8 @@ export default function PreferencesPage() {
     allergies: [] as string[],
     dislikes: [] as string[],
     numberOfPeople: 1,
-    budget: "moyen",
-    cookingTime: "moyen"
+    budget: "medium",
+    cookingTime: "medium"
   });
 
   const [customAllergy, setCustomAllergy] = useState("");
@@ -25,23 +25,23 @@ export default function PreferencesPage() {
   const [generationStatus, setGenerationStatus] = useState('');
 
   const dietTypes = [
-    { value: "omnivore", label: "🥩 Omnivore", description: "Mange de tout" },
-    { value: "vegetarian", label: "🥗 Végétarien", description: "Pas de viande ni poisson" },
-    { value: "vegan", label: "🌱 Végan", description: "Pas de produits animaux" },
-    { value: "pescatarian", label: "🐟 Pescatarien", description: "Végétarien + poisson" }
+    { value: "omnivore", label: "🥩 Omnivore", description: "Eats everything" },
+    { value: "vegetarian", label: "🥗 Vegetarian", description: "No meat or fish" },
+    { value: "vegan", label: "🌱 Vegan", description: "No animal products" },
+    { value: "pescatarian", label: "🐟 Pescatarian", description: "Vegetarian + fish" }
   ];
 
 
   const budgetOptions = [
-    { value: "faible", label: "💰 Faible", description: "Repas à petit budget" },
-    { value: "moyen", label: "💳 Moyen", description: "Budget standard" },
-    { value: "élevé", label: "💎 Élevé", description: "Budget premium" }
+    { value: "low", label: "💰 Low", description: "Budget-friendly meals" },
+    { value: "medium", label: "💳 Medium", description: "Standard budget" },
+    { value: "high", label: "💎 High", description: "Premium budget" }
   ];
 
   const cookingTimeOptions = [
-    { value: "rapide", label: "⚡ Rapide", description: "15-30 minutes" },
-    { value: "moyen", label: "⏰ Moyen", description: "30-60 minutes" },
-    { value: "long", label: "🍳 Long", description: "1h+ (plats mijotés)" }
+    { value: "quick", label: "⚡ Quick", description: "15-30 minutes" },
+    { value: "medium", label: "⏰ Medium", description: "30-60 minutes" },
+    { value: "long", label: "🍳 Long", description: "1h+ (slow-cooked dishes)" }
   ];
 
   const handleDietChange = (diet: string) => {
@@ -89,7 +89,7 @@ export default function PreferencesPage() {
     setIsGenerating(true);
     setGenerationProgress(0);
     setGenerationTime(0);
-    setGenerationStatus('Initialisation...');
+    setGenerationStatus('Initializing...');
 
     // Démarrer le timer
     const startTime = Date.now();
@@ -98,7 +98,7 @@ export default function PreferencesPage() {
     }, 1000);
     
     try {
-      setGenerationStatus('Sauvegarde des préférences...');
+      setGenerationStatus('Saving preferences...');
       setGenerationProgress(10);
       
       // Sauvegarder les préférences en base de données
@@ -112,10 +112,10 @@ export default function PreferencesPage() {
       });
 
       if (!preferencesResponse.ok) {
-        throw new Error('Erreur lors de la sauvegarde des préférences');
+        throw new Error('Error saving preferences');
       }
 
-      setGenerationStatus('Génération du planning avec l\'IA...');
+      setGenerationStatus('Generating meal plan with AI...');
       setGenerationProgress(30);
 
       // Générer le plan détaillé avec l'IA
@@ -127,13 +127,13 @@ export default function PreferencesPage() {
         body: JSON.stringify({ preferences }),
       });
 
-      setGenerationStatus('Traitement de la réponse de l\'IA...');
+      setGenerationStatus('Processing AI response...');
       setGenerationProgress(70);
 
       const data = await response.json();
       
       if (data.success && data.mealPlan) {
-        setGenerationStatus('Sauvegarde du planning...');
+        setGenerationStatus('Saving meal plan...');
         setGenerationProgress(90);
 
         // Sauvegarder le plan généré en base de données
@@ -147,7 +147,7 @@ export default function PreferencesPage() {
         });
 
         if (saveResponse.ok) {
-          setGenerationStatus('Planning généré avec succès !');
+          setGenerationStatus('Meal plan generated successfully!');
           setGenerationProgress(100);
           
           // Attendre un peu pour que l'utilisateur voie le 100%
@@ -155,15 +155,15 @@ export default function PreferencesPage() {
             router.push('/planification');
           }, 1000);
         } else {
-          alert('Erreur lors de la sauvegarde du plan');
+          alert('Error saving meal plan');
         }
       } else {
-        alert('Erreur lors de la génération du plan: ' + (data.message || 'Erreur inconnue'));
+        alert('Error generating meal plan: ' + (data.message || 'Unknown error'));
       }
     } catch (error) {
-      console.error('Erreur:', error);
-      setGenerationStatus('Erreur lors de la génération');
-      alert('Erreur de connexion à l\'API');
+      console.error('Error:', error);
+      setGenerationStatus('Error during generation');
+      alert('API connection error');
     } finally {
       clearInterval(timer);
       setIsGenerating(false);
@@ -177,10 +177,10 @@ export default function PreferencesPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">
-            🍽️ Vos Préférences Alimentaires
+            🍽️ Your Dietary Preferences
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Personnalisez votre planning de repas selon vos goûts et contraintes
+            Customize your meal plan according to your tastes and constraints
           </p>
         </div>
 
@@ -188,7 +188,7 @@ export default function PreferencesPage() {
           {/* Type de régime */}
           <section>
             <h2 className="text-2xl font-bold text-[#3b82f6] mb-4">
-              🥗 Type de Régime Alimentaire
+              🥗 Dietary Type
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {dietTypes.map((diet) => (
@@ -211,18 +211,18 @@ export default function PreferencesPage() {
           {/* Allergies */}
           <section>
             <h2 className="text-2xl font-bold text-[#3b82f6] mb-4">
-              ⚠️ Allergies Alimentaires
+              ⚠️ Food Allergies
             </h2>
             
             {/* Ajout d'allergie personnalisée */}
             <div className="bg-[#1a1a1a] rounded-lg p-4">
-              <h3 className="text-lg font-bold text-white mb-3">Ajouter vos allergies</h3>
+              <h3 className="text-lg font-bold text-white mb-3">Add your allergies</h3>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={customAllergy}
                   onChange={(e) => setCustomAllergy(e.target.value)}
-                  placeholder="Ex: Gluten, Lactose, Noix, Arachides, Œufs..."
+                  placeholder="Ex: Gluten, Lactose, Nuts, Peanuts, Eggs..."
                   className="flex-1 px-4 py-2 bg-[#2a2a2a] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-[#3b82f6] focus:outline-none"
                   onKeyPress={(e) => e.key === 'Enter' && addCustomAllergy()}
                 />
@@ -230,14 +230,14 @@ export default function PreferencesPage() {
                   onClick={addCustomAllergy}
                   className="px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-[#2563eb] transition-colors"
                 >
-                  Ajouter
+                  Add
                 </button>
               </div>
               
               {/* Liste des allergies */}
               {preferences.allergies.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-sm text-gray-400 mb-2">Vos allergies :</p>
+                  <p className="text-sm text-gray-400 mb-2">Your allergies:</p>
                   <div className="flex flex-wrap gap-2">
                     {preferences.allergies.map((allergy) => (
                       <span
@@ -262,18 +262,18 @@ export default function PreferencesPage() {
           {/* Aliments détestés */}
           <section>
             <h2 className="text-2xl font-bold text-[#3b82f6] mb-4">
-              🚫 Aliments à Éviter
+              🚫 Foods to Avoid
             </h2>
             
             {/* Ajout d'aliment à éviter personnalisé */}
             <div className="bg-[#1a1a1a] rounded-lg p-4">
-              <h3 className="text-lg font-bold text-white mb-3">Ajouter des aliments à éviter</h3>
+              <h3 className="text-lg font-bold text-white mb-3">Add foods to avoid</h3>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={customDislike}
                   onChange={(e) => setCustomDislike(e.target.value)}
-                  placeholder="Ex: Épinards, Brocolis, Champignons, Oignons..."
+                  placeholder="Ex: Spinach, Broccoli, Mushrooms, Onions..."
                   className="flex-1 px-4 py-2 bg-[#2a2a2a] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-[#3b82f6] focus:outline-none"
                   onKeyPress={(e) => e.key === 'Enter' && addCustomDislike()}
                 />
@@ -281,14 +281,14 @@ export default function PreferencesPage() {
                   onClick={addCustomDislike}
                   className="px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-[#2563eb] transition-colors"
                 >
-                  Ajouter
+                  Add
                 </button>
               </div>
               
               {/* Liste des aliments à éviter */}
               {preferences.dislikes.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-sm text-gray-400 mb-2">Aliments à éviter :</p>
+                  <p className="text-sm text-gray-400 mb-2">Foods to avoid:</p>
                   <div className="flex flex-wrap gap-2">
                     {preferences.dislikes.map((dislike) => (
                       <span
@@ -313,7 +313,7 @@ export default function PreferencesPage() {
           {/* Nombre de personnes */}
           <section>
             <h2 className="text-2xl font-bold text-[#3b82f6] mb-4">
-              👥 Nombre de Personnes
+              👥 Number of People
             </h2>
             <div className="flex gap-4 items-center">
               <button
@@ -360,7 +360,7 @@ export default function PreferencesPage() {
           {/* Temps de cuisine */}
           <section>
             <h2 className="text-2xl font-bold text-[#3b82f6] mb-4">
-              ⏱️ Temps de Cuisine Disponible
+              ⏱️ Available Cooking Time
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {cookingTimeOptions.map((time) => (
@@ -383,12 +383,12 @@ export default function PreferencesPage() {
           {/* Résumé des préférences */}
           {preferences.dietType && (
             <section className="bg-[#1a1a1a] rounded-lg p-6">
-              <h3 className="text-xl font-bold text-[#3b82f6] mb-4">📋 Résumé de vos préférences</h3>
+              <h3 className="text-xl font-bold text-[#3b82f6] mb-4">📋 Summary of your preferences</h3>
               <div className="space-y-2 text-gray-300">
-                <p><strong>Régime:</strong> {dietTypes.find(d => d.value === preferences.dietType)?.label}</p>
-                <p><strong>Personnes:</strong> {preferences.numberOfPeople}</p>
+                <p><strong>Diet:</strong> {dietTypes.find(d => d.value === preferences.dietType)?.label}</p>
+                <p><strong>People:</strong> {preferences.numberOfPeople}</p>
                 <p><strong>Budget:</strong> {budgetOptions.find(b => b.value === preferences.budget)?.label}</p>
-                <p><strong>Temps de cuisine:</strong> {cookingTimeOptions.find(t => t.value === preferences.cookingTime)?.label}</p>
+                <p><strong>Cooking time:</strong> {cookingTimeOptions.find(t => t.value === preferences.cookingTime)?.label}</p>
                 {preferences.allergies.length > 0 && (
                   <div>
                     <p><strong>Allergies:</strong></p>
@@ -406,7 +406,7 @@ export default function PreferencesPage() {
                 )}
                 {preferences.dislikes.length > 0 && (
                   <div>
-                    <p><strong>À éviter:</strong></p>
+                    <p><strong>To avoid:</strong></p>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {preferences.dislikes.map((dislike) => (
                         <span
@@ -434,17 +434,17 @@ export default function PreferencesPage() {
             {isGenerating ? (
               <span className="flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Génération en cours...
+                Generating...
               </span>
             ) : (
-              '🚀 Générer mon Planning'
+              '🚀 Generate My Meal Plan'
             )}
           </button>
           <Link 
             href="/" 
             className="bg-gradient-to-r from-[#6b7280] to-[#4b5563] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
           >
-            ← Retour à l accueil
+            ← Back to Home
           </Link>
         </div>
 
@@ -477,11 +477,11 @@ export default function PreferencesPage() {
               
               {/* Message d'information */}
               <p className="text-gray-400 text-sm mt-3">
-                {generationProgress < 30 && "L'IA analyse vos préférences..."}
-                {generationProgress >= 30 && generationProgress < 70 && "L'IA génère votre planning personnalisé..."}
-                {generationProgress >= 70 && generationProgress < 90 && "Traitement des données..."}
-                {generationProgress >= 90 && generationProgress < 100 && "Finalisation en cours..."}
-                {generationProgress === 100 && "Terminé ! Redirection..."}
+                {generationProgress < 30 && "AI is analyzing your preferences..."}
+                {generationProgress >= 30 && generationProgress < 70 && "AI is generating your personalized meal plan..."}
+                {generationProgress >= 70 && generationProgress < 90 && "Processing data..."}
+                {generationProgress >= 90 && generationProgress < 100 && "Finalizing..."}
+                {generationProgress === 100 && "Done! Redirecting..."}
               </p>
             </div>
           </div>
