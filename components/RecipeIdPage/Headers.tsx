@@ -43,9 +43,9 @@ const Header = ({ recipe }: HeaderProps) => {
 
     const getDifficultyText = (difficulty: string) => {
         switch (difficulty) {
-            case 'facile': return 'Facile';
-            case 'moyen': return 'Moyen';
-            case 'difficile': return 'Difficile';
+            case 'facile': return 'Easy';
+            case 'moyen': return 'Medium';
+            case 'difficile': return 'Hard';
             default: return difficulty;
         }
     };
@@ -77,7 +77,7 @@ const Header = ({ recipe }: HeaderProps) => {
                 <div className='grid [grid-template-columns:1fr_1fr_1fr_1fr] gap-4 mb-8 max-lg:grid-cols-2 max-sm:grid-cols-1'>
                     <div className={styles.statItem}>
                         <span className={styles.statValue}>{recipe.servings}</span>
-                        <span className={styles.statLabel}>Portions</span>
+                        <span className={styles.statLabel}>Servings</span>
                     </div>
 
                     <div className={styles.statItem}>
@@ -87,12 +87,12 @@ const Header = ({ recipe }: HeaderProps) => {
 
                     <div className={styles.statItem}>
                         <span className={styles.statValue}>{recipe.prepTime} min</span>
-                        <span className={styles.statLabel}>Préparation</span>
+                        <span className={styles.statLabel}>Prep Time</span>
                     </div>
 
                     <div className={styles.statItem}>
                         <span className={styles.statValue}>{recipe.cookTime} min</span>
-                        <span className={styles.statLabel}>Cuisson</span>
+                        <span className={styles.statLabel}>Cooking</span>
                     </div>
                 </div>
 

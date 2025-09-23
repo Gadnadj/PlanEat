@@ -24,13 +24,13 @@ const ShoppingListPage = () => {
     const [items, setItems] = useState<ShoppingItemData[]>([]);
     const [loading, setLoading] = useState(true);
     const [newItemName, setNewItemName] = useState('');
-    const [newItemCategory, setNewItemCategory] = useState('Autres');
+    const [newItemCategory, setNewItemCategory] = useState('Other');
     const [newItemQuantity, setNewItemQuantity] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('Toutes');
+    const [selectedCategory, setSelectedCategory] = useState('All');
     const [editingItem, setEditingItem] = useState<string | null>(null);
     const [editQuantity, setEditQuantity] = useState('');
 
-    const categories = ['Toutes', 'Fruits & Légumes', 'Viandes & Poissons', 'Produits laitiers', 'Épicerie', 'Boulangerie', 'Boissons', 'Autres'];
+    const categories = ['All', 'Fruits & Vegetables', 'Meat & Fish', 'Dairy Products', 'Groceries', 'Bakery', 'Beverages', 'Other'];
 
     const loadItems = useCallback(async () => {
         if (!token) return;
@@ -49,7 +49,7 @@ const ShoppingListPage = () => {
                 }
             }
         } catch (error) {
-            console.error('Erreur lors du chargement des articles:', error);
+            console.error('Error loading items:', error);
         } finally {
             setLoading(false);
         }
@@ -84,11 +84,11 @@ const ShoppingListPage = () => {
                     setItems(prev => [data.item, ...prev]);
                     setNewItemName('');
                     setNewItemQuantity('');
-                    setNewItemCategory('Autres');
+                    setNewItemCategory('Other');
                 }
             }
         } catch (error) {
-            console.error('Erreur lors de l\'ajout de l\'article:', error);
+            console.error('Error adding item:', error);
         }
     };
 
@@ -111,7 +111,7 @@ const ShoppingListPage = () => {
                 ));
             }
         } catch (error) {
-            console.error('Erreur lors de la mise à jour de l\'article:', error);
+            console.error('Error updating item:', error);
         }
     };
 
@@ -130,12 +130,12 @@ const ShoppingListPage = () => {
                 setItems(prev => prev.filter(item => item.id !== id));
             }
         } catch (error) {
-            console.error('Erreur lors de la suppression de l\'article:', error);
+            console.error('Error deleting item:', error);
         }
     };
 
     const deleteAllItems = async () => {
-        if (!token || !confirm('Êtes-vous sûr de vouloir supprimer tous les articles ?')) return;
+        if (!token || !confirm('Are you sure you want to delete all items?')) return;
 
         try {
             const response = await fetch('/api/shopping-list', {
@@ -149,7 +149,7 @@ const ShoppingListPage = () => {
                 setItems([]);
             }
         } catch (error) {
-            console.error('Erreur lors de la suppression de tous les articles:', error);
+            console.error('Error deleting all items:', error);
         }
     };
 
@@ -179,7 +179,7 @@ const ShoppingListPage = () => {
                 setEditQuantity('');
             }
         } catch (error) {
-            console.error('Erreur lors de la modification de l\'article:', error);
+            console.error('Error updating item:', error);
         }
     };
 
@@ -199,7 +199,7 @@ const ShoppingListPage = () => {
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Liste de Courses - Plan Eat</title>
+                <title>Shopping List - Plan Eat</title>
                 <style>
                     body {
                         font-family: Arial, sans-serif;
@@ -294,8 +294,8 @@ const ShoppingListPage = () => {
             </head>
             <body>
                 <div class="header">
-                    <h1>🛒 Ma Liste de Courses</h1>
-                    <p>Générée le ${new Date().toLocaleDateString('fr-FR', { 
+                    <h1>🛒 My Shopping List</h1>
+                    <p>Generated on ${new Date().toLocaleDateString('en-US', { 
                         weekday: 'long', 
                         year: 'numeric', 
                         month: 'long', 
@@ -310,17 +310,17 @@ const ShoppingListPage = () => {
                     </div>
                     <div class="stat">
                         <div class="stat-value">${completedItems.length}</div>
-                        <div class="stat-label">Achetés</div>
+                        <div class="stat-label">Purchased</div>
                     </div>
                     <div class="stat">
                         <div class="stat-value">${remainingItems.length}</div>
-                        <div class="stat-label">Restants</div>
+                        <div class="stat-label">Remaining</div>
                     </div>
                 </div>
 
                 ${remainingItems.length > 0 ? `
                 <div class="section">
-                    <div class="section-title">📝 À acheter (${remainingItems.length})</div>
+                    <div class="section-title">📝 To Buy (${remainingItems.length})</div>
                     ${remainingItems.map(item => `
                         <div class="item">
                             <div>
@@ -335,7 +335,7 @@ const ShoppingListPage = () => {
 
                 ${completedItems.length > 0 ? `
                 <div class="section">
-                    <div class="section-title">✅ Déjà achetés (${completedItems.length})</div>
+                    <div class="section-title">✅ Already Purchased (${completedItems.length})</div>
                     ${completedItems.map(item => `
                         <div class="item completed">
                             <div>
@@ -349,7 +349,7 @@ const ShoppingListPage = () => {
                 ` : ''}
 
                 <div class="footer">
-                    <p>Générée par Plan Eat - Votre assistant nutrition personnel</p>
+                    <p>Generated by Plan Eat - Your personal nutrition assistant</p>
                 </div>
             </body>
             </html>
@@ -362,7 +362,7 @@ const ShoppingListPage = () => {
         printWindow.close();
     };
 
-    const filteredItems = selectedCategory === 'Toutes' 
+    const filteredItems = selectedCategory === 'All' 
         ? items 
         : items.filter(item => item.category === selectedCategory);
 
@@ -375,7 +375,7 @@ const ShoppingListPage = () => {
                 <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex items-center justify-center">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3b82f6] mx-auto mb-4"></div>
-                        <p className="text-white text-lg">Chargement de votre liste de courses...</p>
+                        <p className="text-white text-lg">Loading your shopping list...</p>
                     </div>
                 </div>
             </ProtectedRoute>
@@ -399,14 +399,14 @@ const ShoppingListPage = () => {
             <div className='max-w-[1400px] mx-auto pt-0 py-8 px-8 grid grid-cols-[1fr_300px] gap-8 max-lg:grid-cols-1 max-md:pt-0 max-md:px-4 max-md:pb-8  max-sm:pl-4 max-sm:pr-4'>
                 <section className='bg-[#2a2a2a] rounded-[15px] p-8 shadow-[0_4px_15px_rgba(0,0,0,0.2)]'>
                     <div className='flex justify-between items-center mb-2'>
-                        <h2 className='text-[#3b82f6] text-[1.5rem] font-bold'>Ma liste de courses</h2>
+                        <h2 className='text-[#3b82f6] text-[1.5rem] font-bold'>My Shopping List</h2>
                     </div>
 
                     <div className='flex gap-2 mb-8 max-sm:flex-col'>
                         <input 
                             className='flex-1 bg-[#3a3a3a] border-2 border-[#505050] rounded-[10px] p-[0.8rem] text-[#e0e0e0] text-[1rem] transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]' 
                             type="text" 
-                            placeholder="Nom de l'article..." 
+                            placeholder="Item name..." 
                             value={newItemName}
                             onChange={(e) => setNewItemName(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && addItem()}
@@ -423,7 +423,7 @@ const ShoppingListPage = () => {
                         <input 
                             className='bg-[#3a3a3a] border-2 border-[#505050] rounded-[10px] p-[0.8rem] text-[#e0e0e0] text-[1rem] transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6] w-24' 
                             type="text" 
-                            placeholder='Qté' 
+                            placeholder='Qty' 
                             value={newItemQuantity}
                             onChange={(e) => setNewItemQuantity(e.target.value)}
                         />
@@ -432,7 +432,7 @@ const ShoppingListPage = () => {
                             onClick={addItem}
                             disabled={!newItemName.trim()}
                         >
-                            ➕ Ajouter
+                            ➕ Add
                         </button>
                     </div>
 
@@ -445,9 +445,9 @@ const ShoppingListPage = () => {
                     <div className='flex flex-col gap-2'>
                         {filteredItems.length === 0 ? (
                             <div className="text-center py-8 text-gray-400">
-                                {selectedCategory === 'Toutes' 
-                                    ? 'Aucun article dans votre liste' 
-                                    : `Aucun article dans la catégorie "${selectedCategory}"`
+                                {selectedCategory === 'All' 
+                                    ? 'No items in your list' 
+                                    : `No items in category "${selectedCategory}"`
                                 }
                             </div>
                         ) : (

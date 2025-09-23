@@ -8,9 +8,9 @@ interface StatSectionProps {
 
 const StatSection = ({ totalItems, completedItems, remainingItems }: StatSectionProps) => {
     const list = [
-        { label: 'Articles', value: totalItems.toString() },
-        { label: 'Complétés', value: completedItems.toString() },
-        { label: 'Restants', value: remainingItems.toString() }
+        { label: 'Items', value: totalItems.toString() },
+        { label: 'Completed', value: completedItems.toString() },
+        { label: 'Remaining', value: remainingItems.toString() }
     ];
 
     return (

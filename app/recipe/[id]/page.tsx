@@ -54,10 +54,10 @@ const Page = () => {
           const data = await response.json();
           setRecipe(data.recipe);
         } else {
-          console.error('Erreur lors du chargement de la recette');
+          console.error('Error loading recipe');
         }
       } catch (error) {
-        console.error('Erreur lors du chargement de la recette:', error);
+        console.error('Error loading recipe:', error);
       } finally {
         setLoading(false);
       }
@@ -71,7 +71,7 @@ const Page = () => {
 
   const addIngredientToShoppingList = async (ingredient: { name: string; amount: string; unit?: string }) => {
     if (!token) {
-      alert('Veuillez vous connecter pour ajouter des articles à votre liste de courses');
+      alert('Please log in to add items to your shopping list');
       return;
     }
 
@@ -92,14 +92,14 @@ const Page = () => {
       });
 
       if (response.ok) {
-        alert(`${ingredient.name} ajouté à votre liste de courses (${category}) !`);
+        alert(`${ingredient.name} added to your shopping list (${category})!`);
       } else {
-        console.error(`Erreur lors de l'ajout de ${ingredient.name}`);
-        alert('Erreur lors de l\'ajout à la liste de courses');
+        console.error(`Error adding ${ingredient.name}`);
+        alert('Error adding to shopping list');
       }
     } catch (error) {
-      console.error('Erreur lors de l\'ajout à la liste de courses:', error);
-      alert('Erreur lors de l\'ajout à la liste de courses');
+      console.error('Error adding to shopping list:', error);
+      alert('Error adding to shopping list');
     }
   };
 
@@ -109,7 +109,7 @@ const Page = () => {
         <div className='max-w-[1400px] mx-auto px-8 py-12 flex justify-center items-center'>
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3b82f6] mx-auto mb-4"></div>
-            <p className="text-[#b0b0b0]">Chargement de la recette...</p>
+            <p className="text-[#b0b0b0]">Loading recipe...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -121,7 +121,7 @@ const Page = () => {
       <ProtectedRoute>
         <div className='max-w-[1400px] mx-auto px-8 py-12 flex justify-center items-center'>
           <div className="text-center">
-            <p className="text-[#b0b0b0] text-lg">Recette non trouvée</p>
+            <p className="text-[#b0b0b0] text-lg">Recipe not found</p>
           </div>
         </div>
       </ProtectedRoute>

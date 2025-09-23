@@ -7,7 +7,7 @@ import RecipesList from '@/components/ReceipePage/RecipesList'
 import Search from '@/components/ReceipePage/Search'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 
 interface RecipeData {
   id: string;
