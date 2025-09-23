@@ -5,6 +5,14 @@ export interface IUser extends Document {
   email: string;
   password: string;
   name: string;
+  preferences?: {
+    dietType: string;
+    allergies: string[];
+    dislikes: string[];
+    numberOfPeople: number;
+    budget: string;
+    cookingTime: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,6 +38,37 @@ const UserSchema = new Schema<IUser>({
     trim: true,
     minlength: [2, 'Le nom doit contenir au moins 2 caractères'],
     maxlength: [50, 'Le nom ne peut pas dépasser 50 caractères']
+  },
+  preferences: {
+    dietType: {
+      type: String,
+      enum: ['omnivore', 'vegetarian', 'vegan', 'pescatarian'],
+      default: 'omnivore'
+    },
+    allergies: [{
+      type: String,
+      trim: true
+    }],
+    dislikes: [{
+      type: String,
+      trim: true
+    }],
+    numberOfPeople: {
+      type: Number,
+      min: 1,
+      max: 20,
+      default: 2
+    },
+    budget: {
+      type: String,
+      enum: ['faible', 'moyen', 'élevé'],
+      default: 'moyen'
+    },
+    cookingTime: {
+      type: String,
+      enum: ['rapide', 'moyen', 'long'],
+      default: 'moyen'
+    }
   }
 }, {
   timestamps: true, // Ajoute automatiquement createdAt et updatedAt

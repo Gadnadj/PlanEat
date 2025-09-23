@@ -1,9 +1,27 @@
 "use client"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
+
+interface Meal {
+  name?: string;
+  nom?: string;
+  emoji?: string;
+  ingredients: string[];
+  temps?: string;
+}
+
+interface MealPlan {
+  [day: string]: {
+    matin: Meal;
+    midi: Meal;
+    soir: Meal;
+  };
+}
 
 export default function PlanificationPage() {
+  const { token } = useAuth();
   const [selectedDay, setSelectedDay] = useState<string>("lundi");
   const [preferences, setPreferences] = useState<{
     dietType: string;
@@ -13,23 +31,51 @@ export default function PlanificationPage() {
     budget: string;
     cookingTime: string;
   } | null>(null);
-  const [generatedPlan, setGeneratedPlan] = useState<any>(null);
+  const [generatedPlan, setGeneratedPlan] = useState<MealPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  useEffect(() => {
-    const savedPreferences = localStorage.getItem('mealPreferences');
-    if (savedPreferences) {
-      setPreferences(JSON.parse(savedPreferences));
-    }
+  const loadUserData = useCallback(async () => {
+    if (!token) return;
     
-    // Charger le plan généré par l'IA s'il existe
-    const savedGeneratedPlan = localStorage.getItem('generatedMealPlan');
-    if (savedGeneratedPlan) {
-      setGeneratedPlan(JSON.parse(savedGeneratedPlan));
-    }
-  }, []);
+    try {
+      // Charger les préférences depuis la base de données
+      const preferencesResponse = await fetch('/api/user-preferences', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (preferencesResponse.ok) {
+        const preferencesData = await preferencesResponse.json();
+        if (preferencesData.success) {
+          setPreferences(preferencesData.preferences);
+        }
+      }
 
-  const generateMealPlanWithAI = async () => {
+      // Charger le plan généré par l'IA depuis la base de données
+      const mealPlanResponse = await fetch('/api/meal-plans', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (mealPlanResponse.ok) {
+        const mealPlanData = await mealPlanResponse.json();
+        if (mealPlanData.success) {
+          setGeneratedPlan(mealPlanData.mealPlan);
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      loadUserData();
+    }
+  }, [token, loadUserData]);
+
+
+  const regenerateMealPlan = async () => {
     if (!preferences) return;
     
     setIsGenerating(true);
@@ -46,15 +92,24 @@ export default function PlanificationPage() {
       const data = await response.json();
       
       if (data.success && data.mealPlan) {
-        // Sauvegarder le plan généré par l'IA
-        localStorage.setItem('generatedMealPlan', JSON.stringify(data.mealPlan));
-        setGeneratedPlan(data.mealPlan);
-        
-        if (data.message) {
-          alert(data.message);
+        // Sauvegarder le nouveau plan généré par l'IA en base de données
+        const saveResponse = await fetch('/api/meal-plans', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ preferences, mealPlan: data.mealPlan }),
+        });
+
+        if (saveResponse.ok) {
+          setGeneratedPlan(data.mealPlan);
+          alert('Planning mis à jour avec succès !');
+        } else {
+          alert('Erreur lors de la mise à jour du planning');
         }
       } else {
-        alert('Erreur lors de la génération du plan');
+        alert('Erreur lors de la régénération du plan');
       }
     } catch (error) {
       console.error('Erreur:', error);
@@ -64,166 +119,11 @@ export default function PlanificationPage() {
     }
   };
 
-  const generateMealPlan = (dietType: string) => {
-    const mealPlans = {
-      omnivore: {
-        lundi: {
-          matin: { name: "Petit-déjeuner Continental", emoji: "🥐", ingredients: ["Croissants", "Confiture", "Café", "Jus d'orange"] },
-          midi: { name: "Salade César au Poulet", emoji: "🥗", ingredients: ["Salade verte", "Poulet grillé", "Parmesan", "Croûtons"] },
-          soir: { name: "Pâtes Carbonara", emoji: "🍝", ingredients: ["Pâtes", "Lardons", "Œufs", "Parmesan", "Crème"] }
-        },
-        mardi: {
-          matin: { name: "Pancakes aux Myrtilles", emoji: "🥞", ingredients: ["Farine", "Œufs", "Lait", "Myrtilles", "Sirop d'érable"] },
-          midi: { name: "Wrap au Poulet", emoji: "🌯", ingredients: ["Tortilla", "Poulet", "Avocat", "Tomates", "Laitue"] },
-          soir: { name: "Saumon Grillé aux Légumes", emoji: "🐟", ingredients: ["Saumon", "Brocolis", "Carottes", "Citron", "Herbes"] }
-        },
-        mercredi: {
-          matin: { name: "Smoothie Bowl", emoji: "🥤", ingredients: ["Banane", "Baies", "Granola", "Yaourt grec", "Miel"] },
-          midi: { name: "Quiche Lorraine", emoji: "🥧", ingredients: ["Pâte brisée", "Œufs", "Lardons", "Crème", "Fromage"] },
-          soir: { name: "Curry de Légumes", emoji: "🍛", ingredients: ["Riz", "Légumes variés", "Lait de coco", "Curry", "Épices"] }
-        },
-        jeudi: {
-          matin: { name: "Omelette aux Herbes", emoji: "🍳", ingredients: ["Œufs", "Basilic", "Persil", "Tomates", "Pain grillé"] },
-          midi: { name: "Bowl de Buddha", emoji: "🥗", ingredients: ["Quinoa", "Avocat", "Épinards", "Graines", "Vinaigrette"] },
-          soir: { name: "Poulet Rôti aux Pommes de Terre", emoji: "🍗", ingredients: ["Poulet entier", "Pommes de terre", "Carottes", "Oignons", "Thym"] }
-        },
-        vendredi: {
-          matin: { name: "Granola Maison", emoji: "🥣", ingredients: ["Flocons d'avoine", "Noix", "Miel", "Fruits secs", "Yaourt"] },
-          midi: { name: "Burger Classique", emoji: "🍔", ingredients: ["Pain burger", "Steak haché", "Salade", "Tomate", "Sauce"] },
-          soir: { name: "Pizza Margherita", emoji: "🍕", ingredients: ["Pâte à pizza", "Tomates", "Mozzarella", "Basilic", "Huile d'olive"] }
-        },
-        samedi: {
-          matin: { name: "Brunch Anglais", emoji: "🥓", ingredients: ["Œufs brouillés", "Bacon", "Haricots", "Tomates", "Pain"] },
-          midi: { name: "Tacos au Poisson", emoji: "🌮", ingredients: ["Tortillas", "Poisson blanc", "Chou", "Sauce", "Citron vert"] },
-          soir: { name: "Risotto aux Champignons", emoji: "🍚", ingredients: ["Riz Arborio", "Champignons", "Bouillon", "Parmesan", "Vin blanc"] }
-        },
-        dimanche: {
-          matin: { name: "Pain Perdu", emoji: "🍞", ingredients: ["Pain rassis", "Œufs", "Lait", "Cannelle", "Sirop"] },
-          midi: { name: "Déjeuner Familial", emoji: "🍽️", ingredients: ["Rôti de bœuf", "Légumes rôtis", "Yorkshire pudding", "Sauce"] },
-          soir: { name: "Soupe de Légumes", emoji: "🍲", ingredients: ["Légumes variés", "Bouillon", "Herbes", "Pain", "Fromage"] }
-        }
-      },
-      vegetarian: {
-        lundi: {
-          matin: { name: "Avoine aux Fruits", emoji: "🥣", ingredients: ["Flocons d'avoine", "Banane", "Baies", "Lait végétal", "Miel"] },
-          midi: { name: "Salade de Quinoa", emoji: "🥗", ingredients: ["Quinoa", "Épinards", "Tomates", "Avocat", "Vinaigrette"] },
-          soir: { name: "Pâtes aux Légumes", emoji: "🍝", ingredients: ["Pâtes", "Courgettes", "Tomates", "Basilic", "Parmesan"] }
-        },
-        mardi: {
-          matin: { name: "Pancakes Végétariens", emoji: "🥞", ingredients: ["Farine", "Œufs", "Lait végétal", "Myrtilles", "Sirop d'érable"] },
-          midi: { name: "Wrap Végétarien", emoji: "🌯", ingredients: ["Tortilla", "Avocat", "Tomates", "Laitue", "Hummus"] },
-          soir: { name: "Curry de Légumes", emoji: "🍛", ingredients: ["Riz", "Légumes variés", "Lait de coco", "Curry", "Épices"] }
-        },
-        mercredi: {
-          matin: { name: "Smoothie Bowl Végétarien", emoji: "🥤", ingredients: ["Banane", "Baies", "Granola", "Yaourt grec", "Miel"] },
-          midi: { name: "Quiche aux Légumes", emoji: "🥧", ingredients: ["Pâte brisée", "Œufs", "Épinards", "Tomates", "Fromage"] },
-          soir: { name: "Risotto aux Légumes", emoji: "🍚", ingredients: ["Riz Arborio", "Légumes variés", "Bouillon", "Parmesan", "Herbes"] }
-        },
-        jeudi: {
-          matin: { name: "Omelette aux Herbes", emoji: "🍳", ingredients: ["Œufs", "Basilic", "Persil", "Tomates", "Pain grillé"] },
-          midi: { name: "Bowl de Buddha", emoji: "🥗", ingredients: ["Quinoa", "Avocat", "Épinards", "Graines", "Vinaigrette"] },
-          soir: { name: "Gratin de Légumes", emoji: "🥔", ingredients: ["Pommes de terre", "Carottes", "Courgettes", "Fromage", "Crème"] }
-        },
-        vendredi: {
-          matin: { name: "Granola Maison", emoji: "🥣", ingredients: ["Flocons d'avoine", "Noix", "Miel", "Fruits secs", "Yaourt"] },
-          midi: { name: "Burger Végétarien", emoji: "🍔", ingredients: ["Pain burger", "Steak végétal", "Salade", "Tomate", "Sauce"] },
-          soir: { name: "Pizza Végétarienne", emoji: "🍕", ingredients: ["Pâte à pizza", "Tomates", "Mozzarella", "Basilic", "Légumes"] }
-        },
-        samedi: {
-          matin: { name: "Brunch Végétarien", emoji: "🥓", ingredients: ["Œufs brouillés", "Haricots", "Tomates", "Pain", "Avocat"] },
-          midi: { name: "Tacos Végétariens", emoji: "🌮", ingredients: ["Tortillas", "Haricots", "Chou", "Sauce", "Avocat"] },
-          soir: { name: "Risotto aux Champignons", emoji: "🍚", ingredients: ["Riz Arborio", "Champignons", "Bouillon", "Parmesan", "Herbes"] }
-        },
-        dimanche: {
-          matin: { name: "Pain Perdu", emoji: "🍞", ingredients: ["Pain rassis", "Œufs", "Lait végétal", "Cannelle", "Sirop"] },
-          midi: { name: "Déjeuner Végétarien", emoji: "🍽️", ingredients: ["Quiche", "Légumes rôtis", "Salade", "Vinaigrette"] },
-          soir: { name: "Soupe de Légumes", emoji: "🍲", ingredients: ["Légumes variés", "Bouillon", "Herbes", "Pain", "Fromage"] }
-        }
-      },
-      vegan: {
-        lundi: {
-          matin: { name: "Avoine aux Fruits", emoji: "🥣", ingredients: ["Flocons d'avoine", "Banane", "Baies", "Lait d'amande", "Miel"] },
-          midi: { name: "Salade de Quinoa", emoji: "🥗", ingredients: ["Quinoa", "Épinards", "Tomates", "Avocat", "Vinaigrette"] },
-          soir: { name: "Pâtes aux Légumes", emoji: "🍝", ingredients: ["Pâtes", "Courgettes", "Tomates", "Basilic", "Levure nutritionnelle"] }
-        },
-        mardi: {
-          matin: { name: "Pancakes Végan", emoji: "🥞", ingredients: ["Farine", "Lait d'avoine", "Banane", "Myrtilles", "Sirop d'érable"] },
-          midi: { name: "Wrap Végan", emoji: "🌯", ingredients: ["Tortilla", "Avocat", "Tomates", "Laitue", "Hummus"] },
-          soir: { name: "Curry de Légumes", emoji: "🍛", ingredients: ["Riz", "Légumes variés", "Lait de coco", "Curry", "Épices"] }
-        },
-        mercredi: {
-          matin: { name: "Smoothie Bowl Végan", emoji: "🥤", ingredients: ["Banane", "Baies", "Granola", "Yaourt de coco", "Miel"] },
-          midi: { name: "Quiche Végane", emoji: "🥧", ingredients: ["Pâte brisée", "Tofu", "Épinards", "Tomates", "Levure nutritionnelle"] },
-          soir: { name: "Risotto Végan", emoji: "🍚", ingredients: ["Riz Arborio", "Légumes variés", "Bouillon", "Levure nutritionnelle", "Herbes"] }
-        },
-        jeudi: {
-          matin: { name: "Tofu Brouillé", emoji: "🍳", ingredients: ["Tofu", "Basilic", "Persil", "Tomates", "Pain grillé"] },
-          midi: { name: "Bowl de Buddha", emoji: "🥗", ingredients: ["Quinoa", "Avocat", "Épinards", "Graines", "Vinaigrette"] },
-          soir: { name: "Gratin de Légumes Végan", emoji: "🥔", ingredients: ["Pommes de terre", "Carottes", "Courgettes", "Crème de coco", "Herbes"] }
-        },
-        vendredi: {
-          matin: { name: "Granola Végan", emoji: "🥣", ingredients: ["Flocons d'avoine", "Noix", "Miel", "Fruits secs", "Yaourt de coco"] },
-          midi: { name: "Burger Végan", emoji: "🍔", ingredients: ["Pain burger", "Steak végétal", "Salade", "Tomate", "Sauce végane"] },
-          soir: { name: "Pizza Végane", emoji: "🍕", ingredients: ["Pâte à pizza", "Tomates", "Fromage végan", "Basilic", "Légumes"] }
-        },
-        samedi: {
-          matin: { name: "Brunch Végan", emoji: "🥓", ingredients: ["Tofu brouillé", "Haricots", "Tomates", "Pain", "Avocat"] },
-          midi: { name: "Tacos Végan", emoji: "🌮", ingredients: ["Tortillas", "Haricots", "Chou", "Sauce", "Avocat"] },
-          soir: { name: "Risotto Végan", emoji: "🍚", ingredients: ["Riz Arborio", "Champignons", "Bouillon", "Levure nutritionnelle", "Herbes"] }
-        },
-        dimanche: {
-          matin: { name: "Pain Perdu Végan", emoji: "🍞", ingredients: ["Pain rassis", "Lait d'avoine", "Cannelle", "Sirop", "Banane"] },
-          midi: { name: "Déjeuner Végan", emoji: "🍽️", ingredients: ["Quiche végane", "Légumes rôtis", "Salade", "Vinaigrette"] },
-          soir: { name: "Soupe de Légumes", emoji: "🍲", ingredients: ["Légumes variés", "Bouillon", "Herbes", "Pain", "Levure nutritionnelle"] }
-        }
-      },
-      pescatarian: {
-        lundi: {
-          matin: { name: "Avoine aux Fruits", emoji: "🥣", ingredients: ["Flocons d'avoine", "Banane", "Baies", "Lait végétal", "Miel"] },
-          midi: { name: "Salade de Quinoa", emoji: "🥗", ingredients: ["Quinoa", "Épinards", "Tomates", "Avocat", "Vinaigrette"] },
-          soir: { name: "Saumon Grillé aux Légumes", emoji: "🐟", ingredients: ["Saumon", "Brocolis", "Carottes", "Citron", "Herbes"] }
-        },
-        mardi: {
-          matin: { name: "Pancakes aux Fruits", emoji: "🥞", ingredients: ["Farine", "Œufs", "Lait végétal", "Myrtilles", "Sirop d'érable"] },
-          midi: { name: "Wrap au Thon", emoji: "🌯", ingredients: ["Tortilla", "Thon", "Avocat", "Tomates", "Laitue"] },
-          soir: { name: "Curry de Légumes", emoji: "🍛", ingredients: ["Riz", "Légumes variés", "Lait de coco", "Curry", "Épices"] }
-        },
-        mercredi: {
-          matin: { name: "Smoothie Bowl", emoji: "🥤", ingredients: ["Banane", "Baies", "Granola", "Yaourt grec", "Miel"] },
-          midi: { name: "Quiche aux Légumes", emoji: "🥧", ingredients: ["Pâte brisée", "Œufs", "Épinards", "Tomates", "Fromage"] },
-          soir: { name: "Risotto aux Fruits de Mer", emoji: "🍚", ingredients: ["Riz Arborio", "Fruits de mer", "Bouillon", "Parmesan", "Herbes"] }
-        },
-        jeudi: {
-          matin: { name: "Omelette aux Herbes", emoji: "🍳", ingredients: ["Œufs", "Basilic", "Persil", "Tomates", "Pain grillé"] },
-          midi: { name: "Bowl de Buddha", emoji: "🥗", ingredients: ["Quinoa", "Avocat", "Épinards", "Graines", "Vinaigrette"] },
-          soir: { name: "Poisson en Papillote", emoji: "🐟", ingredients: ["Poisson blanc", "Légumes", "Citron", "Herbes", "Huile d'olive"] }
-        },
-        vendredi: {
-          matin: { name: "Granola Maison", emoji: "🥣", ingredients: ["Flocons d'avoine", "Noix", "Miel", "Fruits secs", "Yaourt"] },
-          midi: { name: "Burger de Poisson", emoji: "🍔", ingredients: ["Pain burger", "Steak de poisson", "Salade", "Tomate", "Sauce"] },
-          soir: { name: "Pizza aux Fruits de Mer", emoji: "🍕", ingredients: ["Pâte à pizza", "Tomates", "Mozzarella", "Fruits de mer", "Basilic"] }
-        },
-        samedi: {
-          matin: { name: "Brunch Pescatarien", emoji: "🥓", ingredients: ["Œufs brouillés", "Saumon fumé", "Tomates", "Pain", "Avocat"] },
-          midi: { name: "Tacos au Poisson", emoji: "🌮", ingredients: ["Tortillas", "Poisson blanc", "Chou", "Sauce", "Citron vert"] },
-          soir: { name: "Risotto aux Champignons", emoji: "🍚", ingredients: ["Riz Arborio", "Champignons", "Bouillon", "Parmesan", "Herbes"] }
-        },
-        dimanche: {
-          matin: { name: "Pain Perdu", emoji: "🍞", ingredients: ["Pain rassis", "Œufs", "Lait végétal", "Cannelle", "Sirop"] },
-          midi: { name: "Déjeuner Pescatarien", emoji: "🍽️", ingredients: ["Poisson rôti", "Légumes rôtis", "Salade", "Vinaigrette"] },
-          soir: { name: "Soupe de Poisson", emoji: "🍲", ingredients: ["Poisson blanc", "Légumes", "Bouillon", "Herbes", "Pain"] }
-        }
-      }
-    };
+  const weeklyMealPlan = generatedPlan;
 
-    return mealPlans[dietType as keyof typeof mealPlans] || mealPlans.omnivore;
-  };
+  const days = weeklyMealPlan ? Object.keys(weeklyMealPlan) as string[] : [];
 
-  const weeklyMealPlan = generatedPlan || (preferences ? generateMealPlan(preferences.dietType) : generateMealPlan('omnivore'));
-
-  const days = Object.keys(weeklyMealPlan) as Array<keyof typeof weeklyMealPlan>;
-
-  const getMealCard = (meal: any, time: string) => {
+  const getMealCard = (meal: Meal, time: string) => {
     // Gérer les deux formats : plan par défaut et plan généré par IA
     const mealName = meal.name || meal.nom || `Repas ${time}`;
     const mealEmoji = meal.emoji || '🍽️';
@@ -289,20 +189,12 @@ export default function PlanificationPage() {
             Votre planning hebdomadaire personnalisé avec des repas équilibrés pour chaque jour
           </p>
           
-          <button
-            onClick={generateMealPlanWithAI}
-            disabled={isGenerating}
-            className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed mb-6"
+          <Link
+            href="/preferences"
+            className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 mb-6 inline-block"
           >
-            {isGenerating ? (
-              <span className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Génération en cours...
-              </span>
-            ) : (
-              '🤖 Générer avec l\'IA'
-            )}
-          </button>
+            🤖 Configurer et générer avec l&apos;IA
+          </Link>
           
           {preferences && (
             <div className="mt-4 bg-[#2a2a2a] rounded-lg p-4 max-w-2xl mx-auto">
@@ -316,64 +208,109 @@ export default function PlanificationPage() {
           )}
         </div>
 
-        {/* Navigation des jours */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {days.map((day) => (
-            <button
-              key={day}
-              onClick={() => setSelectedDay(day)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                selectedDay === day
-                  ? "bg-[#3b82f6] text-white shadow-lg"
-                  : "bg-[#2a2a2a] text-gray-300 hover:bg-[#3a3a3a] hover:text-white"
-              }`}
+        {/* État vide si pas de plan généré */}
+        {!weeklyMealPlan ? (
+          <div className="bg-[#2a2a2a] rounded-2xl p-12 shadow-xl text-center">
+            <div className="text-6xl mb-6">🍽️</div>
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Aucun planning généré
+            </h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Cliquez sur &quot;🤖 Configurer et générer avec l&apos;IA&quot; pour configurer vos préférences alimentaires et créer votre planning personnalisé.
+            </p>
+            <div className="bg-[#1a1a1a] rounded-lg p-6 max-w-md mx-auto mb-6">
+              <h3 className="text-lg font-bold text-[#3b82f6] mb-3">💡 Comment ça marche ?</h3>
+              <ul className="text-gray-300 text-sm space-y-2 text-left">
+                <li>• Configurez vos préférences alimentaires</li>
+                <li>• L&apos;IA génère un planning personnalisé</li>
+                <li>• Régénérez autant de fois que souhaité</li>
+                <li>• Vos plannings sont sauvegardés</li>
+              </ul>
+            </div>
+            <Link
+              href="/preferences"
+              className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 inline-block"
             >
-              {day.charAt(0).toUpperCase() + day.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Planning du jour sélectionné */}
-        <div className="bg-[#2a2a2a] rounded-2xl p-8 shadow-xl">
-          <h2 className="text-2xl font-bold text-[#3b82f6] mb-6 text-center">
-            {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Petit-déjeuner */}
-            <div>
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                🌅 Petit-déjeuner
-              </h3>
-              {getMealCard(weeklyMealPlan[selectedDay as keyof typeof weeklyMealPlan].matin, "matin")}
-            </div>
-
-            {/* Déjeuner */}
-            <div>
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                ☀️ Déjeuner
-              </h3>
-              {getMealCard(weeklyMealPlan[selectedDay as keyof typeof weeklyMealPlan].midi, "midi")}
-            </div>
-
-            {/* Dîner */}
-            <div>
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                🌙 Dîner
-              </h3>
-              {getMealCard(weeklyMealPlan[selectedDay as keyof typeof weeklyMealPlan].soir, "soir")}
-            </div>
+              🚀 Commencer la configuration
+            </Link>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Navigation des jours */}
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              {days.map((day) => (
+                <button
+                  key={day}
+                  onClick={() => setSelectedDay(day)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    selectedDay === day
+                      ? "bg-[#3b82f6] text-white shadow-lg"
+                      : "bg-[#2a2a2a] text-gray-300 hover:bg-[#3a3a3a] hover:text-white"
+                  }`}
+                >
+                  {String(day).charAt(0).toUpperCase() + String(day).slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* Planning du jour sélectionné */}
+            <div className="bg-[#2a2a2a] rounded-2xl p-8 shadow-xl">
+              <h2 className="text-2xl font-bold text-[#3b82f6] mb-6 text-center">
+                {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Petit-déjeuner */}
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    🌅 Petit-déjeuner
+                  </h3>
+                  {getMealCard(weeklyMealPlan[selectedDay]?.matin, "matin")}
+                </div>
+
+                {/* Déjeuner */}
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    ☀️ Déjeuner
+                  </h3>
+                  {getMealCard(weeklyMealPlan[selectedDay]?.midi, "midi")}
+                </div>
+
+                {/* Dîner */}
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    🌙 Dîner
+                  </h3>
+                  {getMealCard(weeklyMealPlan[selectedDay]?.soir, "soir")}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Actions */}
         <div className="flex flex-wrap justify-center gap-4 mt-8">
-          <button className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            🛒 Ajouter à la liste de courses
-          </button>
-          <button className="bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            🔄 Régénérer le planning
-          </button>
+          {weeklyMealPlan && (
+            <button className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              🛒 Ajouter à la liste de courses
+            </button>
+          )}
+          {weeklyMealPlan && (
+            <button 
+              onClick={regenerateMealPlan}
+              disabled={isGenerating}
+              className="bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isGenerating ? (
+                <span className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Régénération...
+                </span>
+              ) : (
+                '🔄 Régénérer le planning'
+              )}
+            </button>
+          )}
           <Link 
             href="/" 
             className="bg-gradient-to-r from-[#6b7280] to-[#4b5563] text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1"

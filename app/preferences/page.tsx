@@ -3,9 +3,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PreferencesPage() {
   const router = useRouter();
+  const { token } = useAuth();
   const [preferences, setPreferences] = useState({
     dietType: "",
     allergies: [] as string[],
@@ -86,6 +88,20 @@ export default function PreferencesPage() {
     setIsGenerating(true);
     
     try {
+      // Sauvegarder les préférences en base de données
+      const preferencesResponse = await fetch('/api/user-preferences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ preferences }),
+      });
+
+      if (!preferencesResponse.ok) {
+        throw new Error('Erreur lors de la sauvegarde des préférences');
+      }
+
       // Générer le plan avec l'IA
       const response = await fetch('/api/generate-meal-plan', {
         method: 'POST',
@@ -98,12 +114,22 @@ export default function PreferencesPage() {
       const data = await response.json();
       
       if (data.success && data.mealPlan) {
-        // Sauvegarder les préférences et le plan généré
-        localStorage.setItem('mealPreferences', JSON.stringify(preferences));
-        localStorage.setItem('generatedMealPlan', JSON.stringify(data.mealPlan));
-        
-        // Rediriger vers la page de planification
-        router.push('/planification');
+        // Sauvegarder le plan généré en base de données
+        const saveResponse = await fetch('/api/meal-plans', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ preferences, mealPlan: data.mealPlan }),
+        });
+
+        if (saveResponse.ok) {
+          // Rediriger vers la page de planification
+          router.push('/planification');
+        } else {
+          alert('Erreur lors de la sauvegarde du plan');
+        }
       } else {
         alert('Erreur lors de la génération du plan: ' + (data.message || 'Erreur inconnue'));
       }
