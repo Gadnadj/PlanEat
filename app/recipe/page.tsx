@@ -43,6 +43,13 @@ const Page = () => {
     const [recipes, setRecipes] = useState<RecipeData[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filters, setFilters] = useState({
+        category: 'Toutes',
+        prepTime: 'Tous',
+        difficulty: 'Toutes',
+        diet: 'Tous',
+        tags: [] as string[]
+    });
 
     const openModal = () => setIsModalOpen(true)
     const closeModal = () => setIsModalOpen(false)
@@ -63,7 +70,15 @@ const Page = () => {
                 headers['Authorization'] = `Bearer ${token}`;
             }
             
-            const response = await fetch('/api/recipes', { headers });
+            // Construire les paramètres de requête
+            const params = new URLSearchParams();
+            if (searchTerm) params.append('search', searchTerm);
+            if (filters.category !== 'Toutes') params.append('category', filters.category);
+            if (filters.difficulty !== 'Toutes') params.append('difficulty', filters.difficulty.toLowerCase());
+            if (filters.prepTime !== 'Tous') params.append('prepTime', filters.prepTime);
+            if (filters.tags.length > 0) params.append('tags', filters.tags.join(','));
+            
+            const response = await fetch(`/api/recipes?${params.toString()}`, { headers });
             if (response.ok) {
                 const data = await response.json();
                 setRecipes(data.recipes);
@@ -86,6 +101,14 @@ const Page = () => {
     const handleRecipeUpdated = () => {
         loadRecipes();
         closeEditModal();
+    };
+
+    const handleFilterChange = (newFilters: typeof filters) => {
+        setFilters(newFilters);
+    };
+
+    const handleSearchChange = (newSearchTerm: string) => {
+        setSearchTerm(newSearchTerm);
     };
 
     const deleteRecipe = async (recipeId: string) => {
@@ -119,15 +142,12 @@ const Page = () => {
         }
     };
 
-    const filteredRecipes = recipes.filter(recipe =>
-        recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        recipe.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    // Le filtrage se fait maintenant côté serveur
+    const filteredRecipes = recipes;
 
     useEffect(() => {
         loadRecipes();
-    }, []);
+    }, [searchTerm, filters]);
 
     useEffect(() => {
         if (isModalOpen) {
@@ -155,7 +175,7 @@ const Page = () => {
             {isModalOpen && <Modal onClose={closeModal} onRecipeCreated={handleRecipeCreated} />}
             {isEditModalOpen && editingRecipe && <EditModal recipe={editingRecipe} onClose={closeEditModal} onRecipeUpdated={handleRecipeUpdated} />}
             <Header />
-            <Search onSearchChange={setSearchTerm} />
+            <Search onSearchChange={handleSearchChange} onFilterChange={handleFilterChange} />
             <RecipesList 
                 recipes={filteredRecipes} 
                 loading={loading}

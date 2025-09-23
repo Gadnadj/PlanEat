@@ -11,6 +11,8 @@ export async function GET(req: Request) {
     const category = searchParams.get('category');
     const difficulty = searchParams.get('difficulty');
     const search = searchParams.get('search');
+    const prepTime = searchParams.get('prepTime');
+    const tags = searchParams.get('tags');
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
@@ -56,6 +58,30 @@ export async function GET(req: Request) {
     if (difficulty) filters.difficulty = difficulty;
     if (search) {
       filters.$text = { $search: search };
+    }
+    
+    // Filtre par temps de préparation
+    if (prepTime) {
+      switch (prepTime) {
+        case 'Moins de 15 min':
+          filters.prepTime = { $lt: 15 };
+          break;
+        case '15-30 min':
+          filters.prepTime = { $gte: 15, $lte: 30 };
+          break;
+        case '30-60 min':
+          filters.prepTime = { $gte: 30, $lte: 60 };
+          break;
+        case 'Plus de 1 heure':
+          filters.prepTime = { $gt: 60 };
+          break;
+      }
+    }
+    
+    // Filtre par tags
+    if (tags) {
+      const tagArray = tags.split(',').map(tag => tag.trim());
+      filters.tags = { $in: tagArray };
     }
 
     // Construire l'ordre de tri

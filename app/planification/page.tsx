@@ -33,9 +33,13 @@ export default function PlanificationPage() {
   } | null>(null);
   const [generatedPlan, setGeneratedPlan] = useState<MealPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadUserData = useCallback(async () => {
-    if (!token) return;
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
     
     try {
       // Charger les préférences depuis la base de données
@@ -65,14 +69,14 @@ export default function PlanificationPage() {
       }
     } catch (error) {
       console.error('Erreur lors du chargement des données:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, [token]);
 
   useEffect(() => {
-    if (token) {
-      loadUserData();
-    }
-  }, [token, loadUserData]);
+    loadUserData();
+  }, [loadUserData]);
 
 
   const regenerateMealPlan = async () => {
@@ -154,27 +158,20 @@ export default function PlanificationPage() {
     );
   };
 
-  // Si pas de préférences, rediriger vers la page de préférences
-  if (!preferences) {
+  // État de chargement
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            🍽️ Configuration Requise
-          </h1>
-          <p className="text-xl text-gray-300 mb-8">
-            Veuillez dVeuillez d abord configurerapos;abord configurer vos préférences alimentaires
-          </p>
-          <Link 
-            href="/preferences"
-            className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-          >
-            🚀 Configurer mes préférences
-          </Link>
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3b82f6] mx-auto mb-4"></div>
+            <p className="text-[#b0b0b0] text-lg">Chargement de vos données...</p>
+          </div>
         </div>
-      </div>
+      </ProtectedRoute>
     );
   }
+
 
   return (
     <ProtectedRoute>
