@@ -44,7 +44,7 @@ const RecipesList = ({ recipes, loading, onDelete, onEdit, onAddToPlanning, curr
                 <div className="flex justify-center items-center py-12">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3b82f6] mx-auto mb-4"></div>
-                        <p className="text-[#b0b0b0]">Chargement des recettes...</p>
+                        <p className="text-[#b0b0b0]">Loading recipes...</p>
                     </div>
                 </div>
             </main>
@@ -54,13 +54,13 @@ const RecipesList = ({ recipes, loading, onDelete, onEdit, onAddToPlanning, curr
     return (
         <main className='max-w-[1400px] mx-auto pt-0 px-8 pb-8'>
             <div className='flex justify-between items-center mb-8 py-4 border-b border-[#404040] max-md:flex-col max-md:items-start max-md:gap-4'>
-                <span className='text-[#b0b0b0] text-base'>{recipes.length} recette{recipes.length > 1 ? 's' : ''} trouvée{recipes.length > 1 ? 's' : ''}</span>
+                <span className='text-[#b0b0b0] text-base'>{recipes.length} recipe{recipes.length > 1 ? 's' : ''} found</span>
             </div>
 
             {recipes.length === 0 ? (
                 <div className="text-center py-12">
-                    <p className="text-[#b0b0b0] text-lg mb-4">Aucune recette trouvée</p>
-                    <p className="text-[#666]">Essayez de modifier vos critères de recherche</p>
+                    <p className="text-[#b0b0b0] text-lg mb-4">No recipes found</p>
+                    <p className="text-[#666]">Try modifying your search criteria</p>
                 </div>
             ) : (
                 <div className='grid gap-8 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))] max-md:grid-cols-1 max-sm:pl-4 max-sm:pr-4' style={{ gridTemplateRows: '1fr' }}>

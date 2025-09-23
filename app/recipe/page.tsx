@@ -47,10 +47,10 @@ const Page = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filters, setFilters] = useState({
-        category: 'Toutes',
-        prepTime: 'Tous',
-        difficulty: 'Toutes',
-        diet: 'Tous',
+        category: 'All',
+        prepTime: 'All',
+        difficulty: 'All',
+        diet: 'All',
         tags: [] as string[]
     });
     const [sortBy, setSortBy] = useState('createdAt');
@@ -84,12 +84,12 @@ const Page = () => {
                 headers['Authorization'] = `Bearer ${token}`;
             }
             
-            // Construire les paramètres de requête
+            // Build query parameters
             const params = new URLSearchParams();
             if (searchTerm) params.append('search', searchTerm);
-            if (filters.category !== 'Toutes') params.append('category', filters.category);
-            if (filters.difficulty !== 'Toutes') params.append('difficulty', filters.difficulty.toLowerCase());
-            if (filters.prepTime !== 'Tous') params.append('prepTime', filters.prepTime);
+            if (filters.category !== 'All') params.append('category', filters.category);
+            if (filters.difficulty !== 'All') params.append('difficulty', filters.difficulty.toLowerCase());
+            if (filters.prepTime !== 'All') params.append('prepTime', filters.prepTime);
             if (filters.tags.length > 0) params.append('tags', filters.tags.join(','));
             params.append('sortBy', sortBy);
             params.append('sortOrder', sortOrder);
@@ -101,17 +101,17 @@ const Page = () => {
                 const data = await response.json();
                 setRecipes(data.recipes);
             } else {
-                console.error('Erreur lors du chargement des recettes');
+                console.error('Error loading recipes');
             }
         } catch (error) {
-            console.error('Erreur lors du chargement des recettes:', error);
+            console.error('Error loading recipes:', error);
         } finally {
             setLoading(false);
         }
     };
 
     const handleRecipeCreated = () => {
-        // Recharger les recettes après création
+        // Reload recipes after creation
         loadRecipes();
         closeModal();
     };
@@ -136,7 +136,7 @@ const Page = () => {
 
     const handleAddToPlanning = async (recipeId: string, day: string, meal: string) => {
         if (!token) {
-            alert('Veuillez vous connecter pour ajouter une recette au planning');
+            alert('Please log in to add a recipe to the meal plan');
             return;
         }
 
@@ -155,27 +155,27 @@ const Page = () => {
             });
 
             if (response.ok) {
-                alert('Recette ajoutée au planning avec succès !');
-                // Déclencher le rechargement de la page de planification
+                alert('Recipe added to meal plan successfully!');
+                // Trigger meal planning page reload
                 localStorage.setItem('planningUpdated', 'true');
                 window.dispatchEvent(new Event('planningUpdated'));
             } else {
                 const error = await response.json();
-                alert(`Erreur: ${error.message || 'Impossible d\'ajouter la recette au planning'}`);
+                alert(`Error: ${error.message || 'Unable to add recipe to meal plan'}`);
             }
         } catch (error) {
-            console.error('Erreur lors de l\'ajout au planning:', error);
-            alert('Erreur lors de l\'ajout au planning');
+            console.error('Error adding to meal plan:', error);
+            alert('Error adding to meal plan');
         }
     };
 
     const deleteRecipe = async (recipeId: string) => {
         if (!token) {
-            alert('Veuillez vous connecter pour supprimer une recette');
+            alert('Please log in to delete a recipe');
             return;
         }
 
-        if (!confirm('Êtes-vous sûr de vouloir supprimer cette recette ?')) {
+        if (!confirm('Are you sure you want to delete this recipe?')) {
             return;
         }
 
@@ -189,18 +189,18 @@ const Page = () => {
 
             if (response.ok) {
                 await loadRecipes();
-                alert('Recette supprimée avec succès !');
+                alert('Recipe deleted successfully!');
             } else {
                 const error = await response.json();
-                alert(`Erreur: ${error.message}`);
+                alert(`Error: ${error.message}`);
             }
         } catch (error) {
-            console.error('Erreur lors de la suppression de la recette:', error);
-            alert('Erreur lors de la suppression de la recette');
+            console.error('Error deleting recipe:', error);
+            alert('Error deleting recipe');
         }
     };
 
-    // Le filtrage se fait maintenant côté serveur
+    // Filtering is now done server-side
     const filteredRecipes = recipes;
 
     useEffect(() => {

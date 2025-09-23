@@ -52,9 +52,9 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
 
     const getDifficultyText = (difficulty: string) => {
         switch (difficulty) {
-            case 'facile': return 'Facile';
-            case 'moyen': return 'Moyen';
-            case 'difficile': return 'Difficile';
+            case 'facile': return 'Easy';
+            case 'moyen': return 'Medium';
+            case 'difficile': return 'Hard';
             default: return difficulty;
         }
     };
@@ -79,7 +79,7 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
                 <div className={styles.recipeStats}>
                     <div className={styles.statItem}>
                         <div className={styles.statValue}>{recipe.servings}</div>
-                        <div className={styles.statLabel}>Portions</div>
+                        <div className={styles.statLabel}>Servings</div>
                     </div>
                     <div className={styles.statItem}>
                         <div className={styles.statValue}>{recipe.nutrition.calories}</div>
@@ -96,10 +96,10 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
                         onClick={() => router.push(`/recipe/${recipe.id}`)} 
                         className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] bg-gradient-to-br from-[#3b82f6] to-[#64748b] hover:to-blue-700 text-white'
                     >
-                        Voir la recette
+                        View Recipe
                     </button>
                     <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>
-                        + Liste
+                        + List
                     </button>
                     {onAddToPlanning && (
                         <button 
@@ -109,7 +109,7 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
                                 onAddToPlanning(recipe);
                             }}
                             className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] bg-[#10b981] hover:bg-[#059669] text-white'
-                            title="Ajouter au planning"
+                            title="Add to meal plan"
                         >
                             📅 Planning
                         </button>
@@ -124,7 +124,7 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
                                         onEdit(recipe);
                                     }}
                                     className='p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] bg-blue-600 hover:bg-blue-700 text-white'
-                                    title="Modifier la recette"
+                                    title="Edit recipe"
                                 >
                                     ✏️
                                 </button>
@@ -137,7 +137,7 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
                                         onDelete(recipe.id);
                                     }}
                                     className='p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] bg-red-600 hover:bg-red-700 text-white'
-                                    title="Supprimer la recette"
+                                    title="Delete recipe"
                                 >
                                     🗑️
                                 </button>
