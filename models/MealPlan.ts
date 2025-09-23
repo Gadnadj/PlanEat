@@ -13,22 +13,22 @@ export interface IMealPlan extends Document {
   };
   mealPlan: {
     [key: string]: {
-      matin: {
-        nom: string;
+      morning: {
+        name: string;
         ingredients: string[];
-        temps: string;
+        time: string;
         emoji?: string;
       };
-      midi: {
-        nom: string;
+      lunch: {
+        name: string;
         ingredients: string[];
-        temps: string;
+        time: string;
         emoji?: string;
       };
-      soir: {
-        nom: string;
+      dinner: {
+        name: string;
         ingredients: string[];
-        temps: string;
+        time: string;
         emoji?: string;
       };
     };
@@ -40,13 +40,13 @@ export interface IMealPlan extends Document {
 const MealPlanSchema = new Schema<IMealPlan>({
   userId: {
     type: String,
-    required: [true, 'L\'ID utilisateur est requis'],
+    required: [true, 'User ID is required'],
     ref: 'User'
   },
   preferences: {
     dietType: {
       type: String,
-      required: [true, 'Le type de régime est requis'],
+      required: [true, 'Diet type is required'],
       enum: ['omnivore', 'vegetarian', 'vegan', 'pescatarian']
     },
     allergies: [{
@@ -59,27 +59,27 @@ const MealPlanSchema = new Schema<IMealPlan>({
     }],
     numberOfPeople: {
       type: Number,
-      required: [true, 'Le nombre de personnes est requis'],
-      min: [1, 'Le nombre de personnes doit être au moins 1'],
-      max: [20, 'Le nombre de personnes ne peut pas dépasser 20']
+      required: [true, 'Number of people is required'],
+      min: [1, 'Number of people must be at least 1'],
+      max: [20, 'Number of people cannot exceed 20']
     },
     budget: {
       type: String,
-      required: [true, 'Le budget est requis'],
-      enum: ['faible', 'moyen', 'élevé']
+      required: [true, 'Budget is required'],
+      enum: ['low', 'medium', 'high']
     },
     cookingTime: {
       type: String,
-      required: [true, 'Le temps de cuisine est requis'],
-      enum: ['rapide', 'moyen', 'long']
+      required: [true, 'Cooking time is required'],
+      enum: ['quick', 'medium', 'long']
     }
   },
   mealPlan: {
     type: Schema.Types.Mixed,
-    required: [true, 'Le plan de repas est requis']
+    required: [true, 'Meal plan is required']
   }
 }, {
-  timestamps: true, // Ajoute automatiquement createdAt et updatedAt
+  timestamps: true, // Automatically adds createdAt and updatedAt
   toJSON: {
     transform: function(doc, ret) {
       ret.id = ret._id;
@@ -92,11 +92,11 @@ const MealPlanSchema = new Schema<IMealPlan>({
   }
 });
 
-// Index pour optimiser les recherches par utilisateur
+// Indexes to optimize user searches
 MealPlanSchema.index({ userId: 1 });
-MealPlanSchema.index({ userId: 1, createdAt: -1 }); // Pour récupérer les plannings les plus récents
+MealPlanSchema.index({ userId: 1, createdAt: -1 }); // To retrieve the most recent meal plans
 
-// Vérifier si le modèle existe déjà avant de le créer
+// Check if model already exists before creating it
 const MealPlan = mongoose.models.MealPlan || mongoose.model<IMealPlan>('MealPlan', MealPlanSchema);
 
 export default MealPlan;

@@ -1,4 +1,4 @@
-    import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IShoppingItem extends Document {
   _id: string;
@@ -14,32 +14,32 @@ export interface IShoppingItem extends Document {
 const ShoppingItemSchema = new Schema<IShoppingItem>({
   userId: {
     type: String,
-    required: [true, 'L\'ID utilisateur est requis'],
+    required: [true, 'User ID is required'],
     ref: 'User'
   },
   name: {
     type: String,
-    required: [true, 'Le nom de l\'article est requis'],
+    required: [true, 'Item name is required'],
     trim: true,
-    maxlength: [100, 'Le nom ne peut pas dépasser 100 caractères']
+    maxlength: [100, 'Name cannot exceed 100 characters']
   },
   category: {
     type: String,
-    required: [true, 'La catégorie est requise'],
-    enum: ['Fruits & Légumes', 'Viandes & Poissons', 'Produits laitiers', 'Épicerie', 'Boulangerie', 'Boissons', 'Autres'],
-    default: 'Autres'
+    required: [true, 'Category is required'],
+    enum: ['Fruits & Vegetables', 'Meat & Fish', 'Dairy Products', 'Groceries', 'Bakery', 'Beverages', 'Other'],
+    default: 'Other'
   },
   quantity: {
     type: String,
     trim: true,
-    maxlength: [50, 'La quantité ne peut pas dépasser 50 caractères']
+    maxlength: [50, 'Quantity cannot exceed 50 characters']
   },
   isCompleted: {
     type: Boolean,
     default: false
   }
 }, {
-  timestamps: true, // Ajoute automatiquement createdAt et updatedAt
+  timestamps: true, // Automatically adds createdAt and updatedAt
   toJSON: {
     transform: function(doc, ret) {
       ret.id = ret._id;
@@ -52,12 +52,12 @@ const ShoppingItemSchema = new Schema<IShoppingItem>({
   }
 });
 
-// Index pour optimiser les recherches par utilisateur
+// Indexes to optimize user searches
 ShoppingItemSchema.index({ userId: 1 });
 ShoppingItemSchema.index({ userId: 1, isCompleted: 1 });
 ShoppingItemSchema.index({ userId: 1, category: 1 });
 
-// Vérifier si le modèle existe déjà avant de le créer
+// Check if model already exists before creating it
 const ShoppingItem = mongoose.models.ShoppingItem || mongoose.model<IShoppingItem>('ShoppingItem', ShoppingItemSchema);
 
 export default ShoppingItem;

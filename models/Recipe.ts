@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IRecipe extends Document {
   id: string;
-  userId?: string; // ID de l'utilisateur qui a créé la recette (undefined pour les recettes du développeur)
+  userId?: string; // User ID who created the recipe (undefined for developer recipes)
   title: string;
   description: string;
   image: string;
@@ -13,8 +13,8 @@ export interface IRecipe extends Document {
     unit?: string;
   }[];
   instructions: string[];
-  prepTime: number; // en minutes
-  cookTime: number; // en minutes
+  prepTime: number; // in minutes
+  cookTime: number; // in minutes
   servings: number;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;
@@ -25,7 +25,7 @@ export interface IRecipe extends Document {
     carbs: number;
     fat: number;
   };
-  externalId?: string; // ID de l'API externe
+  externalId?: string; // External API ID
   source: 'spoonacular' | 'edamam' | 'manual';
   createdAt: Date;
   updatedAt: Date;
@@ -35,39 +35,39 @@ const RecipeSchema = new Schema<IRecipe>({
   userId: {
     type: String,
     ref: 'User',
-    required: false // Optionnel pour les recettes du développeur
+    required: false // Optional for developer recipes
   },
   title: {
     type: String,
-    required: [true, 'Le titre de la recette est requis'],
+    required: [true, 'Recipe title is required'],
     trim: true,
-    maxlength: [100, 'Le titre ne peut pas dépasser 100 caractères']
+    maxlength: [100, 'Title cannot exceed 100 characters']
   },
   description: {
     type: String,
-    required: [true, 'La description est requise'],
+    required: [true, 'Description is required'],
     trim: true,
-    maxlength: [500, 'La description ne peut pas dépasser 500 caractères']
+    maxlength: [500, 'Description cannot exceed 500 characters']
   },
   image: {
     type: String,
-    required: [true, 'L\'image est requise'],
+    required: [true, 'Image is required'],
     trim: true
   },
   emoji: {
     type: String,
-    required: [true, 'L\'emoji est requis'],
+    required: [true, 'Emoji is required'],
     default: '🍽️'
   },
   ingredients: [{
     name: {
       type: String,
-      required: [true, 'Le nom de l\'ingrédient est requis'],
+      required: [true, 'Ingredient name is required'],
       trim: true
     },
     amount: {
       type: String,
-      required: [true, 'La quantité est requise'],
+      required: [true, 'Amount is required'],
       trim: true
     },
     unit: {
@@ -77,33 +77,33 @@ const RecipeSchema = new Schema<IRecipe>({
   }],
   instructions: [{
     type: String,
-    required: [true, 'Les instructions sont requises'],
+    required: [true, 'Instructions are required'],
     trim: true
   }],
   prepTime: {
     type: Number,
-    required: [true, 'Le temps de préparation est requis'],
-    min: [0, 'Le temps de préparation ne peut pas être négatif']
+    required: [true, 'Preparation time is required'],
+    min: [0, 'Preparation time cannot be negative']
   },
   cookTime: {
     type: Number,
-    required: [true, 'Le temps de cuisson est requis'],
-    min: [0, 'Le temps de cuisson ne peut pas être négatif']
+    required: [true, 'Cooking time is required'],
+    min: [0, 'Cooking time cannot be negative']
   },
   servings: {
     type: Number,
-    required: [true, 'Le nombre de portions est requis'],
-    min: [1, 'Le nombre de portions doit être au moins 1']
+    required: [true, 'Number of servings is required'],
+    min: [1, 'Number of servings must be at least 1']
   },
   difficulty: {
     type: String,
-    required: [true, 'La difficulté est requise'],
+    required: [true, 'Difficulty is required'],
     enum: ['easy', 'medium', 'hard'],
     default: 'medium'
   },
   category: {
     type: String,
-    required: [true, 'La catégorie est requise'],
+    required: [true, 'Category is required'],
     trim: true
   },
   tags: [{
@@ -113,23 +113,23 @@ const RecipeSchema = new Schema<IRecipe>({
   nutrition: {
     calories: {
       type: Number,
-      required: [true, 'Les calories sont requises'],
-      min: [0, 'Les calories ne peuvent pas être négatives']
+      required: [true, 'Calories are required'],
+      min: [0, 'Calories cannot be negative']
     },
     protein: {
       type: Number,
-      required: [true, 'Les protéines sont requises'],
-      min: [0, 'Les protéines ne peuvent pas être négatives']
+      required: [true, 'Protein is required'],
+      min: [0, 'Protein cannot be negative']
     },
     carbs: {
       type: Number,
-      required: [true, 'Les glucides sont requis'],
-      min: [0, 'Les glucides ne peuvent pas être négatifs']
+      required: [true, 'Carbs are required'],
+      min: [0, 'Carbs cannot be negative']
     },
     fat: {
       type: Number,
-      required: [true, 'Les lipides sont requis'],
-      min: [0, 'Les lipides ne peuvent pas être négatifs']
+      required: [true, 'Fat is required'],
+      min: [0, 'Fat cannot be negative']
     }
   },
   externalId: {
@@ -138,7 +138,7 @@ const RecipeSchema = new Schema<IRecipe>({
   },
   source: {
     type: String,
-    required: [true, 'La source est requise'],
+    required: [true, 'Source is required'],
     enum: ['spoonacular', 'edamam', 'manual'],
     default: 'manual'
   }
@@ -156,14 +156,14 @@ const RecipeSchema = new Schema<IRecipe>({
   }
 });
 
-// Index pour optimiser les recherches
+// Indexes to optimize searches
 RecipeSchema.index({ title: 'text', description: 'text', tags: 'text' });
 RecipeSchema.index({ category: 1 });
 RecipeSchema.index({ difficulty: 1 });
 RecipeSchema.index({ prepTime: 1 });
 RecipeSchema.index({ externalId: 1 });
 
-// Vérifier si le modèle existe déjà avant de le créer
+// Check if model already exists before creating it
 const Recipe = (mongoose.models.Recipe as mongoose.Model<IRecipe>) || mongoose.model<IRecipe>('Recipe', RecipeSchema);
 
 export default Recipe;
