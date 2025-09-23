@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from '../components/Navbar/Navbar'
 import { AuthProvider } from '../contexts/AuthContext'
+import ScrollToTop from '../components/ScrollToTop'
 
 
 
@@ -34,6 +35,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
+          <ScrollToTop />
           <Navbar />
           {children}
         </AuthProvider>

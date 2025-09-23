@@ -1,6 +1,11 @@
 @import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+/* Scroll fluide pour toute l'application */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -8,6 +13,7 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
 }
 
 :root {
