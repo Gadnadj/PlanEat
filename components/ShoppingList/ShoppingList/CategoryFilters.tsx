@@ -9,14 +9,14 @@ interface CategoryFiltersProps {
 const CategoryFilters = ({ categories, selectedCategory, onCategoryChange }: CategoryFiltersProps) => {
     const getCategoryEmoji = (category: string) => {
         const emojis: { [key: string]: string } = {
-            'Toutes': '📋',
-            'Fruits & Légumes': '🥕',
-            'Viandes & Poissons': '🥩',
-            'Produits laitiers': '🥛',
-            'Épicerie': '🏪',
-            'Boulangerie': '🍞',
-            'Boissons': '🥤',
-            'Autres': '📦'
+            'All': '📋',
+            'Fruits & Vegetables': '🥕',
+            'Meat & Fish': '🥩',
+            'Dairy Products': '🥛',
+            'Groceries': '🏪',
+            'Bakery': '🍞',
+            'Beverages': '🥤',
+            'Other': '📦'
         };
         return emojis[category] || '📦';
     };

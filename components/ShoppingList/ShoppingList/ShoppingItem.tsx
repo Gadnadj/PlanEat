@@ -54,21 +54,21 @@ const ShoppingItem = ({
                                 type="text"
                                 value={editQuantity}
                                 onChange={(e) => onEditQuantityChange(e.target.value)}
-                                placeholder="Quantité"
+                                placeholder="Quantity"
                                 className="bg-[#2a2a2a] border border-[#505050] rounded px-2 py-1 text-sm text-white w-20"
                                 onKeyPress={(e) => e.key === 'Enter' && onSaveEdit()}
                             />
                             <button 
                                 onClick={onSaveEdit}
                                 className="text-green-400 hover:text-green-300 text-sm"
-                                title="Sauvegarder"
+                                title="Save"
                             >
                                 ✓
                             </button>
                             <button 
                                 onClick={onCancelEdit}
                                 className="text-red-400 hover:text-red-300 text-sm"
-                                title="Annuler"
+                                title="Cancel"
                             >
                                 ✕
                             </button>
@@ -86,7 +86,7 @@ const ShoppingItem = ({
                     <button 
                         className={styles.itemActionButton}
                         onClick={onEdit}
-                        title="Modifier la quantité"
+                        title="Edit quantity"
                     >
                         ✏️
                     </button>
@@ -94,7 +94,7 @@ const ShoppingItem = ({
                 <button 
                     className={`${styles.itemActionButton} ${styles.itemDeleteButton}`}
                     onClick={onDelete}
-                    title="Supprimer l'article"
+                    title="Delete item"
                 >
                     🗑️
                 </button>
