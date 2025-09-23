@@ -19,7 +19,7 @@ export const styles = {
         'bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white',
 
     shoppingItem:
-        'bg-[#3a3a3a] rounded-[10px] p-4 flex items-center gap-4 transition-all duration-300 ease-in-out border-l-4 border-l-transparent hover:bg-[$404040] hover:-translate-x-[5px]',
+        'bg-[#3a3a3a] rounded-[10px] p-4 flex items-start gap-4 transition-all duration-300 ease-in-out border-l-4 border-l-transparent hover:bg-[$404040] hover:-translate-x-[5px]',
 
     itemCompleted: 'opacity-60 bg-[#2d2d2d] border-l-4 border-l-[#7cb342]',
     itemCompleteLine: 'line-through text-decoration-line-through',
@@ -30,8 +30,8 @@ export const styles = {
     checkboxChecked: 'bg-[#3b82f6]',
     checkmark: 'text-white font-bold text-[0.8rem]',
 
-    itemContent: 'flex-1 flex flex-col',
-    itemName: 'font-bold text-[#e0e0e0] mb-[0.2rem]',
+    itemContent: 'flex-1 flex flex-col min-w-0',
+    itemName: 'font-bold text-[#e0e0e0] mb-[0.2rem] break-words leading-tight',
     itemDetails:
         'text-[0.8rem] text-[#b0b0b0] flex gap-4 max-md:flex-col max-md:gap-2',
     itemCategory:

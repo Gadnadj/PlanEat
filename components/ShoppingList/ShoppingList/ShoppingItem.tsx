@@ -31,7 +31,7 @@ const ShoppingItem = ({
 }: ShoppingItemProps) => {
     return (
         <div className={`${styles.shoppingItem} ${item.isCompleted ? 'opacity-60' : ''}`}>
-            <div className={styles.itemCheckbox}>
+            <div className={`${styles.itemCheckbox} flex-shrink-0 mt-1`}>
                 <input 
                     type="checkbox" 
                     checked={item.isCompleted}
@@ -81,7 +81,7 @@ const ShoppingItem = ({
                 </div>
             </div>
 
-            <div className={styles.itemActions}>
+            <div className={`${styles.itemActions} flex-shrink-0 mt-1`}>
                 {!isEditing && (
                     <button 
                         className={styles.itemActionButton}

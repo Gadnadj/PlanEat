@@ -191,7 +191,7 @@ Génère un JSON complet pour les 7 jours de la semaine.`;
       // Nettoyer les virgules en fin de ligne dans les objets
       jsonString = jsonString.replace(/,(\s*})/g, '$1');
       
-      // Corriger les virgules manquantes entre les proprié tés
+      // Corriger les virgules manquantes entre les propriétés
       jsonString = jsonString.replace(/"(\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*":/g, ',"$2":');
       jsonString = jsonString.replace(/{\s*"([a-zA-Z_][a-zA-Z0-9_]*)\s*":/g, '{"$1":');
       

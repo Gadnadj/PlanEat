@@ -187,7 +187,7 @@ export default function PlanificationPage() {
       <div 
         key={time} 
         onClick={handleMealClick}
-        className="bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-xl p-4 border border-gray-600 hover:border-[#3b82f6] transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-1"
+        className="bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-xl p-4 border border-gray-600 hover:border-[#3b82f6] transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-1 flex flex-col h-full min-h-[200px]"
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
@@ -196,7 +196,7 @@ export default function PlanificationPage() {
           </div>
           {mealTime && <span className="text-xs bg-[#3b82f6] text-white px-2 py-1 rounded">{mealTime}</span>}
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1 flex-grow">
           <p className="text-gray-400 text-sm font-medium">Ingrédients:</p>
           <ul className="space-y-1">
             {Array.isArray(mealIngredients) ? mealIngredients.slice(0, 3).map((ingredient: any, index: number) => (
@@ -214,7 +214,7 @@ export default function PlanificationPage() {
             )}
           </ul>
         </div>
-        <div className="mt-3 text-center">
+        <div className="mt-3 text-center border-t border-gray-600 pt-3">
           <span className="text-[#3b82f6] text-sm font-medium">Cliquez pour voir les détails</span>
         </div>
       </div>
@@ -327,29 +327,35 @@ export default function PlanificationPage() {
                 {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={{ gridTemplateRows: '1fr' }}>
                 {/* Petit-déjeuner */}
-                <div>
+                <div className="flex flex-col">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     🌅 Petit-déjeuner
                   </h3>
-                  {getMealCard(weeklyMealPlan[selectedDay]?.matin, "matin", selectedDay)}
+                  <div className="flex-grow">
+                    {getMealCard(weeklyMealPlan[selectedDay]?.matin, "matin", selectedDay)}
+                  </div>
                 </div>
 
                 {/* Déjeuner */}
-                <div>
+                <div className="flex flex-col">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     ☀️ Déjeuner
                   </h3>
-                  {getMealCard(weeklyMealPlan[selectedDay]?.midi, "midi", selectedDay)}
+                  <div className="flex-grow">
+                    {getMealCard(weeklyMealPlan[selectedDay]?.midi, "midi", selectedDay)}
+                  </div>
                 </div>
 
                 {/* Dîner */}
-                <div>
+                <div className="flex flex-col">
                   <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     🌙 Dîner
                   </h3>
-                  {getMealCard(weeklyMealPlan[selectedDay]?.soir, "soir", selectedDay)}
+                  <div className="flex-grow">
+                    {getMealCard(weeklyMealPlan[selectedDay]?.soir, "soir", selectedDay)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -358,11 +364,6 @@ export default function PlanificationPage() {
 
         {/* Actions */}
         <div className="flex flex-wrap justify-center gap-4 mt-8">
-          {weeklyMealPlan && (
-            <button className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-              🛒 Ajouter à la liste de courses
-            </button>
-          )}
           {weeklyMealPlan && (
             <button 
               onClick={regenerateMealPlan}
