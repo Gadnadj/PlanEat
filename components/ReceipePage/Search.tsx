@@ -10,9 +10,10 @@ interface SearchProps {
         diet: string;
         tags: string[];
     }) => void;
+    onSortChange: (sortBy: string, sortOrder: string) => void;
 }
 
-const Search = ({ onSearchChange, onFilterChange }: SearchProps) => {
+const Search = ({ onSearchChange, onFilterChange, onSortChange }: SearchProps) => {
     const [filters, setFilters] = useState({
         category: 'Toutes',
         prepTime: 'Tous',
@@ -20,6 +21,8 @@ const Search = ({ onSearchChange, onFilterChange }: SearchProps) => {
         diet: 'Tous',
         tags: [] as string[]
     });
+    const [sortBy, setSortBy] = useState('createdAt');
+    const [sortOrder, setSortOrder] = useState('desc');
 
     const handleFilterChange = (filterType: string, value: string) => {
         const newFilters = { ...filters, [filterType]: value };
@@ -46,6 +49,16 @@ const Search = ({ onSearchChange, onFilterChange }: SearchProps) => {
         };
         setFilters(defaultFilters);
         onFilterChange(defaultFilters);
+    };
+
+    const handleSortChange = (newSortBy: string) => {
+        setSortBy(newSortBy);
+        onSortChange(newSortBy, sortOrder);
+    };
+
+    const handleSortOrderChange = (newSortOrder: string) => {
+        setSortOrder(newSortOrder);
+        onSortChange(sortBy, newSortOrder);
     };
     return (
         <section className='max-w-[1400px] mx-auto px-8 pb-8 bg-[#2a2a2a] rounded-[15px] mb-8 shadow-[0_4px_15px_rgba(0,0,0,0.2)] max-sm:pl-4 max-sm:pr-4'>
@@ -123,6 +136,33 @@ const Search = ({ onSearchChange, onFilterChange }: SearchProps) => {
                         <option>Vegan</option>
                         <option>Sans gluten</option>
                         <option>Cétogène</option>
+                    </select>
+                </div>
+
+                <div className='flex flex-col gap-2 max-md:w-full'>
+                    <label className={styles.label}>Trier par</label>
+                    <select 
+                        className={styles.select}
+                        value={sortBy}
+                        onChange={(e) => handleSortChange(e.target.value)}
+                    >
+                        <option value="createdAt">Date de création</option>
+                        <option value="title">Nom</option>
+                        <option value="prepTime">Temps de préparation</option>
+                        <option value="difficulty">Difficulté</option>
+                        <option value="calories">Calories</option>
+                    </select>
+                </div>
+
+                <div className='flex flex-col gap-2 max-md:w-full'>
+                    <label className={styles.label}>Ordre</label>
+                    <select 
+                        className={styles.select}
+                        value={sortOrder}
+                        onChange={(e) => handleSortOrderChange(e.target.value)}
+                    >
+                        <option value="desc">Décroissant</option>
+                        <option value="asc">Croissant</option>
                     </select>
                 </div>
             </div>

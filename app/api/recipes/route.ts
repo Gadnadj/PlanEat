@@ -40,24 +40,33 @@ export async function GET(req: Request) {
     const filters: any = {};
     
     // Filtre principal : recettes publiques (sans userId) OU recettes de l'utilisateur connecté
-    if (userId) {
-      filters.$or = [
-        { userId: { $exists: false } }, // Recettes publiques (développeur)
-        { userId: null }, // Recettes publiques (développeur)
-        { userId: userId } // Recettes de l'utilisateur connecté
-      ];
-    } else {
-      // Si pas d'authentification, afficher seulement les recettes publiques
-      filters.$or = [
-        { userId: { $exists: false } },
-        { userId: null }
-      ];
-    }
+    const userFilter = userId ? [
+      { userId: { $exists: false } }, // Recettes publiques (développeur)
+      { userId: null }, // Recettes publiques (développeur)
+      { userId: userId } // Recettes de l'utilisateur connecté
+    ] : [
+      { userId: { $exists: false } },
+      { userId: null }
+    ];
     
     if (category) filters.category = category;
     if (difficulty) filters.difficulty = difficulty;
+    
+    // Gérer la recherche avec les filtres utilisateur
     if (search) {
-      filters.$text = { $search: search };
+      const searchFilter = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { tags: { $in: [new RegExp(search, 'i')] } }
+      ];
+      
+      // Combiner les filtres utilisateur et de recherche
+      filters.$and = [
+        { $or: userFilter },
+        { $or: searchFilter }
+      ];
+    } else {
+      filters.$or = userFilter;
     }
     
     // Filtre par temps de préparation
@@ -87,16 +96,37 @@ export async function GET(req: Request) {
     // Construire l'ordre de tri
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sort: any = {};
-    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    
+    // Gérer le tri par calories (qui est dans nutrition.calories)
+    if (sortBy === 'calories') {
+      sort['nutrition.calories'] = sortOrder === 'desc' ? -1 : 1;
+    } else if (sortBy === 'difficulty') {
+      // Tri personnalisé pour la difficulté : facile < moyen < difficile
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const difficultyOrder = { 'facile': 1, 'moyen': 2, 'difficile': 3 };
+      sort.difficulty = sortOrder === 'desc' ? -1 : 1;
+    } else {
+      sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    }
 
     // Calculer la pagination
     const skip = (page - 1) * limit;
 
     // Récupérer les recettes
-    const recipes = await Recipe.find(filters)
+    let recipes = await Recipe.find(filters)
       .sort(sort)
       .skip(skip)
       .limit(limit);
+
+    // Tri personnalisé pour la difficulté si nécessaire
+    if (sortBy === 'difficulty') {
+      const difficultyOrder = { 'facile': 1, 'moyen': 2, 'difficile': 3 };
+      recipes = recipes.sort((a, b) => {
+        const orderA = difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
+        const orderB = difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;
+        return sortOrder === 'desc' ? orderB - orderA : orderA - orderB;
+      });
+    }
 
     // Compter le total pour la pagination
     const total = await Recipe.countDocuments(filters);

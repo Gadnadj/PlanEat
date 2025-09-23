@@ -50,6 +50,8 @@ const Page = () => {
         diet: 'Tous',
         tags: [] as string[]
     });
+    const [sortBy, setSortBy] = useState('createdAt');
+    const [sortOrder, setSortOrder] = useState('desc');
 
     const openModal = () => setIsModalOpen(true)
     const closeModal = () => setIsModalOpen(false)
@@ -77,6 +79,10 @@ const Page = () => {
             if (filters.difficulty !== 'Toutes') params.append('difficulty', filters.difficulty.toLowerCase());
             if (filters.prepTime !== 'Tous') params.append('prepTime', filters.prepTime);
             if (filters.tags.length > 0) params.append('tags', filters.tags.join(','));
+            params.append('sortBy', sortBy);
+            params.append('sortOrder', sortOrder);
+            
+            // console.log('Chargement des recettes avec:', { sortBy, sortOrder, params: params.toString() });
             
             const response = await fetch(`/api/recipes?${params.toString()}`, { headers });
             if (response.ok) {
@@ -109,6 +115,11 @@ const Page = () => {
 
     const handleSearchChange = (newSearchTerm: string) => {
         setSearchTerm(newSearchTerm);
+    };
+
+    const handleSortChange = (newSortBy: string, newSortOrder: string) => {
+        setSortBy(newSortBy);
+        setSortOrder(newSortOrder);
     };
 
     const deleteRecipe = async (recipeId: string) => {
@@ -147,7 +158,7 @@ const Page = () => {
 
     useEffect(() => {
         loadRecipes();
-    }, [searchTerm, filters]);
+    }, [searchTerm, filters, sortBy, sortOrder, token]);
 
     useEffect(() => {
         if (isModalOpen) {
@@ -175,7 +186,7 @@ const Page = () => {
             {isModalOpen && <Modal onClose={closeModal} onRecipeCreated={handleRecipeCreated} />}
             {isEditModalOpen && editingRecipe && <EditModal recipe={editingRecipe} onClose={closeEditModal} onRecipeUpdated={handleRecipeUpdated} />}
             <Header />
-            <Search onSearchChange={handleSearchChange} onFilterChange={handleFilterChange} />
+            <Search onSearchChange={handleSearchChange} onFilterChange={handleFilterChange} onSortChange={handleSortChange} />
             <RecipesList 
                 recipes={filteredRecipes} 
                 loading={loading}
