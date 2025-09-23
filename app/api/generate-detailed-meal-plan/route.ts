@@ -5,120 +5,120 @@ export async function POST(req: Request) {
     const { preferences } = await req.json();
 
     if (!preferences) {
-      return NextResponse.json({ message: 'Préférences manquantes' }, { status: 400 });
+      return NextResponse.json({ message: 'Missing preferences' }, { status: 400 });
     }
 
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
     
     if (!OPENAI_API_KEY) {
-      return NextResponse.json({ message: 'Clé API OpenAI manquante' }, { status: 500 });
+      return NextResponse.json({ message: 'Missing OpenAI API key' }, { status: 500 });
     }
 
-    // Construire le prompt pour ChatGPT
-    const allergiesText = preferences.allergies.length > 0 ? preferences.allergies.join(', ') : 'Aucune';
-    const dislikesText = preferences.dislikes.length > 0 ? preferences.dislikes.join(', ') : 'Aucun';
+    // Build prompt for ChatGPT
+    const allergiesText = preferences.allergies.length > 0 ? preferences.allergies.join(', ') : 'None';
+    const dislikesText = preferences.dislikes.length > 0 ? preferences.dislikes.join(', ') : 'None';
     
-    const prompt = `Crée un plan de repas hebdomadaire en JSON avec ces préférences :
+    const prompt = `Create a weekly meal plan in JSON with these preferences:
 
-Régime : ${preferences.dietType}
-Personnes : ${preferences.numberOfPeople}
-Budget : ${preferences.budget}
-Temps : ${preferences.cookingTime}
-Allergies : ${allergiesText}
-À éviter : ${dislikesText}
+Diet: ${preferences.dietType}
+People: ${preferences.numberOfPeople}
+Budget: ${preferences.budget}
+Time: ${preferences.cookingTime}
+Allergies: ${allergiesText}
+To avoid: ${dislikesText}
 
-RÈGLES :
-- Évite les aliments allergènes
-- Respecte le régime choisi
-- JSON valide uniquement
+RULES:
+- Avoid allergenic foods
+- Respect chosen diet
+- Valid JSON only
 
-Structure JSON (exemple pour 2 jours) :
+JSON Structure (example for 2 days):
 {
-  "lundi": {
-    "matin": {
-      "nom": "Smoothie vert",
-      "description": "Smoothie riche en vitamines",
+  "monday": {
+    "morning": {
+      "name": "Green Smoothie",
+      "description": "Vitamin-rich smoothie",
       "emoji": "🥤",
-      "ingredients": [{"name": "épinards", "amount": "100", "unit": "g"}],
-      "instructions": ["Mixer les ingrédients"],
-      "temps": "5 min",
+      "ingredients": [{"name": "spinach", "amount": "100", "unit": "g"}],
+      "instructions": ["Blend ingredients"],
+      "time": "5 min",
       "servings": 1,
-      "difficulty": "facile",
-      "category": "Boisson",
+      "difficulty": "easy",
+      "category": "Beverage",
       "tags": ["vegan"],
       "nutrition": {"calories": 150, "protein": 5, "carbs": 20, "fat": 2}
     },
-    "midi": {
-      "nom": "Salade quinoa",
-      "description": "Salade complète et nutritive",
+    "noon": {
+      "name": "Quinoa Salad",
+      "description": "Complete and nutritious salad",
       "emoji": "🥗",
       "ingredients": [{"name": "quinoa", "amount": "200", "unit": "g"}],
-      "instructions": ["Cuire le quinoa", "Ajouter les légumes"],
-      "temps": "20 min",
+      "instructions": ["Cook quinoa", "Add vegetables"],
+      "time": "20 min",
       "servings": 2,
-      "difficulty": "facile",
-      "category": "Plat principal",
+      "difficulty": "easy",
+      "category": "Main Course",
       "tags": ["vegan"],
       "nutrition": {"calories": 300, "protein": 12, "carbs": 45, "fat": 8}
     },
-    "soir": {
-      "nom": "Curry légumes",
-      "description": "Curry réconfortant aux légumes",
+    "evening": {
+      "name": "Vegetable Curry",
+      "description": "Comforting vegetable curry",
       "emoji": "🍛",
-      "ingredients": [{"name": "légumes", "amount": "500", "unit": "g"}],
-      "instructions": ["Faire revenir les légumes", "Ajouter les épices"],
-      "temps": "30 min",
+      "ingredients": [{"name": "vegetables", "amount": "500", "unit": "g"}],
+      "instructions": ["Sauté vegetables", "Add spices"],
+      "time": "30 min",
       "servings": 2,
-      "difficulty": "moyen",
-      "category": "Plat principal",
+      "difficulty": "medium",
+      "category": "Main Course",
       "tags": ["vegan"],
       "nutrition": {"calories": 250, "protein": 8, "carbs": 35, "fat": 10}
     }
   },
-  "mardi": {
-    "matin": {
-      "nom": "Porridge avoine",
-      "description": "Porridge crémeux aux fruits",
+  "tuesday": {
+    "morning": {
+      "name": "Oat Porridge",
+      "description": "Creamy porridge with fruits",
       "emoji": "🥣",
-      "ingredients": [{"name": "flocons avoine", "amount": "80", "unit": "g"}],
-      "instructions": ["Cuire les flocons", "Ajouter les fruits"],
-      "temps": "10 min",
+      "ingredients": [{"name": "oat flakes", "amount": "80", "unit": "g"}],
+      "instructions": ["Cook oats", "Add fruits"],
+      "time": "10 min",
       "servings": 1,
-      "difficulty": "facile",
-      "category": "Petit déjeuner",
+      "difficulty": "easy",
+      "category": "Breakfast",
       "tags": ["vegan"],
       "nutrition": {"calories": 200, "protein": 8, "carbs": 35, "fat": 4}
     },
-    "midi": {
-      "nom": "Wrap végétarien",
-      "description": "Wrap frais et coloré",
+    "noon": {
+      "name": "Vegetarian Wrap",
+      "description": "Fresh and colorful wrap",
       "emoji": "🌯",
-      "ingredients": [{"name": "tortilla", "amount": "2", "unit": "pièces"}],
-      "instructions": ["Garnir la tortilla", "Rouler et servir"],
-      "temps": "15 min",
+      "ingredients": [{"name": "tortilla", "amount": "2", "unit": "pieces"}],
+      "instructions": ["Fill tortilla", "Roll and serve"],
+      "time": "15 min",
       "servings": 2,
-      "difficulty": "facile",
-      "category": "Plat principal",
+      "difficulty": "easy",
+      "category": "Main Course",
       "tags": ["vegan"],
       "nutrition": {"calories": 400, "protein": 15, "carbs": 50, "fat": 12}
     },
-    "soir": {
-      "nom": "Pâtes aux légumes",
-      "description": "Pâtes crémeuses aux légumes",
+    "evening": {
+      "name": "Vegetable Pasta",
+      "description": "Creamy pasta with vegetables",
       "emoji": "🍝",
-      "ingredients": [{"name": "pâtes", "amount": "300", "unit": "g"}],
-      "instructions": ["Cuire les pâtes", "Préparer la sauce"],
-      "temps": "25 min",
+      "ingredients": [{"name": "pasta", "amount": "300", "unit": "g"}],
+      "instructions": ["Cook pasta", "Prepare sauce"],
+      "time": "25 min",
       "servings": 2,
-      "difficulty": "facile",
-      "category": "Plat principal",
+      "difficulty": "easy",
+      "category": "Main Course",
       "tags": ["vegan"],
       "nutrition": {"calories": 450, "protein": 18, "carbs": 70, "fat": 8}
     }
   }
 }
 
-Génère un JSON complet pour les 7 jours de la semaine.`;
+Generate complete JSON for all 7 days of the week.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -131,7 +131,7 @@ Génère un JSON complet pour les 7 jours de la semaine.`;
         messages: [
           {
             role: 'system',
-            content: 'Tu es un expert en nutrition et planification de repas. Tu génères des plans de repas détaillés et personnalisés en JSON.'
+            content: 'You are a nutrition and meal planning expert. You generate detailed and personalized meal plans in JSON.'
           },
           {
             role: 'user',
@@ -145,64 +145,64 @@ Génère un JSON complet pour les 7 jours de la semaine.`;
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Erreur OpenAI:', errorData);
-      return NextResponse.json({ message: 'Erreur lors de la génération du plan' }, { status: 500 });
+      console.error('OpenAI error:', errorData);
+      return NextResponse.json({ message: 'Error generating meal plan' }, { status: 500 });
     }
 
     const data = await response.json();
     const content = data.choices[0].message.content;
 
-    // Nettoyer le contenu pour extraire le JSON
+    // Clean content to extract JSON
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error('Aucun JSON trouvé dans la réponse:', content);
-      return NextResponse.json({ message: 'Format de réponse invalide' }, { status: 500 });
+      console.error('No JSON found in response:', content);
+      return NextResponse.json({ message: 'Invalid response format' }, { status: 500 });
     }
 
     try {
-      // Nettoyer le JSON avant de le parser
+      // Clean JSON before parsing
       let jsonString = jsonMatch[0];
       
-      // Supprimer les caractères de contrôle et les caractères non-ASCII problématiques
+      // Remove control characters and problematic non-ASCII characters
       jsonString = jsonString.replace(/[\x00-\x1F\x7F]/g, '');
       
-      // Remplacer les guillemets intelligents par des guillemets normaux
+      // Replace smart quotes with normal quotes
       jsonString = jsonString.replace(/[""]/g, '"');
       jsonString = jsonString.replace(/['']/g, "'");
       
-      // Corriger les virgules en fin de ligne
+      // Fix trailing commas
       jsonString = jsonString.replace(/,(\s*[}\]])/g, '$1');
       
-      // Vérifier et corriger les accolades manquantes
+      // Check and fix missing braces
       const openBraces = (jsonString.match(/\{/g) || []).length;
       const closeBraces = (jsonString.match(/\}/g) || []).length;
       
       if (openBraces > closeBraces) {
-        // Ajouter les accolades fermantes manquantes
+        // Add missing closing braces
         const missingBraces = openBraces - closeBraces;
         jsonString += '}'.repeat(missingBraces);
       }
       
-      // Vérifier que le JSON se termine correctement
+      // Check that JSON ends correctly
       if (!jsonString.trim().endsWith('}')) {
         jsonString = jsonString.trim() + '}';
       }
       
-      // Nettoyer les virgules en fin de ligne dans les objets
+      // Clean trailing commas in objects
       jsonString = jsonString.replace(/,(\s*})/g, '$1');
       
-      // Corriger les virgules manquantes entre les propriétés
+      // Fix missing commas between properties
       jsonString = jsonString.replace(/"(\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*":/g, ',"$2":');
       jsonString = jsonString.replace(/{\s*"([a-zA-Z_][a-zA-Z0-9_]*)\s*":/g, '{"$1":');
       
-      // Supprimer les virgules en début de ligne
+      // Remove leading commas
       jsonString = jsonString.replace(/,\s*{/g, '{');
       
       const mealPlan = JSON.parse(jsonString);
       
-      // Valider que c'est bien un objet avec des jours
-      if (!mealPlan || typeof mealPlan !== 'object' || !mealPlan.lundi) {
-        throw new Error('Structure de planning invalide');
+      // Validate that it's an object with days
+      if (!mealPlan || typeof mealPlan !== 'object' || !mealPlan.monday) {
+        throw new Error('Invalid planning structure');
       }
       
       return NextResponse.json({
@@ -211,10 +211,10 @@ Génère un JSON complet pour les 7 jours de la semaine.`;
       });
       
     } catch (parseError) {
-      console.error('Erreur parsing JSON:', parseError);
-      console.error('JSON problématique:', jsonMatch[0]);
+      console.error('JSON parsing error:', parseError);
+      console.error('Problematic JSON:', jsonMatch[0]);
       
-      // Fallback: utiliser l'API simple si le parsing échoue
+      // Fallback: use simple API if parsing fails
       const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3001';
       const fallbackResponse = await fetch(`${baseUrl}/api/generate-meal-plan`, {
         method: 'POST',
@@ -229,15 +229,15 @@ Génère un JSON complet pour les 7 jours de la semaine.`;
         return NextResponse.json({
           success: true,
           mealPlan: fallbackData.mealPlan,
-          message: 'Planning généré avec format simplifié'
+          message: 'Plan generated with simplified format'
         });
       }
       
-      return NextResponse.json({ message: 'Erreur de génération du planning' }, { status: 500 });
+      return NextResponse.json({ message: 'Meal plan generation error' }, { status: 500 });
     }
 
   } catch (error) {
-    console.error('Erreur génération plan détaillé:', error);
-    return NextResponse.json({ message: 'Erreur serveur' }, { status: 500 });
+    console.error('Detailed meal plan generation error:', error);
+    return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }

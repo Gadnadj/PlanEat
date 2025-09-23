@@ -18,7 +18,7 @@ interface Meal {
   temps?: string;
   time?: string;
   servings?: number;
-  difficulty?: 'facile' | 'moyen' | 'difficile';
+  difficulty?: 'easy' | 'medium' | 'hard';
   category?: string;
   tags?: string[];
   nutrition?: {

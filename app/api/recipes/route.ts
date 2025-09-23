@@ -101,9 +101,9 @@ export async function GET(req: Request) {
     if (sortBy === 'calories') {
       sort['nutrition.calories'] = sortOrder === 'desc' ? -1 : 1;
     } else if (sortBy === 'difficulty') {
-      // Tri personnalisé pour la difficulté : facile < moyen < difficile
+      // Tri personnalisé pour la difficulté : easy < medium < hard
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const difficultyOrder = { 'facile': 1, 'moyen': 2, 'difficile': 3 };
+      const difficultyOrder = { 'easy': 1, 'medium': 2, 'hard': 3 };
       sort.difficulty = sortOrder === 'desc' ? -1 : 1;
     } else {
       sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
@@ -120,7 +120,7 @@ export async function GET(req: Request) {
 
     // Tri personnalisé pour la difficulté si nécessaire
     if (sortBy === 'difficulty') {
-      const difficultyOrder = { 'facile': 1, 'moyen': 2, 'difficile': 3 };
+      const difficultyOrder = { 'easy': 1, 'medium': 2, 'hard': 3 };
       recipes = recipes.sort((a, b) => {
         const orderA = difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
         const orderB = difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;

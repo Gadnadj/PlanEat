@@ -5,54 +5,54 @@ import { verifyPassword, isValidEmail, generateToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // Connexion à MongoDB
+    // Connect to MongoDB
     await connectDB();
 
-    // Parse des données de la requête
+    // Parse request data
     const { email, password } = await request.json();
 
-    // Validation des données
+    // Validate data
     if (!email || !password) {
       return NextResponse.json(
-        { success: false, message: 'Email et mot de passe requis' },
+        { success: false, message: 'Email and password required' },
         { status: 400 }
       );
     }
 
-    // Validation de l'email
+    // Validate email
     if (!isValidEmail(email)) {
       return NextResponse.json(
-        { success: false, message: 'Format d\'email invalide' },
+        { success: false, message: 'Invalid email format' },
         { status: 400 }
       );
     }
 
-    // Trouver l'utilisateur par email
+    // Find user by email
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return NextResponse.json(
-        { success: false, message: 'Email ou mot de passe incorrect' },
+        { success: false, message: 'Incorrect email or password' },
         { status: 401 }
       );
     }
 
-    // Vérifier le mot de passe
+    // Verify password
     const isPasswordValid = await verifyPassword(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { success: false, message: 'Email ou mot de passe incorrect' },
+        { success: false, message: 'Incorrect email or password' },
         { status: 401 }
       );
     }
 
-    // Générer un token JWT
+    // Generate JWT token
     const token = generateToken(user._id.toString());
 
-    // Retourner la réponse avec les informations utilisateur
+    // Return response with user information
     return NextResponse.json(
       {
         success: true,
-        message: 'Connexion réussie',
+        message: 'Login successful',
         user: {
           id: user._id.toString(),
           email: user.email,
@@ -64,10 +64,10 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Erreur lors de la connexion:', error);
+    console.error('Login error:', error);
     
     return NextResponse.json(
-      { success: false, message: 'Erreur interne du serveur' },
+      { success: false, message: 'Internal server error' },
       { status: 500 }
     );
   }

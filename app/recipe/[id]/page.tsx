@@ -24,7 +24,7 @@ interface RecipeData {
   prepTime: number;
   cookTime: number;
   servings: number;
-  difficulty: 'facile' | 'moyen' | 'difficile';
+  difficulty: 'easy' | 'medium' | 'hard';
   category: string;
   tags: string[];
   nutrition: {

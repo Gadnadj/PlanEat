@@ -5,53 +5,53 @@ export async function POST(req: Request) {
     const { preferences } = await req.json();
 
     if (!preferences) {
-      return NextResponse.json({ message: 'Préférences manquantes' }, { status: 400 });
+      return NextResponse.json({ message: 'Missing preferences' }, { status: 400 });
     }
 
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
     
     if (!OPENAI_API_KEY) {
-      return NextResponse.json({ message: 'Clé API OpenAI manquante' }, { status: 500 });
+      return NextResponse.json({ message: 'Missing OpenAI API key' }, { status: 500 });
     }
 
-    // Construire le prompt pour ChatGPT
-    const allergiesText = preferences.allergies.length > 0 ? preferences.allergies.join(', ') : 'Aucune';
-    const dislikesText = preferences.dislikes.length > 0 ? preferences.dislikes.join(', ') : 'Aucun';
+    // Build prompt for ChatGPT
+    const allergiesText = preferences.allergies.length > 0 ? preferences.allergies.join(', ') : 'None';
+    const dislikesText = preferences.dislikes.length > 0 ? preferences.dislikes.join(', ') : 'None';
     
-    const prompt = `Tu es un expert en nutrition et planification de repas. Crée un plan de repas hebdomadaire personnalisé en JSON avec ces préférences :
+    const prompt = `You are a nutrition and meal planning expert. Create a personalized weekly meal plan in JSON with these preferences:
 
-Régime alimentaire : ${preferences.dietType}
-Nombre de personnes : ${preferences.numberOfPeople}
-Budget : ${preferences.budget}
-Temps de cuisine : ${preferences.cookingTime}
-Allergies : ${allergiesText}
-Aliments à éviter : ${dislikesText}
+Diet type: ${preferences.dietType}
+Number of people: ${preferences.numberOfPeople}
+Budget: ${preferences.budget}
+Cooking time: ${preferences.cookingTime}
+Allergies: ${allergiesText}
+Foods to avoid: ${dislikesText}
 
-IMPORTANT - RÈGLES STRICTES À RESPECTER :
-- INTERDICTION ABSOLUE d'inclure des aliments mentionnés dans les allergies
-- INTERDICTION ABSOLUE d'inclure des aliments mentionnés dans les aliments à éviter
-- Vérifie chaque ingrédient pour éviter les allergènes
-- Si une allergie est "fruits", n'inclure AUCUN fruit dans les repas
-- Si une allergie est "noix", n'inclure AUCUNE noix, amande, noisette, etc.
-- Si une allergie est "lactose", n'inclure AUCUN produit laitier
-- Respecte strictement le régime alimentaire choisi
+IMPORTANT - STRICT RULES TO FOLLOW:
+- ABSOLUTE PROHIBITION of including foods mentioned in allergies
+- ABSOLUTE PROHIBITION of including foods mentioned in foods to avoid
+- Check each ingredient to avoid allergens
+- If allergy is "fruits", include NO fruits in meals
+- If allergy is "nuts", include NO nuts, almonds, hazelnuts, etc.
+- If allergy is "lactose", include NO dairy products
+- Strictly respect the chosen diet type
 
-Retourne UNIQUEMENT un JSON valide avec cette structure :
+Return ONLY valid JSON with this structure:
 {
-  "lundi": {
-    "matin": { "nom": "Nom du repas", "ingredients": ["ingredient1", "ingredient2"], "temps": "X min" },
-    "midi": { "nom": "Nom du repas", "ingredients": ["ingredient1", "ingredient2"], "temps": "X min" },
-    "soir": { "nom": "Nom du repas", "ingredients": ["ingredient1", "ingredient2"], "temps": "X min" }
+  "monday": {
+    "morning": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
+    "noon": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
+    "evening": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" }
   },
-  "mardi": { ... },
-  "mercredi": { ... },
-  "jeudi": { ... },
-  "vendredi": { ... },
-  "samedi": { ... },
-  "dimanche": { ... }
+  "tuesday": { ... },
+  "wednesday": { ... },
+  "thursday": { ... },
+  "friday": { ... },
+  "saturday": { ... },
+  "sunday": { ... }
 }
 
-Assure-toi que les repas sont variés, équilibrés et respectent ABSOLUMENT les allergies et préférences alimentaires.`;
+Make sure meals are varied, balanced and ABSOLUTELY respect allergies and dietary preferences.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -64,7 +64,7 @@ Assure-toi que les repas sont variés, équilibrés et respectent ABSOLUMENT les
         messages: [
           {
             role: 'system',
-            content: 'Tu es un assistant nutritionniste expert spécialisé dans la gestion des allergies alimentaires. Tu dois ABSOLUMENT respecter les allergies et aliments à éviter mentionnés. Tu réponds UNIQUEMENT avec du JSON valide, sans texte supplémentaire. JAMAIS d\'ingrédients allergènes dans les repas.'
+            content: 'You are an expert nutritionist assistant specialized in food allergy management. You MUST ABSOLUTELY respect the allergies and foods to avoid mentioned. You respond ONLY with valid JSON, without additional text. NEVER allergenic ingredients in meals.'
           },
           {
             role: 'user',
@@ -86,24 +86,24 @@ Assure-toi que les repas sont variés, équilibrés et respectent ABSOLUMENT les
     const mealPlanContent = data.choices[0]?.message?.content;
 
     if (!mealPlanContent) {
-      throw new Error('Réponse vide de ChatGPT');
+      throw new Error('Empty response from ChatGPT');
     }
 
-    // Parser le JSON retourné par ChatGPT
+    // Parse JSON returned by ChatGPT
     let mealPlan;
     try {
       mealPlan = JSON.parse(mealPlanContent);
       
-      // Valider que les allergies sont respectées
+      // Validate that allergies are respected
       const validationResult = validateMealPlan(mealPlan, preferences);
       if (!validationResult.isValid) {
-        console.warn('Plan généré ne respecte pas les allergies:', validationResult.violations);
-        // Régénérer avec un prompt plus strict
+        console.warn('Generated plan does not respect allergies:', validationResult.violations);
+        // Regenerate with stricter prompt
         mealPlan = await regenerateWithStricterPrompt(preferences, OPENAI_API_KEY);
       }
     } catch (parseError) {
-      // Si le parsing échoue, créer un plan de fallback
-      console.error('Erreur de parsing JSON:', parseError);
+      // If parsing fails, create fallback plan
+      console.error('JSON parsing error:', parseError);
       mealPlan = generateFallbackMealPlan(preferences);
     }
 
@@ -114,9 +114,9 @@ Assure-toi que les repas sont variés, équilibrés et respectent ABSOLUMENT les
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error('Erreur génération plan repas:', error);
+    console.error('Meal plan generation error:', error);
     
-    // En cas d'erreur, retourner un plan de fallback avec des préférences par défaut
+    // In case of error, return fallback plan with default preferences
     const fallbackPlan = generateFallbackMealPlan({
       dietType: 'omnivore',
       numberOfPeople: 2,
@@ -129,16 +129,16 @@ Assure-toi que les repas sont variés, équilibrés et respectent ABSOLUMENT les
     return NextResponse.json({ 
       success: true, 
       mealPlan: fallbackPlan,
-      message: 'Plan généré avec des suggestions par défaut'
+      message: 'Plan generated with default suggestions'
     });
   }
 }
 
-// Plan de fallback en cas d'erreur API
+// Fallback plan in case of API error
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 function generateFallbackMealPlan(preferences: any) {
-  const days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
-  const meals = ['matin', 'midi', 'soir'];
+  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const meals = ['morning', 'noon', 'evening'];
   
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mealPlan: any = {};
@@ -147,9 +147,9 @@ function generateFallbackMealPlan(preferences: any) {
     mealPlan[day] = {};
     meals.forEach(meal => {
       mealPlan[day][meal] = {
-        nom: `Repas ${meal} - ${day}`,
-        ingredients: ['Ingrédient 1', 'Ingrédient 2', 'Ingrédient 3'],
-        temps: '30 min'
+        name: `${meal} meal - ${day}`,
+        ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'],
+        time: '30 min'
       };
     });
   });
@@ -157,31 +157,31 @@ function generateFallbackMealPlan(preferences: any) {
   return mealPlan;
 }
 
-// Fonction de validation des allergies
+// Allergy validation function
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validateMealPlan(mealPlan: any, preferences: any) {
   const violations: string[] = [];
   const allergies = preferences.allergies.map((a: string) => a.toLowerCase());
   const dislikes = preferences.dislikes.map((d: string) => d.toLowerCase());
   
-  // Vérifier chaque repas
+  // Check each meal
   Object.keys(mealPlan).forEach(day => {
     Object.keys(mealPlan[day]).forEach(meal => {
       const ingredients = mealPlan[day][meal].ingredients || [];
       ingredients.forEach((ingredient: string) => {
         const ingredientLower = ingredient.toLowerCase();
         
-        // Vérifier les allergies
+        // Check allergies
         allergies.forEach((allergy: string) => {
           if (ingredientLower.includes(allergy)) {
-            violations.push(`${day} ${meal}: "${ingredient}" contient l'allergène "${allergy}"`);
+            violations.push(`${day} ${meal}: "${ingredient}" contains allergen "${allergy}"`);
           }
         });
         
-        // Vérifier les aliments à éviter
+        // Check foods to avoid
         dislikes.forEach((dislike: string) => {
           if (ingredientLower.includes(dislike)) {
-            violations.push(`${day} ${meal}: "${ingredient}" contient l'aliment à éviter "${dislike}"`);
+            violations.push(`${day} ${meal}: "${ingredient}" contains food to avoid "${dislike}"`);
           }
         });
       });
@@ -194,42 +194,42 @@ function validateMealPlan(mealPlan: any, preferences: any) {
   };
 }
 
-// Fonction pour régénérer avec un prompt plus strict
+// Function to regenerate with stricter prompt
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function regenerateWithStricterPrompt(preferences: any, apiKey: string) {
-  const allergiesText = preferences.allergies.length > 0 ? preferences.allergies.join(', ') : 'Aucune';
-  const dislikesText = preferences.dislikes.length > 0 ? preferences.dislikes.join(', ') : 'Aucun';
+  const allergiesText = preferences.allergies.length > 0 ? preferences.allergies.join(', ') : 'None';
+  const dislikesText = preferences.dislikes.length > 0 ? preferences.dislikes.join(', ') : 'None';
   
-  const strictPrompt = `ATTENTION : Le plan précédent contenait des allergènes. Tu DOIS créer un nouveau plan en respectant ABSOLUMENT ces contraintes :
+  const strictPrompt = `WARNING: The previous plan contained allergens. You MUST create a new plan ABSOLUTELY respecting these constraints:
 
-Régime alimentaire : ${preferences.dietType}
-Nombre de personnes : ${preferences.numberOfPeople}
-Budget : ${preferences.budget}
-Temps de cuisine : ${preferences.cookingTime}
-Allergies STRICTES : ${allergiesText}
-Aliments à éviter STRICTS : ${dislikesText}
+Diet type: ${preferences.dietType}
+Number of people: ${preferences.numberOfPeople}
+Budget: ${preferences.budget}
+Cooking time: ${preferences.cookingTime}
+STRICT Allergies: ${allergiesText}
+STRICT Foods to avoid: ${dislikesText}
 
-RÈGLES ABSOLUES :
-- INTERDICTION TOTALE des aliments allergènes
-- INTERDICTION TOTALE des aliments à éviter
-- Vérifie chaque ingrédient individuellement
-- Si allergie "fruits" → AUCUN fruit, baie, agrume, etc.
-- Si allergie "noix" → AUCUNE noix, amande, noisette, pistache, etc.
-- Si allergie "lactose" → AUCUN lait, fromage, yaourt, beurre, etc.
+ABSOLUTE RULES:
+- TOTAL PROHIBITION of allergenic foods
+- TOTAL PROHIBITION of foods to avoid
+- Check each ingredient individually
+- If allergy "fruits" → NO fruits, berries, citrus, etc.
+- If allergy "nuts" → NO nuts, almonds, hazelnuts, pistachios, etc.
+- If allergy "lactose" → NO milk, cheese, yogurt, butter, etc.
 
-Retourne UNIQUEMENT un JSON valide avec cette structure :
+Return ONLY valid JSON with this structure:
 {
-  "lundi": {
-    "matin": { "nom": "Nom du repas", "ingredients": ["ingredient1", "ingredient2"], "temps": "X min" },
-    "midi": { "nom": "Nom du repas", "ingredients": ["ingredient1", "ingredient2"], "temps": "X min" },
-    "soir": { "nom": "Nom du repas", "ingredients": ["ingredient1", "ingredient2"], "temps": "X min" }
+  "monday": {
+    "morning": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
+    "noon": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
+    "evening": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" }
   },
-  "mardi": { ... },
-  "mercredi": { ... },
-  "jeudi": { ... },
-  "vendredi": { ... },
-  "samedi": { ... },
-  "dimanche": { ... }
+  "tuesday": { ... },
+  "wednesday": { ... },
+  "thursday": { ... },
+  "friday": { ... },
+  "saturday": { ... },
+  "sunday": { ... }
 }`;
 
   try {
@@ -244,7 +244,7 @@ Retourne UNIQUEMENT un JSON valide avec cette structure :
         messages: [
           {
             role: 'system',
-            content: 'Tu es un assistant nutritionniste expert spécialisé dans la gestion des allergies alimentaires. Tu dois ABSOLUMENT respecter les allergies et aliments à éviter mentionnés. Tu réponds UNIQUEMENT avec du JSON valide, sans texte supplémentaire. JAMAIS d\'ingrédients allergènes dans les repas.'
+            content: 'You are an expert nutritionist assistant specialized in food allergy management. You MUST ABSOLUTELY respect the allergies and foods to avoid mentioned. You respond ONLY with valid JSON, without additional text. NEVER allergenic ingredients in meals.'
           },
           {
             role: 'user',
@@ -252,7 +252,7 @@ Retourne UNIQUEMENT un JSON valide avec cette structure :
           }
         ],
         max_tokens: 2000,
-        temperature: 0.3, // Température plus basse pour plus de cohérence
+        temperature: 0.3, // Lower temperature for more consistency
       }),
     });
 
@@ -264,9 +264,9 @@ Retourne UNIQUEMENT un JSON valide avec cette structure :
       }
     }
   } catch (error) {
-    console.error('Erreur lors de la régénération stricte:', error);
+    console.error('Error during strict regeneration:', error);
   }
   
-  // Fallback si la régénération échoue
+  // Fallback if regeneration fails
   return generateFallbackMealPlan(preferences);
 }

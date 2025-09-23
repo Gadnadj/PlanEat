@@ -16,7 +16,7 @@ export interface IRecipe extends Document {
   prepTime: number; // en minutes
   cookTime: number; // en minutes
   servings: number;
-  difficulty: 'facile' | 'moyen' | 'difficile';
+  difficulty: 'easy' | 'medium' | 'hard';
   category: string;
   tags: string[];
   nutrition: {
@@ -98,8 +98,8 @@ const RecipeSchema = new Schema<IRecipe>({
   difficulty: {
     type: String,
     required: [true, 'La difficulté est requise'],
-    enum: ['facile', 'moyen', 'difficile'],
-    default: 'moyen'
+    enum: ['easy', 'medium', 'hard'],
+    default: 'medium'
   },
   category: {
     type: String,

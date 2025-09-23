@@ -5,29 +5,29 @@ import { hashPassword, isValidEmail, isValidPassword, isValidName, generateToken
 
 export async function POST(request: NextRequest) {
   try {
-    // Connexion à MongoDB
+    // Connect to MongoDB
     await connectDB();
 
-    // Parse des données de la requête
+    // Parse request data
     const { email, password, name } = await request.json();
 
-    // Validation des données
+    // Validate data
     if (!email || !password || !name) {
       return NextResponse.json(
-        { success: false, message: 'Tous les champs sont requis' },
+        { success: false, message: 'All fields are required' },
         { status: 400 }
       );
     }
 
-    // Validation de l'email
+    // Validate email
     if (!isValidEmail(email)) {
       return NextResponse.json(
-        { success: false, message: 'Format d\'email invalide' },
+        { success: false, message: 'Invalid email format' },
         { status: 400 }
       );
     }
 
-    // Validation du mot de passe
+    // Validate password
     const passwordValidation = isValidPassword(password);
     if (!passwordValidation.valid) {
       return NextResponse.json(
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validation du nom
+    // Validate name
     const nameValidation = isValidName(name);
     if (!nameValidation.valid) {
       return NextResponse.json(
@@ -45,19 +45,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier si l'utilisateur existe déjà
+    // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return NextResponse.json(
-        { success: false, message: 'Un utilisateur avec cet email existe déjà' },
+        { success: false, message: 'A user with this email already exists' },
         { status: 409 }
       );
     }
 
-    // Hacher le mot de passe
+    // Hash password
     const hashedPassword = await hashPassword(password);
 
-    // Créer le nouvel utilisateur
+    // Create new user
     const user = new User({
       email: email.toLowerCase().trim(),
       password: hashedPassword,
@@ -66,14 +66,14 @@ export async function POST(request: NextRequest) {
 
     await user.save();
 
-    // Générer un token JWT
+    // Generate JWT token
     const token = generateToken(user._id.toString());
 
-    // Retourner la réponse sans le mot de passe
+    // Return response without password
     return NextResponse.json(
       {
         success: true,
-        message: 'Compte créé avec succès',
+        message: 'Account created successfully',
         user: {
           id: user._id.toString(),
           email: user.email,
@@ -85,18 +85,18 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Erreur lors de l\'inscription:', error);
+    console.error('Signup error:', error);
     
-    // Gestion des erreurs de validation Mongoose
+    // Handle Mongoose validation errors
     if (error instanceof Error && error.name === 'ValidationError') {
       return NextResponse.json(
-        { success: false, message: 'Données invalides' },
+        { success: false, message: 'Invalid data' },
         { status: 400 }
       );
     }
 
     return NextResponse.json(
-      { success: false, message: 'Erreur interne du serveur' },
+      { success: false, message: 'Internal server error' },
       { status: 500 }
     );
   }

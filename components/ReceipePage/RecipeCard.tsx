@@ -18,7 +18,7 @@ interface RecipeData {
   prepTime: number;
   cookTime: number;
   servings: number;
-  difficulty: 'facile' | 'moyen' | 'difficile';
+  difficulty: 'easy' | 'medium' | 'hard';
   category: string;
   tags: string[];
   nutrition: {
@@ -43,18 +43,18 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
 
     const getDifficultyColor = (difficulty: string) => {
         switch (difficulty) {
-            case 'facile': return 'bg-green-600';
-            case 'moyen': return 'bg-yellow-600';
-            case 'difficile': return 'bg-red-600';
+            case 'easy': return 'bg-green-600';
+            case 'medium': return 'bg-yellow-600';
+            case 'hard': return 'bg-red-600';
             default: return 'bg-gray-600';
         }
     };
 
     const getDifficultyText = (difficulty: string) => {
         switch (difficulty) {
-            case 'facile': return 'Easy';
-            case 'moyen': return 'Medium';
-            case 'difficile': return 'Hard';
+            case 'easy': return 'Easy';
+            case 'medium': return 'Medium';
+            case 'hard': return 'Hard';
             default: return difficulty;
         }
     };

@@ -7,7 +7,7 @@ import RecipesList from '@/components/ReceipePage/RecipesList'
 import Search from '@/components/ReceipePage/Search'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 interface RecipeData {
   id: string;
@@ -25,7 +25,7 @@ interface RecipeData {
   prepTime: number;
   cookTime: number;
   servings: number;
-  difficulty: 'facile' | 'moyen' | 'difficile';
+  difficulty: 'easy' | 'medium' | 'hard';
   category: string;
   tags: string[];
   nutrition: {
@@ -77,7 +77,7 @@ const Page = () => {
         setPlanningRecipe(null);
     }
 
-    const loadRecipes = async () => {
+    const loadRecipes = useCallback(async () => {
         try {
             const headers: HeadersInit = {};
             if (token) {
@@ -108,7 +108,7 @@ const Page = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [searchTerm, filters, sortBy, sortOrder, token]);
 
     const handleRecipeCreated = () => {
         // Reload recipes after creation
@@ -205,7 +205,7 @@ const Page = () => {
 
     useEffect(() => {
         loadRecipes();
-    }, [searchTerm, filters, sortBy, sortOrder, token]);
+    }, [loadRecipes]);
 
     useEffect(() => {
         if (isModalOpen) {
