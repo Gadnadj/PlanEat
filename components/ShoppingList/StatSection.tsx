@@ -1,12 +1,16 @@
 import { styles } from './styles'
 
-const StatSection = () => {
+interface StatSectionProps {
+    totalItems: number;
+    completedItems: number;
+    remainingItems: number;
+}
 
+const StatSection = ({ totalItems, completedItems, remainingItems }: StatSectionProps) => {
     const list = [
-        { label: 'Articles', value: '12' },
-        { label: 'Complétés', value: '7' },
-        { label: 'Restants', value: '5' },
-        { label: 'Budget estimé', value: '-45$' }
+        { label: 'Articles', value: totalItems.toString() },
+        { label: 'Complétés', value: completedItems.toString() },
+        { label: 'Restants', value: remainingItems.toString() }
     ];
 
     return (
@@ -14,7 +18,7 @@ const StatSection = () => {
             {
                 list.map((item, index) => (
                     <div className={styles.statItem} key={index}>
-                        <div className={styles.statItem}>{item.value}</div>
+                        <div className={styles.statValue}>{item.value}</div>
                         <div className={styles.statLabel}>{item.label}</div>
                     </div>
                 ))

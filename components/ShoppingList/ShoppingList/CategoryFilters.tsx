@@ -1,14 +1,39 @@
 import { styles } from '../styles'
 
-const CategoryFilters = () => {
+interface CategoryFiltersProps {
+    categories: string[];
+    selectedCategory: string;
+    onCategoryChange: (category: string) => void;
+}
+
+const CategoryFilters = ({ categories, selectedCategory, onCategoryChange }: CategoryFiltersProps) => {
+    const getCategoryEmoji = (category: string) => {
+        const emojis: { [key: string]: string } = {
+            'Toutes': '📋',
+            'Fruits & Légumes': '🥕',
+            'Viandes & Poissons': '🥩',
+            'Produits laitiers': '🥛',
+            'Épicerie': '🏪',
+            'Boulangerie': '🍞',
+            'Boissons': '🥤',
+            'Autres': '📦'
+        };
+        return emojis[category] || '📦';
+    };
+
     return (
         <div className='flex gap-2 mb-8 flex-wrap max-md:justify-center'>
-            <button className={styles.categoryButton}>Tout</button>
-            <button className={styles.categoryButton}>🥕 Fruits & Légumes</button>
-            <button className={styles.categoryButton}>🥩 Viandes</button>
-            <button className={styles.categoryButton}>🥛 Produits laitiers</button>
-            <button className={styles.categoryButton}>🏪 Épiceri</button>
-            <button className={styles.categoryButton}>📦 Autres</button>
+            {categories.map((category) => (
+                <button 
+                    key={category}
+                    className={`${styles.categoryButton} ${
+                        selectedCategory === category ? styles.categoryButtonActive : ''
+                    }`}
+                    onClick={() => onCategoryChange(category)}
+                >
+                    {getCategoryEmoji(category)} {category}
+                </button>
+            ))}
         </div>
     )
 }
