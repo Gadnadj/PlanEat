@@ -51,7 +51,7 @@ const Page = () => {
         tags: [] as string[]
     });
     const [sortBy, setSortBy] = useState('createdAt');
-    const [sortOrder, setSortOrder] = useState('desc');
+    const [sortOrder, setSortOrder] = useState('asc');
 
     const openModal = () => setIsModalOpen(true)
     const closeModal = () => setIsModalOpen(false)

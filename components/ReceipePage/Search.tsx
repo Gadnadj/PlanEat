@@ -22,7 +22,7 @@ const Search = ({ onSearchChange, onFilterChange, onSortChange }: SearchProps) =
         tags: [] as string[]
     });
     const [sortBy, setSortBy] = useState('createdAt');
-    const [sortOrder, setSortOrder] = useState('desc');
+    const [sortOrder, setSortOrder] = useState('asc');
 
     const handleFilterChange = (filterType: string, value: string) => {
         const newFilters = { ...filters, [filterType]: value };

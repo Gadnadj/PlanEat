@@ -42,7 +42,7 @@ const Ingredients = ({ recipe, onAddIngredient }: IngredientsProps) => {
             <div className='grid [grid-template-columns:repeat(auto-fit,_minmax(250px,_1fr))] gap-4 max-md:grid-cols-1'>
                 {recipe.ingredients.map((ingredient, index) => (
                     <div key={index} className={`${styles.ingredientItem} group flex items-center justify-between`}>
-                        <div className="flex-1">
+                        <div className="flex flex-1 gap-2 items-center">
                             <span className={styles.ingredientName}>{ingredient.name}</span>
                             <span className={styles.ingredientQuantity}>
                                 {ingredient.amount} {ingredient.unit || ''}

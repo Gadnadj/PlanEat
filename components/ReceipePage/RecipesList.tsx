@@ -54,16 +54,6 @@ const RecipesList = ({ recipes, loading, onDelete, onEdit, currentUserId }: Reci
         <main className='max-w-[1400px] mx-auto pt-0 px-8 pb-8'>
             <div className='flex justify-between items-center mb-8 py-4 border-b border-[#404040] max-md:flex-col max-md:items-start max-md:gap-4'>
                 <span className='text-[#b0b0b0] text-base'>{recipes.length} recette{recipes.length > 1 ? 's' : ''} trouvée{recipes.length > 1 ? 's' : ''}</span>
-                <div className='flex gap-4 items-center'>
-                    <span className='text-[#b0b0b0] text-base'>Trier par:</span>
-                    <select className={styles.select}>
-                        <option>Popularité</option>
-                        <option>Date d ajout</option>
-                        <option>Temps de préparation</option>
-                        <option>Difficulté</option>
-                        <option>Note</option>
-                    </select>
-                </div>
             </div>
 
             {recipes.length === 0 ? (
