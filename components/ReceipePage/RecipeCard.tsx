@@ -60,8 +60,8 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
 
     return (
         <article className={styles.recipeTag}>
-            <div className={styles.recipeImage}>
-                {recipe.emoji}
+            <div className={styles.recipeImage} style={{ backgroundImage: `url(${recipe.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <div className="text-6xl">{recipe.emoji}</div>
                 <span className={`${styles.recipeDifficulty} ${getDifficultyColor(recipe.difficulty)}`}>
                     {getDifficultyText(recipe.difficulty)}
                 </span>

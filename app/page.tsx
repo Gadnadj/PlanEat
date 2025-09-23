@@ -245,7 +245,7 @@ export default function Home() {
 
   // Home page for logged-in users (your original content)
   const recipeCard = 'bg-gradient-to-br from-[#3a3a3a] to-gray-[#2d2d2d] rounded-xl overflow-hidden transition-all duration-300 ease-out border border-gray-600 hover:-translate-y-1 hover:shadow-2xl flex flex-col h-full max-sm:rounded-lg';
-  const recipeImage = 'w-full h-40 sm:h-48 bg-gradient-to-br from-[#3b82f6] to-[#64748b] flex items-center justify-center text-4xl sm:text-6xl text-white flex-shrink-0';
+  const recipeImage = 'relative w-full h-40 sm:h-48 bg-gradient-to-br from-[#3b82f6] to-[#64748b] flex items-center justify-center text-4xl sm:text-6xl text-white flex-shrink-0';
   const recipeInfo = 'p-4 sm:p-6 flex flex-col flex-grow';
   const recipeInfoH3 = 'text-[#3b82f6] mb-3 sm:mb-4 text-lg sm:text-xl font-bold leading-tight';
   const ingredients = 'mb-4 flex-grow min-h-28 sm:min-h-32';
@@ -309,24 +309,44 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" style={{ gridTemplateRows: '1fr' }}>
-              {recipes.map((recipe) => (
+              {recipes.map((recipe) => {
+                const getDifficultyStyle = (difficulty: string) => {
+                  switch (difficulty) {
+                    case 'easy': return { backgroundColor: '#16a34a' }; // Vert
+                    case 'medium': return { backgroundColor: '#ca8a04' }; // Orange/Jaune
+                    case 'hard': return { backgroundColor: '#dc2626' }; // Rouge
+                    default: return { backgroundColor: '#4b5563' }; // Gris
+                  }
+                };
+
+                const getDifficultyText = (difficulty: string) => {
+                  switch (difficulty) {
+                    case 'easy': return 'Easy';
+                    case 'medium': return 'Medium';
+                    case 'hard': return 'Hard';
+                    default: return difficulty;
+                  }
+                };
+
+                // Only show emoji if no image or image is default/placeholder
+                const hasRealImage = recipe.image && !recipe.image.includes('default') && recipe.image.trim() !== '';
+
+                return (
                 <div key={recipe.id} className={recipeCard}>
                   <div className={recipeImage} style={{ backgroundImage: `url(${recipe.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                    <div className="text-6xl">{recipe.emoji}</div>
+                    {!hasRealImage && <div className="text-6xl">{recipe.emoji}</div>}
+                    <span 
+                      className="absolute top-4 right-4 text-white py-[0.3rem] px-[0.8rem] rounded-[15px] text-[0.8rem] font-bold"
+                      style={getDifficultyStyle(recipe.difficulty)}
+                    >
+                      {getDifficultyText(recipe.difficulty)}
+                    </span>
                   </div>
                   <div className={recipeInfo}>
-                    <h3 className={recipeInfoH3}>{recipe.title}</h3>
-                    <p className="text-gray-400 text-sm mb-3 sm:mb-4 line-clamp-2 h-8 sm:h-10 overflow-hidden leading-tight">{recipe.description}</p>
-                    <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4 text-xs sm:text-sm text-gray-400 flex-wrap">
+                    <h3 className="text-[#3b82f6] mb-3 sm:mb-4 text-lg sm:text-xl font-bold leading-tight h-14">{recipe.title}</h3>
+                    <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4 text-xs sm:text-sm text-gray-400 flex-wrap h-6">
                       <span className="flex items-center gap-1">⏱️ {recipe.prepTime} min</span>
                       <span className="flex items-center gap-1">👥 {recipe.servings}</span>
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        recipe.difficulty === 'facile' ? 'bg-green-900 text-green-300' :
-                        recipe.difficulty === 'moyen' ? 'bg-yellow-900 text-yellow-300' :
-                        'bg-red-900 text-red-300'
-                      }`}>
-                        {recipe.difficulty}
-                      </span>
                     </div>
                     <div className={ingredients}>
                       <h4 className={ingredientsH4}>Ingredients:</h4>
@@ -361,7 +381,8 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

@@ -51,8 +51,8 @@ const Header = ({ recipe }: HeaderProps) => {
 
     return (
         <header className='bg-linear-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-[20px] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.3)] mb-8'>
-            <div className='relative h-[400px] bg-linear-to-br from-[#3b82f6] to-[#64748b] flex justify-center items-center text-[8rem] text-white max-md:h-[250px] max-md:text-[4rem]'>
-                {recipe.emoji}
+            <div className='relative h-[400px] bg-linear-to-br from-[#3b82f6] to-[#64748b] flex justify-center items-center text-[8rem] text-white max-md:h-[250px] max-md:text-[4rem]' style={{ backgroundImage: `url(${recipe.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <div className="text-[8rem] max-md:text-[4rem]">{recipe.emoji}</div>
                 <span className={`absolute top-6 right-6 ${getDifficultyColor(recipe.difficulty)} text-white px-4 py-2 rounded-[20px] text-[0.9rem] font-bold`}>
                     {getDifficultyText(recipe.difficulty)}
                 </span>
