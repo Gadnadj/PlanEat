@@ -26,23 +26,23 @@ interface PlanningModalProps {
 }
 
 const PlanningModal = ({ recipe, isOpen, onClose, onAddToPlanning }: PlanningModalProps) => {
-  const [selectedDay, setSelectedDay] = useState('lundi');
-  const [selectedMeal, setSelectedMeal] = useState('midi');
+  const [selectedDay, setSelectedDay] = useState('monday');
+  const [selectedMeal, setSelectedMeal] = useState('lunch');
 
   const days = [
-    { value: 'lundi', label: 'Lundi' },
-    { value: 'mardi', label: 'Mardi' },
-    { value: 'mercredi', label: 'Mercredi' },
-    { value: 'jeudi', label: 'Jeudi' },
-    { value: 'vendredi', label: 'Vendredi' },
-    { value: 'samedi', label: 'Samedi' },
-    { value: 'dimanche', label: 'Dimanche' }
+    { value: 'monday', label: 'Lundi' },
+    { value: 'tuesday', label: 'Mardi' },
+    { value: 'wednesday', label: 'Mercredi' },
+    { value: 'thursday', label: 'Jeudi' },
+    { value: 'friday', label: 'Vendredi' },
+    { value: 'saturday', label: 'Samedi' },
+    { value: 'sunday', label: 'Dimanche' }
   ];
 
   const meals = [
-    { value: 'matin', label: 'Matin', emoji: '🌅' },
-    { value: 'midi', label: 'Midi', emoji: '☀️' },
-    { value: 'soir', label: 'Soir', emoji: '🌙' }
+    { value: 'morning', label: 'Matin', emoji: '🌅' },
+    { value: 'lunch', label: 'Midi', emoji: '☀️' },
+    { value: 'dinner', label: 'Soir', emoji: '🌙' }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {

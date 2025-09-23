@@ -40,6 +40,7 @@ const Page = () => {
   const router = useRouter();
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [originalServings, setOriginalServings] = useState<number>(2);
   const [currentServings, setCurrentServings] = useState<number>(2);
   const [originalIngredients, setOriginalIngredients] = useState<RecipeData['ingredients']>([]);
@@ -82,6 +83,10 @@ const Page = () => {
 
   useEffect(() => {
     const loadRecipe = async () => {
+      setLoading(true);
+      setHasError(false);
+      setRecipe(null);
+      
       try {
         // Get user's meal plan
         const headers: HeadersInit = {};
@@ -271,19 +276,28 @@ const Page = () => {
               setOriginalIngredients(formattedIngredients);
               
               setRecipe(recipeData);
+              setLoading(false);
             } else {
               console.error('Meal not found in planning for', day, meal);
               console.error('Available day data:', dayData);
               console.error('Full meal plan:', data.mealPlan);
               console.error('Looking for:', `${day}-${meal}`);
+              setHasError(true);
+              setLoading(false);
             }
+          } else {
+            console.error('No meal plan data found');
+            setHasError(true);
+            setLoading(false);
           }
         } else {
           console.error('Erreur lors du chargement du planning');
+          setHasError(true);
+          setLoading(false);
         }
       } catch (error) {
         console.error('Erreur lors du chargement de la recette:', error);
-      } finally {
+        setHasError(true);
         setLoading(false);
       }
     };
@@ -340,7 +354,7 @@ const Page = () => {
     );
   }
 
-  if (!recipe) {
+  if (!loading && hasError) {
     return (
       <ProtectedRoute>
         <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex items-center justify-center">
@@ -354,6 +368,20 @@ const Page = () => {
             >
               ← Retour au planning
             </button>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  // Only render the main content if we have a recipe and are not in an error state
+  if (!recipe || loading) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3b82f6] mx-auto mb-4"></div>
+            <p className="text-[#b0b0b0] text-lg">Chargement de la recette...</p>
           </div>
         </div>
       </ProtectedRoute>

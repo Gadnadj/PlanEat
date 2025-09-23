@@ -50,8 +50,8 @@ export async function POST(req: Request) {
     }
 
     // Vérifier que le jour et le moment sont valides
-    const validDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
-    const validMeals = ['matin', 'midi', 'soir'];
+    const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const validMeals = ['morning', 'lunch', 'dinner'];
 
     if (!validDays.includes(day) || !validMeals.includes(meal)) {
       return NextResponse.json({ message: 'Jour ou moment invalide' }, { status: 400 });
@@ -59,10 +59,18 @@ export async function POST(req: Request) {
 
     // Modifier la recette dans le planning
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (mealPlan.mealPlan as any)[day][meal] = {
-      nom: recipe.title,
-      ingredients: recipe.ingredients.map(ing => `${ing.amount} ${ing.unit} ${ing.name}`),
-      temps: `${recipe.prepTime}min`,
+    const mealPlanData = mealPlan.mealPlan as any;
+    
+    // S'assurer que la structure existe
+    if (!mealPlanData[day]) {
+      mealPlanData[day] = {};
+    }
+    
+    // Ajouter la recette avec la bonne structure
+    mealPlanData[day][meal] = {
+      name: recipe.title,
+      ingredients: recipe.ingredients.map(ing => `${ing.amount}${ing.unit ? ' ' + ing.unit : ''} ${ing.name}`),
+      time: `${recipe.prepTime} min`,
       emoji: recipe.emoji
     };
 
