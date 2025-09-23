@@ -40,8 +40,8 @@ Return ONLY valid JSON with this structure:
 {
   "monday": {
     "morning": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
-    "noon": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
-    "evening": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" }
+    "lunch": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
+    "dinner": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" }
   },
   "tuesday": { ... },
   "wednesday": { ... },
@@ -64,7 +64,7 @@ Make sure meals are varied, balanced and ABSOLUTELY respect allergies and dietar
         messages: [
           {
             role: 'system',
-            content: 'You are an expert nutritionist assistant specialized in food allergy management. You MUST ABSOLUTELY respect the allergies and foods to avoid mentioned. You respond ONLY with valid JSON, without additional text. NEVER allergenic ingredients in meals.'
+            content: 'You are an expert nutritionist assistant specialized in food allergy management. You MUST ABSOLUTELY respect the allergies and foods to avoid mentioned. You respond ONLY with valid JSON, without additional text. NEVER allergenic ingredients in meals. IMPORTANT: Generate ALL content exclusively in ENGLISH language. All meal names and ingredients must be written in English only.'
           },
           {
             role: 'user',
@@ -107,6 +107,31 @@ Make sure meals are varied, balanced and ABSOLUTELY respect allergies and dietar
       mealPlan = generateFallbackMealPlan(preferences);
     }
 
+    // Enrich the meal plan with detailed descriptions and instructions
+    try {
+      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      const enrichResponse = await fetch(`${baseUrl}/api/enrich-meal-plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mealPlan }),
+      });
+
+      if (enrichResponse.ok) {
+        const enrichData = await enrichResponse.json();
+        if (enrichData.success && enrichData.enrichedPlan) {
+          return NextResponse.json({ 
+            success: true, 
+            mealPlan: enrichData.enrichedPlan 
+          });
+        }
+      }
+    } catch (enrichError) {
+      console.warn('Failed to enrich meal plan, returning basic plan:', enrichError);
+    }
+
+    // Return basic plan if enrichment fails
     return NextResponse.json({ 
       success: true, 
       mealPlan 
@@ -120,8 +145,8 @@ Make sure meals are varied, balanced and ABSOLUTELY respect allergies and dietar
     const fallbackPlan = generateFallbackMealPlan({
       dietType: 'omnivore',
       numberOfPeople: 2,
-      budget: 'moyen',
-      cookingTime: 'moyen',
+      budget: 'medium',
+      cookingTime: 'medium',
       allergies: [],
       dislikes: []
     });
@@ -138,7 +163,7 @@ Make sure meals are varied, balanced and ABSOLUTELY respect allergies and dietar
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 function generateFallbackMealPlan(preferences: any) {
   const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-  const meals = ['morning', 'noon', 'evening'];
+  const meals = ['morning', 'lunch', 'dinner'];
   
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mealPlan: any = {};
@@ -221,8 +246,8 @@ Return ONLY valid JSON with this structure:
 {
   "monday": {
     "morning": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
-    "noon": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
-    "evening": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" }
+    "lunch": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
+    "dinner": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" }
   },
   "tuesday": { ... },
   "wednesday": { ... },
@@ -244,7 +269,7 @@ Return ONLY valid JSON with this structure:
         messages: [
           {
             role: 'system',
-            content: 'You are an expert nutritionist assistant specialized in food allergy management. You MUST ABSOLUTELY respect the allergies and foods to avoid mentioned. You respond ONLY with valid JSON, without additional text. NEVER allergenic ingredients in meals.'
+            content: 'You are an expert nutritionist assistant specialized in food allergy management. You MUST ABSOLUTELY respect the allergies and foods to avoid mentioned. You respond ONLY with valid JSON, without additional text. NEVER allergenic ingredients in meals. IMPORTANT: Generate ALL content exclusively in ENGLISH language. All meal names and ingredients must be written in English only.'
           },
           {
             role: 'user',

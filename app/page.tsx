@@ -28,7 +28,6 @@ interface RecipeData {
   }[];
   instructions: string[];
   prepTime: number;
-  cookTime: number;
   servings: number;
   difficulty: 'facile' | 'moyen' | 'difficile';
   category: string;
@@ -319,7 +318,7 @@ export default function Home() {
                     <h3 className={recipeInfoH3}>{recipe.title}</h3>
                     <p className="text-gray-400 text-sm mb-3 sm:mb-4 line-clamp-2 h-8 sm:h-10 overflow-hidden leading-tight">{recipe.description}</p>
                     <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4 text-xs sm:text-sm text-gray-400 flex-wrap">
-                      <span className="flex items-center gap-1">⏱️ {recipe.prepTime + recipe.cookTime} min</span>
+                      <span className="flex items-center gap-1">⏱️ {recipe.prepTime} min</span>
                       <span className="flex items-center gap-1">👥 {recipe.servings}</span>
                       <span className={`px-2 py-1 rounded text-xs ${
                         recipe.difficulty === 'facile' ? 'bg-green-900 text-green-300' :

@@ -16,7 +16,6 @@ interface RecipeData {
   }[];
   instructions: string[];
   prepTime: number;
-  cookTime: number;
   servings: number;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;
@@ -86,8 +85,8 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
                         <div className={styles.statLabel}>Calories</div>
                     </div>
                     <div className={styles.statItem}>
-                        <div className={styles.statValue}>{recipe.prepTime + recipe.cookTime}</div>
-                        <div className={styles.statLabel}>Total</div>
+                        <div className={styles.statValue}>{recipe.prepTime}</div>
+                        <div className={styles.statLabel}>Prep Time</div>
                     </div>
                 </div>
 

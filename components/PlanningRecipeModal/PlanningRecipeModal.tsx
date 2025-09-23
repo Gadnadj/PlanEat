@@ -48,7 +48,6 @@ const PlanningRecipeModal = ({ meal, isOpen, onClose }: PlanningRecipeModalProps
     ingredients: meal.ingredients || [],
     instructions: meal.instructions || ['Instructions détaillées non disponibles'],
     prepTime: parseInt(meal.temps?.replace(' min', '') || meal.time?.replace(' min', '') || '30'),
-    cookTime: 0,
     servings: meal.servings || 4,
     difficulty: meal.difficulty || 'facile' as 'facile' | 'moyen' | 'difficile',
     category: meal.category || 'Plat principal',

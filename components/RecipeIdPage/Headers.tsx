@@ -14,7 +14,6 @@ interface RecipeData {
   }[];
   instructions: string[];
   prepTime: number;
-  cookTime: number;
   servings: number;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;
@@ -88,11 +87,6 @@ const Header = ({ recipe }: HeaderProps) => {
                     <div className={styles.statItem}>
                         <span className={styles.statValue}>{recipe.prepTime} min</span>
                         <span className={styles.statLabel}>Prep Time</span>
-                    </div>
-
-                    <div className={styles.statItem}>
-                        <span className={styles.statValue}>{recipe.cookTime} min</span>
-                        <span className={styles.statLabel}>Cooking</span>
                     </div>
                 </div>
 

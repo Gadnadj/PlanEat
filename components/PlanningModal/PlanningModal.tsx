@@ -7,7 +7,6 @@ interface RecipeData {
   image: string;
   emoji: string;
   prepTime: number;
-  cookTime: number;
   servings: number;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;

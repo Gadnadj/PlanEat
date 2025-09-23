@@ -19,7 +19,7 @@ interface Meal {
   temps?: string;
   time?: string;
   servings?: number;
-  difficulty?: 'facile' | 'moyen' | 'difficile';
+  difficulty?: 'easy' | 'medium' | 'hard';
   category?: string;
   tags?: string[];
   nutrition?: {
@@ -32,16 +32,38 @@ interface Meal {
 
 interface MealPlan {
   [day: string]: {
-    matin: Meal;
-    midi: Meal;
-    soir: Meal;
+    morning: Meal;
+    lunch: Meal;
+    dinner: Meal;
   };
+}
+
+// Transform meal plan data from old French field names to new English field names
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformMealPlan(mealPlan: any): MealPlan | null {
+  if (!mealPlan) return null;
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const transformedPlan: any = {};
+  
+  Object.keys(mealPlan).forEach(day => {
+    const dayData = mealPlan[day];
+    if (dayData) {
+      transformedPlan[day] = {
+        morning: dayData.morning || dayData.matin,
+        lunch: dayData.lunch || dayData.midi || dayData.noon,
+        dinner: dayData.dinner || dayData.soir || dayData.evening
+      };
+    }
+  });
+  
+  return transformedPlan;
 }
 
 export default function PlanificationPage() {
   const { token } = useAuth();
   const router = useRouter();
-  const [selectedDay, setSelectedDay] = useState<string>("lundi");
+  const [selectedDay, setSelectedDay] = useState<string>("monday");
   const [preferences, setPreferences] = useState<{
     dietType: string;
     allergies: string[];
@@ -56,17 +78,26 @@ export default function PlanificationPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Translation function for day names (display only)
-  const translateDayForDisplay = (frenchDay: string): string => {
+  const translateDayForDisplay = (dayKey: string): string => {
     const dayTranslations: { [key: string]: string } = {
+      // French to English
       'lundi': 'Monday',
       'mardi': 'Tuesday', 
       'mercredi': 'Wednesday',
       'jeudi': 'Thursday',
       'vendredi': 'Friday',
       'samedi': 'Saturday',
-      'dimanche': 'Sunday'
+      'dimanche': 'Sunday',
+      // English to proper case
+      'monday': 'Monday',
+      'tuesday': 'Tuesday',
+      'wednesday': 'Wednesday',
+      'thursday': 'Thursday',
+      'friday': 'Friday',
+      'saturday': 'Saturday',
+      'sunday': 'Sunday'
     };
-    return dayTranslations[frenchDay] || frenchDay;
+    return dayTranslations[dayKey] || dayKey.charAt(0).toUpperCase() + dayKey.slice(1);
   };
 
   const loadUserData = useCallback(async () => {
@@ -99,7 +130,15 @@ export default function PlanificationPage() {
         const mealPlanData = await mealPlanResponse.json();
         if (mealPlanData.success) {
           console.log('Meal plan loaded:', mealPlanData.mealPlan);
-          setGeneratedPlan(mealPlanData.mealPlan);
+          console.log('Available days:', Object.keys(mealPlanData.mealPlan || {}));
+          if (Object.keys(mealPlanData.mealPlan || {}).length > 0) {
+            const firstDay = Object.keys(mealPlanData.mealPlan)[0];
+            console.log(`Structure of ${firstDay}:`, mealPlanData.mealPlan[firstDay]);
+          }
+          
+          // Transform data if it has old French field names
+          const transformedPlan = transformMealPlan(mealPlanData.mealPlan);
+          setGeneratedPlan(transformedPlan);
         }
       }
     } catch (error) {
@@ -185,13 +224,32 @@ export default function PlanificationPage() {
   const weeklyMealPlan = generatedPlan;
 
   const days = weeklyMealPlan ? Object.keys(weeklyMealPlan) as string[] : [];
+  
+  // Make sure selectedDay exists in the data, otherwise select the first available day
+  useEffect(() => {
+    if (days.length > 0 && !days.includes(selectedDay)) {
+      setSelectedDay(days[0]);
+    }
+  }, [days, selectedDay]);
 
-  const getMealCard = (meal: Meal, time: string, day: string) => {
+  const getMealCard = (meal: Meal | undefined, time: string, day: string) => {
+    // Handle undefined meal (for backward compatibility and missing data)
+    if (!meal) {
+      return (
+        <div className="bg-gradient-to-br from-[#3a3a3a] to-[#2d2d2d] rounded-xl p-4 border border-gray-600 flex flex-col h-full min-h-[200px] items-center justify-center">
+          <div className="text-4xl mb-3">🍽️</div>
+          <p className="text-gray-400 text-center">No meal planned</p>
+          <p className="text-gray-500 text-sm mt-2">Generate a meal plan to see meals here</p>
+        </div>
+      );
+    }
+
     // Handle both formats: default plan and AI-generated plan
     const mealName = meal.name || meal.nom || `Meal ${time}`;
     const mealEmoji = meal.emoji || '🍽️';
     const mealIngredients = meal.ingredients || [];
     const mealTime = meal.temps || meal.time || '30 min';
+    const mealNutrition = meal.nutrition;
     
     const handleMealClick = () => {
       router.push(`/planning-recipe/${day}-${time}`);
@@ -228,6 +286,31 @@ export default function PlanificationPage() {
             )}
           </ul>
         </div>
+        
+        {/* Nutrition information */}
+        {mealNutrition && (
+          <div className="mt-3 border-t border-gray-600 pt-3">
+            <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="bg-[#1f1f1f] rounded-lg p-2">
+                <div className="text-[#3b82f6] text-sm font-bold">{mealNutrition.calories}</div>
+                <div className="text-gray-400 text-xs">Cal</div>
+              </div>
+              <div className="bg-[#1f1f1f] rounded-lg p-2">
+                <div className="text-[#10b981] text-sm font-bold">{mealNutrition.protein}g</div>
+                <div className="text-gray-400 text-xs">Protein</div>
+              </div>
+              <div className="bg-[#1f1f1f] rounded-lg p-2">
+                <div className="text-[#f59e0b] text-sm font-bold">{mealNutrition.carbs}g</div>
+                <div className="text-gray-400 text-xs">Carbs</div>
+              </div>
+              <div className="bg-[#1f1f1f] rounded-lg p-2">
+                <div className="text-[#ef4444] text-sm font-bold">{mealNutrition.fat}g</div>
+                <div className="text-gray-400 text-xs">Fat</div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="mt-3 text-center border-t border-gray-600 pt-3">
           <span className="text-[#3b82f6] text-sm font-medium">Click to view details</span>
         </div>
@@ -348,7 +431,11 @@ export default function PlanificationPage() {
                     🌅 Breakfast
                   </h3>
                   <div className="flex-grow">
-                    {getMealCard(weeklyMealPlan[selectedDay]?.matin, "matin", selectedDay)}
+                    {getMealCard(
+                      weeklyMealPlan[selectedDay]?.morning || (weeklyMealPlan[selectedDay] as Record<string, unknown>)?.matin as Meal, 
+                      "morning", 
+                      selectedDay
+                    )}
                   </div>
                 </div>
 
@@ -358,7 +445,11 @@ export default function PlanificationPage() {
                     ☀️ Lunch
                   </h3>
                   <div className="flex-grow">
-                    {getMealCard(weeklyMealPlan[selectedDay]?.midi, "midi", selectedDay)}
+                    {getMealCard(
+                      weeklyMealPlan[selectedDay]?.lunch || (weeklyMealPlan[selectedDay] as Record<string, unknown>)?.midi as Meal, 
+                      "lunch", 
+                      selectedDay
+                    )}
                   </div>
                 </div>
 
@@ -368,7 +459,11 @@ export default function PlanificationPage() {
                     🌙 Dinner
                   </h3>
                   <div className="flex-grow">
-                    {getMealCard(weeklyMealPlan[selectedDay]?.soir, "soir", selectedDay)}
+                    {getMealCard(
+                      weeklyMealPlan[selectedDay]?.dinner || (weeklyMealPlan[selectedDay] as Record<string, unknown>)?.soir as Meal, 
+                      "dinner", 
+                      selectedDay
+                    )}
                   </div>
                 </div>
               </div>

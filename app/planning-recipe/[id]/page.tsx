@@ -22,9 +22,8 @@ interface RecipeData {
   }[];
   instructions: string[];
   prepTime: number;
-  cookTime: number;
   servings: number;
-  difficulty: 'facile' | 'moyen' | 'difficile';
+  difficulty: 'easy' | 'medium' | 'hard';
   category: string;
   tags: string[];
   nutrition: {
@@ -45,7 +44,7 @@ const Page = () => {
   useEffect(() => {
     const loadRecipe = async () => {
       try {
-        // Récupérer le planning de l'utilisateur
+        // Get user's meal plan
         const headers: HeadersInit = {};
         if (token) {
           headers['Authorization'] = `Bearer ${token}`;
@@ -62,269 +61,96 @@ const Page = () => {
             if (data.mealPlan[day] && data.mealPlan[day][meal]) {
               const mealData = data.mealPlan[day][meal];
               
-              // Fonction pour générer une description basée sur le nom et les ingrédients
-              const generateDescription = (name: string, ingredients: string[]) => {
-                const descriptions = {
-                  'Porridge': 'Porridge crémeux et nutritif, parfait pour bien commencer la journée avec des saveurs douces et réconfortantes.',
-                  'Smoothie': 'Smoothie frais et vitaminé, mélange parfait de fruits et nutriments pour un boost d\'énergie naturel.',
-                  'Omelette': 'Omelette moelleuse et savoureuse, riche en protéines et parfaitement assaisonnée pour un repas équilibré.',
-                  'Salade': 'Salade fraîche et colorée, combinaison harmonieuse d\'ingrédients croquants et de saveurs délicates.',
-                  'Poulet': 'Plat de poulet savoureux et tendre, préparé avec soin pour révéler toutes ses saveurs naturelles.',
-                  'Pâtes': 'Plat de pâtes réconfortant et délicieux, sauce onctueuse et ingrédients de qualité pour un repas satisfaisant.',
-                  'Soupe': 'Soupe chaude et réconfortante, mélange parfait de légumes et d\'épices pour un moment de pure gourmandise.',
-                  'Riz': 'Plat de riz parfumé et nutritif, accompagné d\'ingrédients frais pour une expérience culinaire authentique.',
-                  'Poisson': 'Plat de poisson frais et délicat, préparation simple qui met en valeur la qualité du produit.',
-                  'Légumes': 'Plat de légumes coloré et vitaminé, préparation qui révèle toute la richesse des produits de saison.'
-                };
-                
-                // Trouver une description basée sur le nom
-                for (const [keyword, desc] of Object.entries(descriptions)) {
-                  if (name.toLowerCase().includes(keyword.toLowerCase())) {
-                    return desc;
-                  }
+              // Use AI-enriched description if available, otherwise generate fallback
+              const getDescription = (mealData: { description?: string; name?: string; nom?: string; ingredients?: string[] }) => {
+                if (mealData.description) {
+                  return mealData.description;
                 }
                 
-                // Description générique avec les ingrédients
-                const ingredientList = ingredients.slice(0, 3).join(', ');
-                return `Délicieuse recette préparée avec ${ingredientList}${ingredients.length > 3 ? ' et d\'autres ingrédients' : ''}. Un plat savoureux et équilibré qui ravira vos papilles.`;
+                // Fallback description if AI enrichment wasn't available
+                const ingredientsList = mealData.ingredients && mealData.ingredients.length > 0 
+                  ? ` featuring ${mealData.ingredients.slice(0, 3).join(', ')}` 
+                  : '';
+                return `Delicious ${mealData.name} prepared with care${ingredientsList}. A nutritious and flavorful dish perfect for any meal.`;
               };
 
-              // Fonction pour générer des instructions basées sur le nom et les ingrédients
-              const generateInstructions = (name: string, ingredients: string[], prepTime: number) => {
-                const baseInstructions = {
-                  'Porridge': [
-                    'Dans une casserole, faites chauffer le lait d\'amande à feu moyen.',
-                    'Ajoutez les flocons d\'avoine et mélangez bien.',
-                    'Laissez cuire en remuant régulièrement pendant 10-15 minutes.',
-                    'Ajoutez les fruits et mélangez délicatement.',
-                    'Servez chaud et savourez !'
-                  ],
-                  'Smoothie': [
-                    'Lavez et préparez tous les fruits.',
-                    'Placez tous les ingrédients dans un blender.',
-                    'Mixez pendant 1-2 minutes jusqu\'à obtenir une texture lisse.',
-                    'Goûtez et ajustez la consistance si nécessaire.',
-                    'Servez immédiatement dans des verres frais.'
-                  ],
-                  'Omelette': [
-                    'Cassez les œufs dans un bol et battez-les vigoureusement.',
-                    'Préparez et hachez finement les légumes.',
-                    'Chauffez une poêle avec un peu d\'huile à feu moyen.',
-                    'Versez les œufs battus et ajoutez les légumes.',
-                    'Pliez l\'omelette en deux et servez aussitôt.'
-                  ],
-                  'Salade': [
-                    'Lavez et essorez soigneusement tous les légumes.',
-                    'Coupez les légumes en morceaux de taille uniforme.',
-                    'Préparez une vinaigrette avec huile, vinaigre et épices.',
-                    'Mélangez tous les ingrédients dans un grand saladier.',
-                    'Assaisonnez avec la vinaigrette et servez frais.'
-                  ]
-                };
-                
-                // Trouver des instructions spécifiques
-                for (const [keyword, instructions] of Object.entries(baseInstructions)) {
-                  if (name.toLowerCase().includes(keyword.toLowerCase())) {
-                    return instructions;
-                  }
+              // Use AI-enriched instructions if available, otherwise generate fallback
+              const getInstructions = (mealData: { instructions?: string[]; time?: string; temps?: string }) => {
+                if (mealData.instructions && Array.isArray(mealData.instructions) && mealData.instructions.length > 0) {
+                  return mealData.instructions;
                 }
                 
-                // Instructions génériques
-                return [
-                  'Préparez et lavez tous les ingrédients nécessaires.',
-                  'Suivez les techniques de cuisson appropriées pour chaque ingrédient.',
-                  `Cuisez pendant environ ${prepTime} minutes en surveillant la cuisson.`,
-                  'Assaisonnez selon vos goûts et préférences.',
-                  'Servez chaud et dégustez ce délicieux plat !'
+                // Fallback instructions if AI enrichment wasn't available
+                const prepTime = parseInt(mealData.time?.replace(/\D/g, '') || '30');
+                return prepTime > 30 ? [
+                  'Gather and prepare all ingredients by washing, chopping, and measuring.',
+                  'Preheat your cooking equipment (oven, pan, or grill) to the appropriate temperature.',
+                  'Begin with ingredients that take the longest to cook.',
+                  `Cook for approximately ${prepTime} minutes, monitoring progress and adjusting heat as needed.`,
+                  'Season throughout the cooking process, tasting and adjusting flavors.',
+                  'Allow to rest briefly before serving to let flavors settle and temperature equalize.'
+                ] : [
+                  'Prepare and organize all ingredients for quick cooking.',
+                  'Heat your cooking surface or equipment to the right temperature.',
+                  `Cook for about ${prepTime} minutes, working efficiently to maintain quality.`,
+                  'Season to taste and adjust consistency if needed.',
+                  'Serve immediately while hot and fresh for best results.'
                 ];
               };
 
-              // Base de données nutritionnelle approximative (pour 100g)
-              const nutritionDB = {
-                // Fruits
-                'banane': { calories: 89, protein: 1, carbs: 23, fat: 0.3 },
-                'pomme': { calories: 52, protein: 0.3, carbs: 14, fat: 0.2 },
-                'orange': { calories: 47, protein: 0.9, carbs: 12, fat: 0.1 },
-                'fraise': { calories: 32, protein: 0.7, carbs: 8, fat: 0.3 },
-                'fruits rouges': { calories: 35, protein: 0.8, carbs: 8, fat: 0.3 },
-                'fruits': { calories: 50, protein: 0.8, carbs: 12, fat: 0.2 },
-                
-                // Légumes
-                'tomate': { calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2 },
-                'carotte': { calories: 41, protein: 0.9, carbs: 10, fat: 0.2 },
-                'épinards': { calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
-                'poivron': { calories: 31, protein: 1, carbs: 7, fat: 0.3 },
-                'légumes': { calories: 30, protein: 2, carbs: 6, fat: 0.3 },
-                
-                // Céréales et féculents
-                'flocons d\'avoine': { calories: 389, protein: 17, carbs: 66, fat: 7 },
-                'riz': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
-                'pâtes': { calories: 371, protein: 13, carbs: 75, fat: 1.5 },
-                'quinoa': { calories: 368, protein: 14, carbs: 64, fat: 6 },
-                'pain': { calories: 265, protein: 9, carbs: 49, fat: 3.2 },
-                
-                // Protéines
-                'œufs': { calories: 155, protein: 13, carbs: 1.1, fat: 11 },
-                'oeufs': { calories: 155, protein: 13, carbs: 1.1, fat: 11 },
-                'poulet': { calories: 239, protein: 27, carbs: 0, fat: 14 },
-                'poisson': { calories: 206, protein: 22, carbs: 0, fat: 12 },
-                'thon': { calories: 144, protein: 30, carbs: 0, fat: 1 },
-                'saumon': { calories: 208, protein: 20, carbs: 0, fat: 13 },
-                
-                // Légumineuses
-                'lentilles': { calories: 353, protein: 25, carbs: 60, fat: 1.1 },
-                'haricots': { calories: 347, protein: 23, carbs: 63, fat: 1.2 },
-                'pois chiches': { calories: 364, protein: 19, carbs: 61, fat: 6 },
-                
-                // Produits laitiers
-                'lait': { calories: 64, protein: 3.2, carbs: 5, fat: 3.6 },
-                'lait d\'amande': { calories: 17, protein: 0.6, carbs: 0.3, fat: 1.1 },
-                'yaourt': { calories: 59, protein: 10, carbs: 3.6, fat: 0.4 },
-                'fromage': { calories: 113, protein: 25, carbs: 1, fat: 1 },
-                
-                // Matières grasses
-                'huile d\'olive': { calories: 884, protein: 0, carbs: 0, fat: 100 },
-                'beurre': { calories: 717, protein: 0.9, carbs: 0.1, fat: 81 },
-                'avocat': { calories: 160, protein: 2, carbs: 9, fat: 15 }
-              };
-
-              // Fonction pour calculer les quantités selon le nombre de personnes
-              const calculatePortions = (baseAmount: string, basePeople: number, targetPeople: number) => {
-                const multiplier = targetPeople / basePeople;
-                const numericAmount = parseFloat(baseAmount.replace(/[^\d.,]/g, '').replace(',', '.'));
-                
-                if (isNaN(numericAmount)) {
-                  return baseAmount;
-                }
-                
-                const newAmount = Math.round(numericAmount * multiplier * 10) / 10;
-                return baseAmount.replace(/[\d.,]+/, newAmount.toString());
-              };
-
-              // Fonction pour estimer la quantité d'un ingrédient
-              const estimateIngredientAmount = (ingredient: string, servings: number) => {
-                const name = ingredient.toLowerCase();
-                
-                // Portions standards par personne (en grammes)
-                const standardPortions = {
-                  'flocons d\'avoine': 50,
-                  'riz': 75,
-                  'pâtes': 80,
-                  'quinoa': 60,
-                  'poulet': 120,
-                  'poisson': 120,
-                  'œufs': 60, // ~1 œuf
-                  'oeufs': 60,
-                  'légumes': 150,
-                  'fruits': 120,
-                  'lait': 200,
-                  'lait d\'amande': 200,
-                  'tomate': 100,
-                  'épinards': 80,
-                  'carotte': 80,
-                  'poivron': 100
-                };
-                
-                for (const [key, portion] of Object.entries(standardPortions)) {
-                  if (name.includes(key)) {
-                    return portion * servings;
-                  }
-                }
-                
-                return 100 * servings; // Quantité par défaut
-              };
-
-              // Convertir le format simple des ingrédients vers le format détaillé
-              const formatIngredients = (ingredients: string[], servings: number) => {
+              // Simple ingredient formatter for AI-enriched data
+              const formatIngredients = (ingredients: string[]) => {
                 return ingredients.map(ingredient => {
-                  // Essayer d'extraire quantité, unité et nom
+                  // Try to extract quantity, unit and name from the ingredient string
                   const match = ingredient.match(/^(\d+(?:[.,]\d+)?)\s*([a-zA-Zé]*)\s*(.+)$/);
                   if (match) {
                     const [, amount, unit, name] = match;
-                    const calculatedAmount = calculatePortions(amount, 1, servings);
                     return {
                       name: name.trim(),
-                      amount: calculatedAmount,
-                      unit: unit || 'g'
+                      amount: amount.replace(',', '.'),
+                      unit: unit || 'piece'
                     };
                   }
                   
-                  // Estimer la quantité si pas spécifiée
-                  const estimatedAmount = estimateIngredientAmount(ingredient, servings);
+                  // If no quantity specified, use ingredient as-is
                   return {
-                    name: ingredient,
-                    amount: estimatedAmount.toString(),
-                    unit: 'g'
+                    name: ingredient.trim(),
+                    amount: '1',
+                    unit: 'piece'
                   };
                 });
-              };
-
-              // Fonction pour calculer les valeurs nutritionnelles
-              const calculateNutrition = (ingredients: any[], servings: number) => {
-                let totalCalories = 0;
-                let totalProtein = 0;
-                let totalCarbs = 0;
-                let totalFat = 0;
-
-                ingredients.forEach(ingredient => {
-                  const name = ingredient.name.toLowerCase();
-                  const amount = parseFloat(ingredient.amount) || 0;
-                  
-                  // Chercher l'ingrédient dans la base nutritionnelle
-                  let nutritionInfo = null;
-                  for (const [key, nutrition] of Object.entries(nutritionDB)) {
-                    if (name.includes(key) || key.includes(name)) {
-                      nutritionInfo = nutrition;
-                      break;
-                    }
-                  }
-                  
-                  if (nutritionInfo) {
-                    // Calculer pour la quantité utilisée (base 100g)
-                    const factor = amount / 100;
-                    totalCalories += nutritionInfo.calories * factor;
-                    totalProtein += nutritionInfo.protein * factor;
-                    totalCarbs += nutritionInfo.carbs * factor;
-                    totalFat += nutritionInfo.fat * factor;
-                  }
-                });
-
-                // Diviser par le nombre de portions pour avoir les valeurs par personne
-                return {
-                  calories: Math.round(totalCalories / servings),
-                  protein: Math.round(totalProtein / servings * 10) / 10,
-                  carbs: Math.round(totalCarbs / servings * 10) / 10,
-                  fat: Math.round(totalFat / servings * 10) / 10
-                };
               };
 
               // Récupérer le nombre de personnes depuis les préférences
               const numberOfPeople = data.preferences?.numberOfPeople || 4;
               const servings = mealData.servings || numberOfPeople;
 
-              // Convertir et calculer les ingrédients avec les bonnes quantités
+              // Format ingredients for display
               const formattedIngredients = Array.isArray(mealData.ingredients) ? 
-                formatIngredients(mealData.ingredients, servings) : [];
+                formatIngredients(mealData.ingredients) : [];
 
-              // Calculer les valeurs nutritionnelles automatiquement
-              const calculatedNutrition = mealData.nutrition || calculateNutrition(formattedIngredients, servings);
+              // Use AI-enriched nutrition data if available
 
               // Convertir le format du planning vers le format de recette
               const recipeData: RecipeData = {
                 id: `${day}-${meal}`,
                 title: mealData.nom || mealData.name || 'Recette',
-                description: mealData.description || generateDescription(mealData.nom || '', mealData.ingredients || []),
+                description: getDescription(mealData),
                 image: `https://images.unsplash.com/photo-1546069901-ba9599e7e5d0?w=400&h=300&fit=crop&crop=center`,
                 emoji: mealData.emoji || '🍽️',
                 ingredients: formattedIngredients,
-                instructions: mealData.instructions || generateInstructions(mealData.nom || '', mealData.ingredients || [], parseInt(mealData.temps?.replace(' min', '') || '30')),
+                instructions: getInstructions(mealData),
                 prepTime: parseInt(mealData.temps?.replace(' min', '') || mealData.time?.replace(' min', '') || '30'),
-                cookTime: 0,
                 servings: servings,
                 difficulty: mealData.difficulty || 'facile',
                 category: mealData.category || 'Plat principal',
                 tags: mealData.tags || [],
-                nutrition: calculatedNutrition
+                nutrition: mealData.nutrition || {
+                  calories: 300,
+                  protein: 15,
+                  carbs: 35,
+                  fat: 10
+                }
               };
               
               setRecipe(recipeData);
@@ -401,7 +227,7 @@ const Page = () => {
           <div className="text-center">
             <div className="text-6xl mb-4">🍽️</div>
             <h1 className="text-3xl font-bold text-white mb-4">Recette non trouvée</h1>
-            <p className="text-gray-300 mb-6">Cette recette n'existe pas dans votre planning</p>
+            <p className="text-gray-300 mb-6">Cette recette n&apos;existe pas dans votre planning</p>
             <button
               onClick={() => router.push('/planification')}
               className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
@@ -416,10 +242,9 @@ const Page = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Bouton retour */}
-          <div className="mb-6">
+      {/* Bouton retour avec fond gradient comme avant */}
+      <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] py-6">
+        <div className="max-w-[1400px] mx-auto px-8">
             <button
               onClick={() => router.push('/planification')}
               className="flex items-center gap-2 text-[#3b82f6] hover:text-white transition-colors"
@@ -427,23 +252,27 @@ const Page = () => {
               <span className="text-xl">←</span>
               <span>Retour au planning</span>
             </button>
+        </div>
           </div>
 
-          {/* Contenu de la recette */}
+      {/* Layout en grille identique à la page recipe normale */}
+      <div className="max-w-[1400px] mx-auto px-8 py-12 grid [grid-template-columns:1fr_350px] gap-12 max-lg:grid max-lg:grid-cols-1 max-md:pt-0 max-md:px-4 max-md:pb-8">
+        <main>
           <Header recipe={recipe} />
-          <div className="mt-8">
+
+          <div className="flex flex-col gap-8 max-sm:p-6">
             <Ingredients 
               recipe={recipe} 
               onAddIngredient={addIngredientToShoppingList}
             />
-          </div>
-          <div className="mt-8">
+
             <Preparation recipe={recipe} />
           </div>
-          <div className="mt-8">
+        </main>
+
+        <aside className="flex flex-col gap-6 max-sm:p-4">
             <Nutrition recipe={recipe} />
-          </div>
-        </div>
+        </aside>
       </div>
     </ProtectedRoute>
   );

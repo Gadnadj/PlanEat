@@ -14,7 +14,6 @@ export interface IRecipe extends Document {
   }[];
   instructions: string[];
   prepTime: number; // in minutes
-  cookTime: number; // in minutes
   servings: number;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;
@@ -84,11 +83,6 @@ const RecipeSchema = new Schema<IRecipe>({
     type: Number,
     required: [true, 'Preparation time is required'],
     min: [0, 'Preparation time cannot be negative']
-  },
-  cookTime: {
-    type: Number,
-    required: [true, 'Cooking time is required'],
-    min: [0, 'Cooking time cannot be negative']
   },
   servings: {
     type: Number,

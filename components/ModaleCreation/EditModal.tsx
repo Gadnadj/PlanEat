@@ -15,7 +15,6 @@ interface RecipeData {
   }[];
   instructions: string[];
   prepTime: number;
-  cookTime: number;
   servings: number;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;
@@ -44,7 +43,6 @@ const EditModal = ({ recipe, onClose, onRecipeUpdated }: Props) => {
     description: recipe.description,
     category: recipe.category,
     prepTime: recipe.prepTime,
-    cookTime: recipe.cookTime,
     servings: recipe.servings,
     difficulty: recipe.difficulty,
     calories: recipe.nutrition.calories,
@@ -137,7 +135,6 @@ const EditModal = ({ recipe, onClose, onRecipeUpdated }: Props) => {
           description: formData.description,
           category: formData.category,
           prepTime: formData.prepTime,
-          cookTime: formData.cookTime,
           servings: formData.servings,
           difficulty: formData.difficulty,
           emoji: formData.emoji,
@@ -227,17 +224,6 @@ const EditModal = ({ recipe, onClose, onRecipeUpdated }: Props) => {
                     min={1}
                     value={formData.prepTime}
                     onChange={(e) => handleInputChange('prepTime', parseInt(e.target.value))}
-                  />
-                </div>
-                <div className={formGroup}>
-                  <label className={formLabel}>Cooking Time (min)</label>
-                  <input
-                    className={formInput}
-                    type="number"
-                    placeholder='10'
-                    min={1}
-                    value={formData.cookTime}
-                    onChange={(e) => handleInputChange('cookTime', parseInt(e.target.value))}
                   />
                 </div>
                 <div className={formGroup}>

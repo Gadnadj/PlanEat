@@ -27,10 +27,13 @@ Time: ${preferences.cookingTime}
 Allergies: ${allergiesText}
 To avoid: ${dislikesText}
 
-RULES:
-- Avoid allergenic foods
-- Respect chosen diet
-- Valid JSON only
+IMPORTANT RULES:
+- Generate ALL content in ENGLISH language only
+- Meal names, descriptions, instructions must be in English
+- Avoid allergenic foods completely
+- Respect chosen diet strictly
+- Return valid JSON only
+- No French content allowed
 
 JSON Structure (example for 2 days):
 {
@@ -131,7 +134,7 @@ Generate complete JSON for all 7 days of the week.`;
         messages: [
           {
             role: 'system',
-            content: 'You are a nutrition and meal planning expert. You generate detailed and personalized meal plans in JSON.'
+            content: 'You are a nutrition and meal planning expert. You generate detailed and personalized meal plans in JSON format. IMPORTANT: Generate ALL content exclusively in ENGLISH language. All meal names, descriptions, ingredients, and instructions must be written in English only. Never use French or any other language.'
           },
           {
             role: 'user',
@@ -205,10 +208,35 @@ Generate complete JSON for all 7 days of the week.`;
         throw new Error('Invalid planning structure');
       }
       
-      return NextResponse.json({
-        success: true,
-        mealPlan
+    // Enrich the meal plan with detailed descriptions and instructions
+    try {
+      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      const enrichResponse = await fetch(`${baseUrl}/api/enrich-meal-plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mealPlan }),
       });
+
+      if (enrichResponse.ok) {
+        const enrichData = await enrichResponse.json();
+        if (enrichData.success && enrichData.enrichedPlan) {
+          return NextResponse.json({ 
+            success: true, 
+            mealPlan: enrichData.enrichedPlan 
+          });
+        }
+      }
+    } catch (enrichError) {
+      console.warn('Failed to enrich meal plan, returning basic plan:', enrichError);
+    }
+
+    // Return basic plan if enrichment fails
+    return NextResponse.json({ 
+      success: true, 
+      mealPlan 
+    });
       
     } catch (parseError) {
       console.error('JSON parsing error:', parseError);

@@ -16,7 +16,6 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
     description: '',
     category: 'Main Course',
     prepTime: 15,
-    cookTime: 10,
     servings: 4,
     difficulty: 'easy' as 'easy' | 'medium' | 'hard',
     calories: 350,
@@ -108,7 +107,6 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
           description: formData.description,
           category: formData.category,
           prepTime: formData.prepTime,
-          cookTime: formData.cookTime,
           servings: formData.servings,
           difficulty: formData.difficulty,
           emoji: formData.emoji,
@@ -199,17 +197,6 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
                     min={1}
                     value={formData.prepTime}
                     onChange={(e) => handleInputChange('prepTime', parseInt(e.target.value))}
-                  />
-                </div>
-                <div className={formGroup}>
-                  <label className={formLabel}>Cooking Time (min)</label>
-                  <input
-                    className={formInput}
-                    type="number"
-                    placeholder='10'
-                    min={1}
-                    value={formData.cookTime}
-                    onChange={(e) => handleInputChange('cookTime', parseInt(e.target.value))}
                   />
                 </div>
                 <div className={formGroup}>

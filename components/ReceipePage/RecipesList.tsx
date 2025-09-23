@@ -15,7 +15,6 @@ interface RecipeData {
   }[];
   instructions: string[];
   prepTime: number;
-  cookTime: number;
   servings: number;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;

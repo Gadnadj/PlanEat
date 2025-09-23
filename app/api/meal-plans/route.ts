@@ -4,34 +4,34 @@ import MealPlan from '@/models/MealPlan';
 import User from '@/models/User';
 import { verifyToken } from '@/lib/auth';
 
-// GET - Récupérer le planning de l'utilisateur
+// GET - Retrieve user's meal plan
 export async function GET(req: Request) {
   try {
     const authHeader = req.headers.get('authorization');
     const token = authHeader?.replace('Bearer ', '');
     
     if (!token) {
-      return NextResponse.json({ message: 'Token d\'authentification manquant' }, { status: 401 });
+      return NextResponse.json({ message: 'Authentication token missing' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
     if (!decoded) {
-      return NextResponse.json({ message: 'Token invalide' }, { status: 401 });
+      return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
     }
 
     await connectToDatabase();
     
     const user = await User.findById(decoded.userId);
     if (!user) {
-      return NextResponse.json({ message: 'Utilisateur non trouvé' }, { status: 404 });
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    // Récupérer le planning le plus récent de l'utilisateur
+    // Get the user's most recent meal plan
     const mealPlan = await MealPlan.findOne({ userId: user._id })
       .sort({ createdAt: -1 });
 
     if (!mealPlan) {
-      return NextResponse.json({ message: 'Aucun planning trouvé' }, { status: 404 });
+      return NextResponse.json({ message: 'No meal plan found' }, { status: 404 });
     }
 
     return NextResponse.json({ 
@@ -41,47 +41,47 @@ export async function GET(req: Request) {
     });
 
   } catch (error) {
-    console.error('Erreur récupération planning:', error);
-    return NextResponse.json({ message: 'Erreur serveur' }, { status: 500 });
+    console.error('Error retrieving meal plan:', error);
+    return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
 
-// POST - Sauvegarder un nouveau planning
+// POST - Save a new meal plan
 export async function POST(req: Request) {
   try {
     const authHeader = req.headers.get('authorization');
     const token = authHeader?.replace('Bearer ', '');
     
     if (!token) {
-      return NextResponse.json({ message: 'Token d\'authentification manquant' }, { status: 401 });
+      return NextResponse.json({ message: 'Authentication token missing' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
     if (!decoded) {
-      return NextResponse.json({ message: 'Token invalide' }, { status: 401 });
+      return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
     }
 
     const { preferences, mealPlan } = await req.json();
 
     if (!preferences || !mealPlan) {
-      return NextResponse.json({ message: 'Préférences et plan de repas requis' }, { status: 400 });
+      return NextResponse.json({ message: 'Preferences and meal plan required' }, { status: 400 });
     }
 
     await connectToDatabase();
     
     const user = await User.findById(decoded.userId);
     if (!user) {
-      return NextResponse.json({ message: 'Utilisateur non trouvé' }, { status: 404 });
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    // Mettre à jour les préférences de l'utilisateur
+    // Update user preferences
     await User.findByIdAndUpdate(user._id, { preferences });
 
-    // Vérifier s'il existe déjà un planning pour cet utilisateur
+    // Check if a meal plan already exists for this user
     const existingMealPlan = await MealPlan.findOne({ userId: user._id });
 
     if (existingMealPlan) {
-      // Mettre à jour le planning existant
+      // Update existing meal plan
       await MealPlan.findByIdAndUpdate(existingMealPlan._id, {
         preferences,
         mealPlan,
@@ -90,11 +90,11 @@ export async function POST(req: Request) {
 
       return NextResponse.json({ 
         success: true, 
-        message: 'Planning mis à jour avec succès',
+        message: 'Meal plan updated successfully',
         mealPlan
       });
     } else {
-      // Créer un nouveau planning si aucun n'existe
+      // Create new meal plan if none exists
       const newMealPlan = new MealPlan({
         userId: user._id,
         preferences,
@@ -105,13 +105,13 @@ export async function POST(req: Request) {
 
       return NextResponse.json({ 
         success: true, 
-        message: 'Planning créé avec succès',
+        message: 'Meal plan created successfully',
         mealPlan: newMealPlan.mealPlan
       });
     }
 
   } catch (error) {
-    console.error('Erreur sauvegarde planning:', error);
-    return NextResponse.json({ message: 'Erreur serveur' }, { status: 500 });
+    console.error('Error saving meal plan:', error);
+    return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
