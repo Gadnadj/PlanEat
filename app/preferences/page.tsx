@@ -118,8 +118,8 @@ export default function PreferencesPage() {
       setGenerationStatus('Generating meal plan with AI...');
       setGenerationProgress(30);
 
-      // Générer le plan détaillé avec l'IA
-      const response = await fetch('/api/generate-detailed-meal-plan', {
+      // Générer le plan avec l'IA (API simple et fiable)
+      const response = await fetch('/api/generate-meal-plan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -131,10 +131,25 @@ export default function PreferencesPage() {
       setGenerationProgress(70);
 
       const data = await response.json();
+      console.log('Generated meal plan data:', data);
       
       if (data.success && data.mealPlan) {
         setGenerationStatus('Saving meal plan...');
         setGenerationProgress(90);
+
+        console.log('Preparing to save meal plan...');
+        console.log('Preferences:', preferences);
+        console.log('Meal plan keys:', Object.keys(data.mealPlan));
+        console.log('Sample day structure (monday):', data.mealPlan.monday);
+        
+        // Validate meal plan structure
+        const hasValidStructure = Object.values(data.mealPlan).every((day: unknown) => 
+          day && typeof day === 'object' && day !== null &&
+          ('morning' in day || 'matin' in day) && 
+          ('lunch' in day || 'midi' in day || 'noon' in day) && 
+          ('dinner' in day || 'soir' in day || 'evening' in day)
+        );
+        console.log('Meal plan has valid structure:', hasValidStructure);
 
         // Sauvegarder le plan généré en base de données
         const saveResponse = await fetch('/api/meal-plans', {
@@ -146,7 +161,13 @@ export default function PreferencesPage() {
           body: JSON.stringify({ preferences, mealPlan: data.mealPlan }),
         });
 
+        console.log('Save response status:', saveResponse.status);
+        console.log('Save response headers:', Object.fromEntries(saveResponse.headers));
+
         if (saveResponse.ok) {
+          const saveData = await saveResponse.json();
+          console.log('Save success data:', saveData);
+          
           setGenerationStatus('Meal plan generated successfully!');
           setGenerationProgress(100);
           
@@ -155,9 +176,22 @@ export default function PreferencesPage() {
             router.push('/planification');
           }, 1000);
         } else {
-          alert('Error saving meal plan');
+          // Obtenir le détail de l'erreur
+          try {
+            const errorData = await saveResponse.json();
+            console.error('Save error details:', errorData);
+            console.error('Response status:', saveResponse.status);
+            console.error('Response statusText:', saveResponse.statusText);
+            alert('Error saving meal plan: ' + (errorData.message || `Status: ${saveResponse.status} - ${saveResponse.statusText}`));
+          } catch (jsonError) {
+            console.error('Error parsing error response:', jsonError);
+            const errorText = await saveResponse.text();
+            console.error('Raw error response:', errorText);
+            alert('Error saving meal plan: Unable to parse server response. Status: ' + saveResponse.status);
+          }
         }
       } else {
+        console.error('Generation failed:', data);
         alert('Error generating meal plan: ' + (data.message || 'Unknown error'));
       }
     } catch (error) {

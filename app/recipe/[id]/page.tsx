@@ -39,6 +39,45 @@ const Page = () => {
   const params = useParams();
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [originalServings, setOriginalServings] = useState<number>(1);
+  const [currentServings, setCurrentServings] = useState<number>(1);
+  const [originalIngredients, setOriginalIngredients] = useState<RecipeData['ingredients']>([]);
+
+  // Function to scale ingredient quantities
+  const scaleIngredients = (ingredients: RecipeData['ingredients'], originalServings: number, newServings: number) => {
+    if (originalServings === 0) return ingredients;
+    
+    const multiplier = newServings / originalServings;
+    
+    return ingredients.map(ingredient => {
+      const amount = parseFloat(ingredient.amount);
+      if (isNaN(amount)) return ingredient;
+      
+      const scaledAmount = (amount * multiplier).toFixed(1);
+      // Remove .0 if it's a whole number
+      const finalAmount = scaledAmount.endsWith('.0') ? scaledAmount.slice(0, -2) : scaledAmount;
+      
+      return {
+        ...ingredient,
+        amount: finalAmount
+      };
+    });
+  };
+
+  // Update current recipe when servings change
+  const updateServings = (newServings: number) => {
+    if (!recipe || newServings < 1) return;
+    
+    setCurrentServings(newServings);
+    
+    const scaledIngredients = scaleIngredients(originalIngredients, originalServings, newServings);
+    
+    setRecipe(prev => prev ? {
+      ...prev,
+      servings: newServings,
+      ingredients: scaledIngredients
+    } : null);
+  };
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -51,7 +90,14 @@ const Page = () => {
         const response = await fetch(`/api/recipes/${params.id}`, { headers });
         if (response.ok) {
           const data = await response.json();
-          setRecipe(data.recipe);
+          const recipeData = data.recipe;
+          
+          // Save original data for scaling
+          setOriginalServings(recipeData.servings);
+          setCurrentServings(recipeData.servings);
+          setOriginalIngredients(recipeData.ingredients);
+          
+          setRecipe(recipeData);
         } else {
           console.error('Error loading recipe');
         }
@@ -131,7 +177,11 @@ const Page = () => {
     <ProtectedRoute>
       <div className='max-w-[1400px] mx-auto px-8 py-12 grid [grid-template-columns:1fr_350px] gap-12 max-lg:grid max-lg:grid-cols-1 max-md:pt-0 max-md:px-4 max-md:pb-8'>
         <main>
-          <Header recipe={recipe} />
+          <Header 
+            recipe={recipe} 
+            currentServings={currentServings}
+            onServingsChange={updateServings}
+          />
 
           <div className='flex flex-col gap-8 max-sm:p-6'>
             <Ingredients 

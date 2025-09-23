@@ -28,9 +28,11 @@ interface RecipeData {
 
 interface HeaderProps {
   recipe: RecipeData;
+  currentServings?: number;
+  onServingsChange?: (servings: number) => void;
 }
 
-const Header = ({ recipe }: HeaderProps) => {
+const Header = ({ recipe, currentServings, onServingsChange }: HeaderProps) => {
     const getDifficultyColor = (difficulty: string) => {
         switch (difficulty) {
             case 'facile': return 'bg-green-600';
@@ -75,7 +77,27 @@ const Header = ({ recipe }: HeaderProps) => {
 
                 <div className='grid [grid-template-columns:1fr_1fr_1fr_1fr] gap-4 mb-8 max-lg:grid-cols-2 max-sm:grid-cols-1'>
                     <div className={styles.statItem}>
-                        <span className={styles.statValue}>{recipe.servings}</span>
+                        {onServingsChange ? (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => onServingsChange(Math.max(1, (currentServings || recipe.servings) - 1))}
+                                    className="bg-[#3b82f6] hover:bg-[#2563eb] text-white w-8 h-8 rounded-full font-bold transition-colors"
+                                    disabled={(currentServings || recipe.servings) <= 1}
+                                >
+                                    -
+                                </button>
+                                <span className={styles.statValue}>{currentServings || recipe.servings}</span>
+                                <button
+                                    onClick={() => onServingsChange(Math.min(20, (currentServings || recipe.servings) + 1))}
+                                    className="bg-[#3b82f6] hover:bg-[#2563eb] text-white w-8 h-8 rounded-full font-bold transition-colors"
+                                    disabled={(currentServings || recipe.servings) >= 20}
+                                >
+                                    +
+                                </button>
+                            </div>
+                        ) : (
+                            <span className={styles.statValue}>{recipe.servings}</span>
+                        )}
                         <span className={styles.statLabel}>Servings</span>
                     </div>
 

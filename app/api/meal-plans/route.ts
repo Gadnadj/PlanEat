@@ -67,26 +67,54 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Preferences and meal plan required' }, { status: 400 });
     }
 
-    await connectToDatabase();
-    
-    const user = await User.findById(decoded.userId);
-    if (!user) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    // Validation supplémentaire des données
+    if (typeof preferences !== 'object' || typeof mealPlan !== 'object') {
+      return NextResponse.json({ message: 'Invalid data format' }, { status: 400 });
     }
 
+    // Vérifier que les champs obligatoires des préférences sont présents
+    const requiredPreferenceFields = ['dietType', 'numberOfPeople', 'budget', 'cookingTime'];
+    for (const field of requiredPreferenceFields) {
+      if (!preferences[field]) {
+        return NextResponse.json({ message: `Missing required preference: ${field}` }, { status: 400 });
+      }
+    }
+
+    // Vérifier que le meal plan contient des données
+    if (Object.keys(mealPlan).length === 0) {
+      return NextResponse.json({ message: 'Meal plan cannot be empty' }, { status: 400 });
+    }
+
+    console.log('Connecting to database...');
+    await connectToDatabase();
+    console.log('Database connected successfully');
+    
+    console.log('Looking for user with ID:', decoded.userId);
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      console.error('User not found with ID:', decoded.userId);
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+    console.log('User found:', user.email);
+
     // Update user preferences
+    console.log('Updating user preferences...');
     await User.findByIdAndUpdate(user._id, { preferences });
+    console.log('User preferences updated successfully');
 
     // Check if a meal plan already exists for this user
+    console.log('Checking for existing meal plan...');
     const existingMealPlan = await MealPlan.findOne({ userId: user._id });
 
     if (existingMealPlan) {
+      console.log('Existing meal plan found, updating...');
       // Update existing meal plan
       await MealPlan.findByIdAndUpdate(existingMealPlan._id, {
         preferences,
         mealPlan,
         updatedAt: new Date()
       });
+      console.log('Meal plan updated successfully');
 
       return NextResponse.json({ 
         success: true, 
@@ -94,6 +122,7 @@ export async function POST(req: Request) {
         mealPlan
       });
     } else {
+      console.log('No existing meal plan found, creating new one...');
       // Create new meal plan if none exists
       const newMealPlan = new MealPlan({
         userId: user._id,
@@ -101,7 +130,9 @@ export async function POST(req: Request) {
         mealPlan
       });
 
+      console.log('Saving new meal plan to database...');
       await newMealPlan.save();
+      console.log('New meal plan created successfully');
 
       return NextResponse.json({ 
         success: true, 
@@ -112,6 +143,35 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error('Error saving meal plan:', error);
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    
+    // Déterminer le type d'erreur pour fournir un message plus précis
+    let errorMessage = 'Server error';
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      if (error.message.includes('validation')) {
+        errorMessage = 'Validation error: ' + error.message;
+        statusCode = 400;
+      } else if (error.message.includes('duplicate') || error.message.includes('E11000')) {
+        errorMessage = 'Meal plan already exists for this user';
+        statusCode = 409;
+      } else if (error.message.includes('connect') || error.message.includes('ENOTFOUND')) {
+        errorMessage = 'Database connection error';
+        statusCode = 503;
+      } else {
+        errorMessage = error.message;
+      }
+      
+      console.error('Detailed error:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    }
+    
+    return NextResponse.json({ 
+      message: errorMessage,
+      error: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : String(error) : undefined
+    }, { status: statusCode });
   }
 }

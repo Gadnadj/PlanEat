@@ -166,42 +166,44 @@ Generate complete JSON for all 7 days of the week.`;
       // Clean JSON before parsing
       let jsonString = jsonMatch[0];
       
-      // Remove control characters and problematic non-ASCII characters
-      jsonString = jsonString.replace(/[\x00-\x1F\x7F]/g, '');
-      
-      // Replace smart quotes with normal quotes
-      jsonString = jsonString.replace(/[""]/g, '"');
-      jsonString = jsonString.replace(/['']/g, "'");
-      
-      // Fix trailing commas
-      jsonString = jsonString.replace(/,(\s*[}\]])/g, '$1');
-      
-      // Check and fix missing braces
-      const openBraces = (jsonString.match(/\{/g) || []).length;
-      const closeBraces = (jsonString.match(/\}/g) || []).length;
-      
-      if (openBraces > closeBraces) {
-        // Add missing closing braces
-        const missingBraces = openBraces - closeBraces;
-        jsonString += '}'.repeat(missingBraces);
+      // Try to parse JSON as-is first
+      let mealPlan;
+      try {
+        mealPlan = JSON.parse(jsonString);
+      } catch (initialParseError) {
+        console.log('Initial parse failed, trying to clean JSON...');
+        
+        // Remove control characters and problematic non-ASCII characters
+        jsonString = jsonString.replace(/[\x00-\x1F\x7F]/g, '');
+        
+        // Replace smart quotes with normal quotes
+        jsonString = jsonString.replace(/[""]/g, '"');
+        jsonString = jsonString.replace(/['']/g, "'");
+        
+        // Fix trailing commas
+        jsonString = jsonString.replace(/,(\s*[}\]])/g, '$1');
+        
+        // Check and fix missing braces
+        const openBraces = (jsonString.match(/\{/g) || []).length;
+        const closeBraces = (jsonString.match(/\}/g) || []).length;
+        
+        if (openBraces > closeBraces) {
+          // Add missing closing braces
+          const missingBraces = openBraces - closeBraces;
+          jsonString += '}'.repeat(missingBraces);
+        }
+        
+        // Check that JSON ends correctly
+        if (!jsonString.trim().endsWith('}')) {
+          jsonString = jsonString.trim() + '}';
+        }
+        
+        // Clean trailing commas in objects
+        jsonString = jsonString.replace(/,(\s*})/g, '$1');
+        
+        // Parse the cleaned JSON
+        mealPlan = JSON.parse(jsonString);
       }
-      
-      // Check that JSON ends correctly
-      if (!jsonString.trim().endsWith('}')) {
-        jsonString = jsonString.trim() + '}';
-      }
-      
-      // Clean trailing commas in objects
-      jsonString = jsonString.replace(/,(\s*})/g, '$1');
-      
-      // Fix missing commas between properties
-      jsonString = jsonString.replace(/"(\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*":/g, ',"$2":');
-      jsonString = jsonString.replace(/{\s*"([a-zA-Z_][a-zA-Z0-9_]*)\s*":/g, '{"$1":');
-      
-      // Remove leading commas
-      jsonString = jsonString.replace(/,\s*{/g, '{');
-      
-      const mealPlan = JSON.parse(jsonString);
       
       // Validate that it's an object with days
       if (!mealPlan || typeof mealPlan !== 'object' || !mealPlan.monday) {
@@ -210,7 +212,13 @@ Generate complete JSON for all 7 days of the week.`;
       
     // Enrich the meal plan with detailed descriptions and instructions
     try {
-      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      // Fix baseUrl - use correct port for Next.js dev server
+      const baseUrl = process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:3000' 
+        : (process.env.NEXTAUTH_URL || 'http://localhost:3000');
+      
+      console.log('Attempting to enrich meal plan at:', `${baseUrl}/api/enrich-meal-plan`);
+      
       const enrichResponse = await fetch(`${baseUrl}/api/enrich-meal-plan`, {
         method: 'POST',
         headers: {
@@ -221,12 +229,15 @@ Generate complete JSON for all 7 days of the week.`;
 
       if (enrichResponse.ok) {
         const enrichData = await enrichResponse.json();
+        console.log('Enrichment successful');
         if (enrichData.success && enrichData.enrichedPlan) {
           return NextResponse.json({ 
             success: true, 
             mealPlan: enrichData.enrichedPlan 
           });
         }
+      } else {
+        console.warn('Enrichment response not ok:', enrichResponse.status, enrichResponse.statusText);
       }
     } catch (enrichError) {
       console.warn('Failed to enrich meal plan, returning basic plan:', enrichError);
@@ -243,7 +254,7 @@ Generate complete JSON for all 7 days of the week.`;
       console.error('Problematic JSON:', jsonMatch[0]);
       
       // Fallback: use simple API if parsing fails
-      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3001';
+      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
       const fallbackResponse = await fetch(`${baseUrl}/api/generate-meal-plan`, {
         method: 'POST',
         headers: {

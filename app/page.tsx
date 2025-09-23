@@ -253,7 +253,7 @@ export default function Home() {
   const ingredientsul = 'list-none pl-0';
   const ingredientli = "text-[#b0b0b0] pl-4 relative before:content-['•'] before:text-[#3b82f6] before:absolute before:left-0 text-sm sm:text-base";
   // const addToList = 'bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white border-none py-3 px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out w-full hover:-translate-y-0.5 hover:bg-gradient-to-br hover:blue-blue-600 hover:to-blue-700';
-  const shoppingItem = 'bg-[#3a3a3a] p-4 mb-2 rounded-lg border-l-4 border-l-[#3b82f6] transition-all duration-300 ease-out hover:bg-[#404040] hover:-translate-x-[5px]'
+  const shoppingItem = 'bg-[#3a3a3a] p-4 mb-2 rounded-lg border-l-4 border-l-[#3b82f6] transition-all duration-300 ease-out hover:bg-[#404040] hover:-translate-x-[5px]';
 
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-8 grid grid-cols-[1fr] gap-4 sm:gap-8 max-md:grid-cols-1">

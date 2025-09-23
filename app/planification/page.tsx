@@ -271,12 +271,28 @@ export default function PlanificationPage() {
         <div className="space-y-1 flex-grow">
           <p className="text-gray-400 text-sm font-medium">Ingredients:</p>
           <ul className="space-y-1">
-            {Array.isArray(mealIngredients) ? mealIngredients.slice(0, 3).map((ingredient: string | { amount?: string; unit?: string; name?: string }, index: number) => (
-              <li key={index} className="text-[#b0b0b0] text-sm flex items-center gap-2">
-                <span className="text-[#3b82f6] text-xs">•</span>
-                {typeof ingredient === 'string' ? ingredient : `${ingredient.amount || ''} ${ingredient.unit || ''} ${ingredient.name || ''}`.trim()}
-              </li>
-            )) : (
+            {Array.isArray(mealIngredients) ? mealIngredients.slice(0, 3).map((ingredient: string | { amount?: string; unit?: string; name?: string }, index: number) => {
+              // Format ingredient display based on its structure
+              let displayText = '';
+              if (typeof ingredient === 'string') {
+                displayText = ingredient;
+              } else if (ingredient && typeof ingredient === 'object') {
+                // Handle structured ingredient object
+                const amount = ingredient.amount || '';
+                const unit = ingredient.unit || '';
+                const name = ingredient.name || '';
+                displayText = `${amount} ${unit} ${name}`.trim();
+              } else {
+                displayText = String(ingredient);
+              }
+              
+              return (
+                <li key={index} className="text-[#b0b0b0] text-sm flex items-center gap-2">
+                  <span className="text-[#3b82f6] text-xs">•</span>
+                  {displayText}
+                </li>
+              );
+            }) : (
               <li className="text-[#b0b0b0] text-sm">No ingredients available</li>
             )}
             {Array.isArray(mealIngredients) && mealIngredients.length > 3 && (

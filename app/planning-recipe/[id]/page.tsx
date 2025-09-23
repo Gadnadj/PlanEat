@@ -40,6 +40,45 @@ const Page = () => {
   const router = useRouter();
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [originalServings, setOriginalServings] = useState<number>(2);
+  const [currentServings, setCurrentServings] = useState<number>(2);
+  const [originalIngredients, setOriginalIngredients] = useState<RecipeData['ingredients']>([]);
+
+  // Function to scale ingredient quantities
+  const scaleIngredients = (ingredients: RecipeData['ingredients'], originalServings: number, newServings: number) => {
+    if (originalServings === 0) return ingredients;
+    
+    const multiplier = newServings / originalServings;
+    
+    return ingredients.map(ingredient => {
+      const amount = parseFloat(ingredient.amount);
+      if (isNaN(amount)) return ingredient;
+      
+      const scaledAmount = (amount * multiplier).toFixed(1);
+      // Remove .0 if it's a whole number
+      const finalAmount = scaledAmount.endsWith('.0') ? scaledAmount.slice(0, -2) : scaledAmount;
+      
+      return {
+        ...ingredient,
+        amount: finalAmount
+      };
+    });
+  };
+
+  // Update current recipe when servings change
+  const updateServings = (newServings: number) => {
+    if (!recipe || newServings < 1) return;
+    
+    setCurrentServings(newServings);
+    
+    const scaledIngredients = scaleIngredients(originalIngredients, originalServings, newServings);
+    
+    setRecipe(prev => prev ? {
+      ...prev,
+      servings: newServings,
+      ingredients: scaledIngredients
+    } : null);
+  };
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -55,14 +94,64 @@ const Page = () => {
           const data = await response.json();
           if (data.success && data.mealPlan) {
             // Extraire l'ID de la recette depuis les paramètres
-            // Format attendu: "lundi-matin", "mardi-midi", etc.
+            // Format attendu: "monday-morning", "tuesday-lunch", etc.
             const [day, meal] = (params.id as string).split('-');
             
-            if (data.mealPlan[day] && data.mealPlan[day][meal]) {
-              const mealData = data.mealPlan[day][meal];
+            // Map meal times to handle different API formats
+            const getMealData = (dayData: unknown, mealTime: string) => {
+              // Direct lookup first
+              if (dayData && typeof dayData === 'object' && mealTime in dayData) {
+                return (dayData as Record<string, unknown>)[mealTime];
+              }
+              
+              // Map different meal time formats
+              const mealMapping: { [key: string]: string[] } = {
+                'morning': ['morning', 'matin'],
+                'lunch': ['lunch', 'midi', 'noon'],
+                'dinner': ['dinner', 'soir', 'evening']
+              };
+              
+              // Try all possible variations
+              const possibleKeys = mealMapping[mealTime] || [mealTime];
+              if (dayData && typeof dayData === 'object') {
+                const dayRecord = dayData as Record<string, unknown>;
+                for (const key of possibleKeys) {
+                  if (key in dayRecord) return dayRecord[key];
+                }
+              }
+              
+              return null;
+            };
+            
+            const dayData = data.mealPlan[day];
+            const mealData = dayData ? getMealData(dayData, meal) : null;
+            
+            if (mealData && typeof mealData === 'object') {
+              const typedMealData = mealData as {
+                description?: string;
+                name?: string;
+                nom?: string;
+                ingredients?: unknown[];
+                instructions?: string[];
+                time?: string;
+                temps?: string;
+                servings?: number;
+                difficulty?: string;
+                emoji?: string;
+                category?: string;
+                tags?: string[];
+                nutrition?: {
+                  calories: number;
+                  protein: number;
+                  carbs: number;
+                  fat: number;
+                };
+              };
+              
+              console.log('Found meal data for', day, meal, ':', typedMealData);
               
               // Use AI-enriched description if available, otherwise generate fallback
-              const getDescription = (mealData: { description?: string; name?: string; nom?: string; ingredients?: string[] }) => {
+              const getDescription = (mealData: { description?: string; name?: string; nom?: string; ingredients?: unknown[] }) => {
                 if (mealData.description) {
                   return mealData.description;
                 }
@@ -98,54 +187,77 @@ const Page = () => {
                 ];
               };
 
-              // Simple ingredient formatter for AI-enriched data
-              const formatIngredients = (ingredients: string[]) => {
+              // Enhanced ingredient formatter for both simple and complex data formats
+              const formatIngredients = (ingredients: unknown[]) => {
+                if (!Array.isArray(ingredients)) return [];
+                
                 return ingredients.map(ingredient => {
-                  // Try to extract quantity, unit and name from the ingredient string
-                  const match = ingredient.match(/^(\d+(?:[.,]\d+)?)\s*([a-zA-Zé]*)\s*(.+)$/);
-                  if (match) {
-                    const [, amount, unit, name] = match;
+                  // If ingredient is already an object with name, amount, unit (from detailed API)
+                  if (typeof ingredient === 'object' && ingredient !== null && 'name' in ingredient) {
+                    const ing = ingredient as { name: string; amount?: string; unit?: string };
                     return {
-                      name: name.trim(),
-                      amount: amount.replace(',', '.'),
-                      unit: unit || 'piece'
+                      name: ing.name.trim(),
+                      amount: ing.amount || '1',
+                      unit: ing.unit || ''
                     };
                   }
                   
-                  // If no quantity specified, use ingredient as-is
+                  // If ingredient is a string (from simple API)
+                  if (typeof ingredient === 'string') {
+                    // Try to extract quantity, unit and name from the ingredient string
+                    const match = ingredient.match(/^(\d+(?:[.,]\d+)?)\s*([a-zA-Zé]*)\s*(.+)$/);
+                    if (match) {
+                      const [, amount, unit, name] = match;
+                      return {
+                        name: name.trim(),
+                        amount: amount.replace(',', '.'),
+                        unit: unit || ''
+                      };
+                    }
+                    
+                    // If no quantity specified, use ingredient as-is
+                    return {
+                      name: ingredient.trim(),
+                      amount: '1',
+                      unit: ''
+                    };
+                  }
+                  
+                  // Fallback for unexpected format
                   return {
-                    name: ingredient.trim(),
+                    name: String(ingredient).trim(),
                     amount: '1',
-                    unit: 'piece'
+                    unit: ''
                   };
                 });
               };
 
               // Récupérer le nombre de personnes depuis les préférences
-              const numberOfPeople = data.preferences?.numberOfPeople || 4;
-              const servings = mealData.servings || numberOfPeople;
+              const numberOfPeople = data.preferences?.numberOfPeople || 2;
+              // Toujours utiliser le nombre de personnes des préférences
+              const servings = numberOfPeople;
 
               // Format ingredients for display
-              const formattedIngredients = Array.isArray(mealData.ingredients) ? 
-                formatIngredients(mealData.ingredients) : [];
+              const formattedIngredients = Array.isArray(typedMealData.ingredients) ? 
+                formatIngredients(typedMealData.ingredients) : [];
 
               // Use AI-enriched nutrition data if available
 
               // Convertir le format du planning vers le format de recette
               const recipeData: RecipeData = {
                 id: `${day}-${meal}`,
-                title: mealData.nom || mealData.name || 'Recette',
-                description: getDescription(mealData),
+                title: typedMealData.nom || typedMealData.name || 'Recette',
+                description: getDescription(typedMealData),
                 image: `https://images.unsplash.com/photo-1546069901-ba9599e7e5d0?w=400&h=300&fit=crop&crop=center`,
-                emoji: mealData.emoji || '🍽️',
+                emoji: typedMealData.emoji || '🍽️',
                 ingredients: formattedIngredients,
-                instructions: getInstructions(mealData),
-                prepTime: parseInt(mealData.temps?.replace(' min', '') || mealData.time?.replace(' min', '') || '30'),
+                instructions: getInstructions(typedMealData),
+                prepTime: parseInt(typedMealData.temps?.replace(' min', '') || typedMealData.time?.replace(' min', '') || '30'),
                 servings: servings,
-                difficulty: mealData.difficulty || 'facile',
-                category: mealData.category || 'Plat principal',
-                tags: mealData.tags || [],
-                nutrition: mealData.nutrition || {
+                difficulty: (typedMealData.difficulty as 'easy' | 'medium' | 'hard') || 'easy',
+                category: typedMealData.category || 'Plat principal',
+                tags: typedMealData.tags || [],
+                nutrition: typedMealData.nutrition || {
                   calories: 300,
                   protein: 15,
                   carbs: 35,
@@ -153,9 +265,17 @@ const Page = () => {
                 }
               };
               
+              // Save original data for scaling
+              setOriginalServings(servings);
+              setCurrentServings(servings);
+              setOriginalIngredients(formattedIngredients);
+              
               setRecipe(recipeData);
             } else {
-              console.error('Recette non trouvée dans le planning');
+              console.error('Meal not found in planning for', day, meal);
+              console.error('Available day data:', dayData);
+              console.error('Full meal plan:', data.mealPlan);
+              console.error('Looking for:', `${day}-${meal}`);
             }
           }
         } else {
@@ -258,7 +378,11 @@ const Page = () => {
       {/* Layout en grille identique à la page recipe normale */}
       <div className="max-w-[1400px] mx-auto px-8 py-12 grid [grid-template-columns:1fr_350px] gap-12 max-lg:grid max-lg:grid-cols-1 max-md:pt-0 max-md:px-4 max-md:pb-8">
         <main>
-          <Header recipe={recipe} />
+          <Header 
+            recipe={recipe} 
+            currentServings={currentServings}
+            onServingsChange={updateServings}
+          />
 
           <div className="flex flex-col gap-8 max-sm:p-6">
             <Ingredients 

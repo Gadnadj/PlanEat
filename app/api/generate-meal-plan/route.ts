@@ -36,12 +36,12 @@ IMPORTANT - STRICT RULES TO FOLLOW:
 - If allergy is "lactose", include NO dairy products
 - Strictly respect the chosen diet type
 
-Return ONLY valid JSON with this structure:
+Return ONLY valid JSON with this structure, INCLUDING PRECISE QUANTITIES for ${preferences.numberOfPeople} person(s):
 {
   "monday": {
-    "morning": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
-    "lunch": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
-    "dinner": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" }
+    "morning": { "name": "Meal name", "ingredients": ["200g oats", "1 banana", "2 tbsp honey"], "time": "X min" },
+    "lunch": { "name": "Meal name", "ingredients": ["300g chicken breast", "150g lettuce", "2 tbsp olive oil"], "time": "X min" },
+    "dinner": { "name": "Meal name", "ingredients": ["400g salmon", "200g asparagus", "1 lemon"], "time": "X min" }
   },
   "tuesday": { ... },
   "wednesday": { ... },
@@ -51,6 +51,11 @@ Return ONLY valid JSON with this structure:
   "sunday": { ... }
 }
 
+IMPORTANT RULES FOR QUANTITIES:
+- Always include precise quantities (grams, ml, pieces, tbsp, tsp, cups)
+- Scale quantities for exactly ${preferences.numberOfPeople} person(s)
+- Use appropriate units: solids in grams (g), liquids in ml, spices in tsp/tbsp
+- Examples: "300g chicken", "200ml milk", "2 tbsp olive oil", "1 tsp salt", "2 eggs"
 Make sure meals are varied, balanced and ABSOLUTELY respect allergies and dietary preferences.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -160,21 +165,46 @@ Make sure meals are varied, balanced and ABSOLUTELY respect allergies and dietar
 }
 
 // Fallback plan in case of API error
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateFallbackMealPlan(preferences: any) {
   const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
   const meals = ['morning', 'lunch', 'dinner'];
+  const numberOfPeople = preferences.numberOfPeople || 2;
+  
+  // Scale quantities based on number of people
+  const scale = (base: number) => Math.round(base * numberOfPeople);
+  
+  const fallbackMeals = {
+    morning: [
+      { name: "Oatmeal with Banana", ingredients: [`${scale(80)}g oats`, `${numberOfPeople} banana(s)`, `${scale(2)} tbsp honey`] },
+      { name: "Scrambled Eggs", ingredients: [`${scale(2)} eggs`, `${scale(1)} tbsp butter`, `${scale(1)} tsp herbs`] },
+      { name: "Yogurt with Granola", ingredients: [`${scale(200)}ml yogurt`, `${scale(50)}g granola`, `${scale(100)}g berries`] }
+    ],
+    lunch: [
+      { name: "Chicken Salad", ingredients: [`${scale(150)}g chicken breast`, `${scale(100)}g lettuce`, `${scale(2)} tbsp olive oil`] },
+      { name: "Vegetable Sandwich", ingredients: [`${scale(2)} slices bread`, `${numberOfPeople} avocado(s)`, `${scale(100)}g vegetables`] },
+      { name: "Quinoa Bowl", ingredients: [`${scale(100)}g quinoa`, `${scale(150)}g mixed vegetables`, `${scale(2)} tbsp dressing`] }
+    ],
+    dinner: [
+      { name: "Grilled Salmon", ingredients: [`${scale(200)}g salmon`, `${scale(150)}g asparagus`, `${numberOfPeople} lemon(s)`] },
+      { name: "Pasta with Vegetables", ingredients: [`${scale(100)}g pasta`, `${scale(200)}g vegetables`, `${scale(2)} tbsp olive oil`] },
+      { name: "Chicken Stir Fry", ingredients: [`${scale(150)}g chicken`, `${scale(200)}g mixed vegetables`, `${scale(100)}g rice`] }
+    ]
+  };
   
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mealPlan: any = {};
   
   days.forEach(day => {
     mealPlan[day] = {};
-    meals.forEach(meal => {
+    meals.forEach((meal, mealIndex) => {
+      const mealOptions = fallbackMeals[meal as keyof typeof fallbackMeals];
+      const selectedMeal = mealOptions[mealIndex % mealOptions.length];
+      
       mealPlan[day][meal] = {
-        name: `${meal} meal - ${day}`,
-        ingredients: ['Ingredient 1', 'Ingredient 2', 'Ingredient 3'],
-        time: '30 min'
+        name: selectedMeal.name,
+        ingredients: selectedMeal.ingredients,
+        time: meal === 'morning' ? '15 min' : meal === 'lunch' ? '25 min' : '35 min'
       };
     });
   });
@@ -242,12 +272,12 @@ ABSOLUTE RULES:
 - If allergy "nuts" → NO nuts, almonds, hazelnuts, pistachios, etc.
 - If allergy "lactose" → NO milk, cheese, yogurt, butter, etc.
 
-Return ONLY valid JSON with this structure:
+Return ONLY valid JSON with this structure, INCLUDING PRECISE QUANTITIES for ${preferences.numberOfPeople} person(s):
 {
   "monday": {
-    "morning": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
-    "lunch": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" },
-    "dinner": { "name": "Meal name", "ingredients": ["ingredient1", "ingredient2"], "time": "X min" }
+    "morning": { "name": "Meal name", "ingredients": ["200g oats", "1 banana", "2 tbsp honey"], "time": "X min" },
+    "lunch": { "name": "Meal name", "ingredients": ["300g chicken breast", "150g lettuce", "2 tbsp olive oil"], "time": "X min" },
+    "dinner": { "name": "Meal name", "ingredients": ["400g salmon", "200g asparagus", "1 lemon"], "time": "X min" }
   },
   "tuesday": { ... },
   "wednesday": { ... },
@@ -255,7 +285,9 @@ Return ONLY valid JSON with this structure:
   "friday": { ... },
   "saturday": { ... },
   "sunday": { ... }
-}`;
+}
+
+IMPORTANT: Always include precise quantities (grams, ml, pieces, tbsp, tsp) scaled for ${preferences.numberOfPeople} person(s).`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {

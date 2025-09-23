@@ -26,7 +26,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
     // Construire les filtres de sécurité
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filters: any = { _id: params.id };
+    const resolvedParams = await params;
+    const filters: any = { _id: resolvedParams.id };
     
     // Filtre principal : recettes publiques (sans userId) OU recettes de l'utilisateur connecté
     if (userId) {
