@@ -1,11 +1,64 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 
+interface ShoppingItemData {
+  id: string;
+  name: string;
+  category: string;
+  quantity?: string;
+  isCompleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function Home() {
-  const { user, loading } = useAuth();
-  const [empty] = useState(true);
+  const { user, loading, token } = useAuth();
+  const [shoppingItems, setShoppingItems] = useState<ShoppingItemData[]>([]);
+  const [shoppingLoading, setShoppingLoading] = useState(false);
+
+  const loadShoppingItems = useCallback(async () => {
+    if (!token) return;
+    
+    setShoppingLoading(true);
+    try {
+      const response = await fetch('/api/shopping-list', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setShoppingItems(data.items);
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des articles:', error);
+    } finally {
+      setShoppingLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (user && token) {
+      loadShoppingItems();
+    }
+  }, [user, token, loadShoppingItems]);
+
+  // Rafraîchir la liste quand l'utilisateur revient sur la page
+  useEffect(() => {
+    const handleFocus = () => {
+      if (user && token) {
+        loadShoppingItems();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user, token, loadShoppingItems]);
 
   const handleStartWithAI = async () => {
     // Rediriger vers la page de préférences
@@ -204,25 +257,67 @@ export default function Home() {
       </main >
 
       <aside className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl h-fit sticky top-[120px] max-md:static">
-        <h2 className="text-[#3b82f6] mb-6 text-2xl font-bold flex items-center gap-2">
-          <span className="text-2xl">🛒</span>
-          Liste de courses
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-[#3b82f6] text-2xl font-bold flex items-center gap-2">
+            <span className="text-2xl">🛒</span>
+            Liste de courses
+          </h2>
+          <Link 
+            href="/shopping-list"
+            className="text-[#3b82f6] hover:text-[#60a5fa] text-sm font-medium transition-colors"
+          >
+            Voir tout
+          </Link>
+        </div>
 
-        {
-          empty ? (
-            <div className="text-center text-[#888] italic p-8">
-              Votre liste de courses est vide.<br />
-              Ajoutez des recettes pour commencer!
+        {shoppingLoading ? (
+          <div className="text-center text-[#888] p-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#3b82f6] mx-auto mb-2"></div>
+            Chargement...
+          </div>
+        ) : shoppingItems.length === 0 ? (
+          <div className="text-center text-[#888] italic p-8">
+            Votre liste de courses est vide.<br />
+            <Link href="/shopping-list" className="text-[#3b82f6] hover:text-[#60a5fa] transition-colors">
+              Ajoutez des articles
+            </Link> pour commencer!
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="text-sm text-[#b0b0b0] mb-3">
+              {shoppingItems.filter(item => !item.isCompleted).length} article(s) restant(s)
             </div>
-          ) : (
-            <ul className="list-none">
-              <li className={shoppingItem}>Tomates Cerises</li>
-              <li className={shoppingItem}>Concombres</li>
-              <li className={shoppingItem}>Olives noires</li>
+            <ul className="list-none space-y-2">
+              {shoppingItems
+                .filter(item => !item.isCompleted)
+                .slice(0, 5)
+                .map((item) => (
+                  <li 
+                    key={item.id}
+                    className={`${shoppingItem} ${item.isCompleted ? 'opacity-60 line-through' : ''}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-white font-medium">{item.name}</span>
+                      {item.quantity && (
+                        <span className="text-[#b0b0b0] text-sm">{item.quantity}</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-[#3b82f6] mt-1">{item.category}</div>
+                  </li>
+                ))}
             </ul>
-          )
-        }
+            {shoppingItems.filter(item => !item.isCompleted).length > 5 && (
+              <div className="text-center mt-4">
+                <Link 
+                  href="/shopping-list"
+                  className="text-[#3b82f6] hover:text-[#60a5fa] text-sm font-medium transition-colors"
+                >
+                  +{shoppingItems.filter(item => !item.isCompleted).length - 5} autres articles
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
       </aside>
     </div >
   );
