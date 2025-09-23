@@ -35,7 +35,7 @@ const Navbar = () => {
                             <Link className={linkClasses} href={'/recipe'}>Recipes</Link>
                         </li>
                         <li>
-                            <Link className={linkClasses} href={'/planification'}>Planification</Link>
+                            <Link className={linkClasses} href={'/planification'}>Meal Planning</Link>
                         </li>
                         <li>
                             <Link className={linkClasses} href={'/shopping-list'}>Shopping List</Link>
@@ -43,13 +43,13 @@ const Navbar = () => {
                         {user ? (
                             <li className='flex items-center gap-4'>
                                 <span className='text-gray-300 text-sm'>
-                                    Bonjour, {user.name}
+                                    Hello, {user.name}
                                 </span>
                                 <button 
                                     onClick={logout}
                                     className='px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm'
                                 >
-                                    Déconnexion
+                                    Logout
                                 </button>
                             </li>
                         ) : (
@@ -87,7 +87,7 @@ const Navbar = () => {
                             </li>
                             <li>
                                 <Link className={mobileLinkClasses} href={'/planification'} onClick={closeMobileMenu}>
-                                    📅 Planification
+                                    📅 Meal Planning
                                 </Link>
                             </li>
                             <li>
@@ -98,7 +98,7 @@ const Navbar = () => {
                             {user ? (
                                 <>
                                     <li className='px-4 py-2 text-gray-300 text-sm border-t border-gray-600 mt-2 pt-4'>
-                                        Bonjour, {user.name}
+                                        Hello, {user.name}
                                     </li>
                                     <li>
                                         <button 
@@ -108,7 +108,7 @@ const Navbar = () => {
                                             }}
                                             className='w-full text-left px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all duration-300'
                                         >
-                                            🚪 Déconnexion
+                                            🚪 Logout
                                         </button>
                                     </li>
                                 </>

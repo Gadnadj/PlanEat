@@ -20,11 +20,11 @@ const Page = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
-    // États pour le formulaire de connexion
+    // States for login form
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
 
-    // États pour le formulaire d'inscription
+    // States for signup form
     const [signupName, setSignupName] = useState('');
     const [signupEmail, setSignupEmail] = useState('');
     const [signupPassword, setSignupPassword] = useState('');
@@ -50,7 +50,7 @@ const Page = () => {
         setMessage('');
 
         if (signupPassword !== signupConfirmPassword) {
-            setMessage('Les mots de passe ne correspondent pas');
+            setMessage('Passwords do not match');
             setLoading(false);
             return;
         }
@@ -73,26 +73,26 @@ const Page = () => {
             </nav>
             <div className='flex'>
                 <div className="bg-[rgb(42,42,42)]/95 backdrop-blur-xl p-12 shadow-2xl w-full max-w-md m-8 relative overflow-hidden rounded-lg max-md:py-8 max-md:px-6 max-md:m-4 max-sm:py-6 max-sm:px-4">
-                    {/* Barre shimmer */}
+                    {/* Shimmer bar */}
                     <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#3b82f6] to-transparent animate-shimmer"></div>
 
                     {activeTab === 'login' ? (
                         <div className='text-center mb-10'>
                             <h1 className='text-[2.2rem] text-[#3b82f6] mb-2 font-bold max-md:text-[2rem]'>
-                                Bon Retour
+                                Welcome Back
                             </h1>
-                            <p className='text-[#b0b0b0] text-base leading-6'>Rejoignez PlanEat pour revolutionner votre facon de cuisiner avec l IA</p>
+                            <p className='text-[#b0b0b0] text-base leading-6'>Join PlanEat to revolutionize your way of cooking with AI</p>
                         </div>
                     ) : (
                         <div className='text-center mb-10'>
                             <h1 className='text-[2.2rem] text-[#3b82f6] mb-2 font-bold max-md:text-[2rem]'>
-                                Bienvenue
+                                Welcome
                             </h1>
-                            <p className='text-[#b0b0b0] text-base leading-6'>Rejoignez PlanEat pour revolutionner votre facon de cuisiner avec l IA</p>
+                            <p className='text-[#b0b0b0] text-base leading-6'>Join PlanEat to revolutionize your way of cooking with AI</p>
                         </div>
                     )}
 
-                    {/* ONGLETS */}
+                    {/* TABS */}
                     <div className='flex mb-8 bg-[rgba(64,64,64,0.5)] rounded-[12px] p-[0.3rem]'>
                         <button
                             onClick={() => setActiveTab('login')}
@@ -104,7 +104,7 @@ const Page = () => {
                                 }
                     `}
                         >
-                            Connexion
+                            Login
                         </button>
 
                         <button
@@ -117,14 +117,14 @@ const Page = () => {
                                 }
                     `}
                         >
-                            Inscription
+                            Sign Up
                         </button>
                     </div>
 
                     {/* MESSAGE */}
                     {message && (
                         <div className={`mb-6 p-3 rounded-lg text-sm ${
-                            message.includes('réussie') || message.includes('succès') 
+                            message.includes('success') || message.includes('successful') 
                                 ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
                                 : 'bg-red-500/20 text-red-400 border border-red-500/30'
                         }`}>
@@ -132,7 +132,7 @@ const Page = () => {
                         </div>
                     )}
 
-                    {/* FORMULAIRE DE CONNEXION */}
+                    {/* LOGIN FORM */}
                     {activeTab === 'login' && (
                         <form onSubmit={handleLogin} className='animate-fadeInUp space-y-6'>
                             <div className={formGroup}>
@@ -165,17 +165,17 @@ const Page = () => {
                             <div className={formOptions}>
                                 <div className={checkboxContainer}>
                                     <input className=' w-[18px] h-[18px] accent-[#3b82f6]' type="checkbox" />
-                                    <label>Se souvenir de moi</label>
+                                    <label>Remember me</label>
                                 </div>
-                                <Link href={'/forget-password'} className='text-[#3b82f6] no-underline transition-all duration0300 ease-out hover:text-[#64748b]'>Forget Password</Link>
+                                <Link href={'/forget-password'} className='text-[#3b82f6] no-underline transition-all duration0300 ease-out hover:text-[#64748b]'>Forgot Password?</Link>
                             </div>
                             <button type='submit' className={confirmButton} disabled={loading}>
-                                {loading ? 'Connexion...' : 'Login'}
+                                {loading ? 'Logging in...' : 'Login'}
                             </button>
                         </form>
                     )}
 
-                    {/* FORMULAIRE D'INSCRIPTION */}
+                    {/* SIGNUP FORM */}
                     {activeTab === 'register' && (
                         <form onSubmit={handleSignup} className='animate-fadeInUp space-y-6'>
                             <div className={formGroup}>
@@ -234,11 +234,11 @@ const Page = () => {
                             <div className={formOptions}>
                                 <div className={checkboxContainer}>
                                     <input className=' w-[18px] h-[18px] accent-[#3b82f6]' type="checkbox" />
-                                    <label>J accepte les <Link href={'/terms'}>conditions d utilisation</Link></label>
+                                    <label>I accept the <Link href={'/terms'}>terms of service</Link></label>
                                 </div>
                             </div>
                             <button type='submit' className={confirmButton} disabled={loading}>
-                                {loading ? 'Création...' : 'Create my account'}
+                                {loading ? 'Creating account...' : 'Create my account'}
                             </button>
                         </form>
                     )}
@@ -246,7 +246,7 @@ const Page = () => {
                     {/* SEPARATOR */}
                     <div className='flex items-center my-8 text-[#888] text-sm'>
                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#404040] to-transparent"></div>
-                        <span className='px-4'>ou continuer avec</span>
+                        <span className='px-4'>or continue with</span>
                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#404040] to-transparent"></div>
                     </div>
                     <div className='flex gap-4 mb-8'>

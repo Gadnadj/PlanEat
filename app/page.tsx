@@ -117,7 +117,7 @@ export default function Home() {
 
   const addIngredientToShoppingList = async (ingredient: { name: string; amount: string; unit?: string }) => {
     if (!token) {
-      alert('Veuillez vous connecter pour ajouter des articles à votre liste de courses');
+      alert('Please log in to add items to your shopping list');
       return;
     }
 
@@ -138,22 +138,22 @@ export default function Home() {
       });
 
       if (response.ok) {
-        // Recharger la shopping list
+        // Reload shopping list
         await loadShoppingItems();
-        alert(`${ingredient.name} ajouté à votre liste de courses (${category}) !`);
+        alert(`${ingredient.name} added to your shopping list (${category})!`);
       } else {
-        console.error(`Erreur lors de l'ajout de ${ingredient.name}`);
-        alert('Erreur lors de l\'ajout à la liste de courses');
+        console.error(`Error adding ${ingredient.name}`);
+        alert('Error adding to shopping list');
       }
     } catch (error) {
-      console.error('Erreur lors de l\'ajout à la liste de courses:', error);
-      alert('Erreur lors de l\'ajout à la liste de courses');
+      console.error('Error adding to shopping list:', error);
+      alert('Error adding to shopping list');
     }
   };
 
 
   const handleStartWithAI = async () => {
-    // Rediriger vers la page de préférences
+    // Redirect to preferences page
     window.location.href = '/preferences';
   };
 
@@ -169,7 +169,7 @@ export default function Home() {
     );
   }
 
-  // Page d'accueil pour utilisateurs non connectés
+  // Home page for non-logged-in users
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] py-8">
@@ -180,19 +180,19 @@ export default function Home() {
               🍽️ PlanEat
             </h1>
             <p className="text-xl mb-8 opacity-90 max-w-[600px] mx-auto">
-              Planifiez vos repas avec l intelligence artificielle. 
-              Obtenez des suggestions personnalisées et optimisez vos courses.
+              Plan your meals with artificial intelligence. 
+              Get personalized suggestions and optimize your shopping.
             </p>
             
             <div className="flex flex-wrap justify-center gap-4">
               <Link href="/login?mode=signup">
                 <button className="bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white px-8 py-4 border-none rounded-full text-lg font-bold cursor-pointer transition-all duration-300 ease-in-out shadow-xs hover:-translate-y-0.5 hover:shadow-lg">
-                  Créer un compte
+                  Create Account
                 </button>
               </Link>
               <Link href="/login">
                 <button className="bg-gradient-to-br from-[#6b7280] to-[#4b5563] text-white px-8 py-4 border-none rounded-full text-lg font-bold cursor-pointer transition-all duration-300 ease-in-out shadow-xs hover:-translate-y-0.5 hover:shadow-lg">
-                  Se connecter
+                  Sign In
                 </button>
               </Link>
             </div>
@@ -202,25 +202,25 @@ export default function Home() {
           <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             <div className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl text-center">
               <div className="text-4xl mb-4">🤖</div>
-              <h3 className="text-xl font-bold text-[#3b82f6] mb-4">IA Personnalisée</h3>
+              <h3 className="text-xl font-bold text-[#3b82f6] mb-4">Personalized AI</h3>
               <p className="text-gray-300">
-                Des suggestions de repas adaptées à vos goûts, allergies et préférences alimentaires.
+                Meal suggestions adapted to your tastes, allergies and dietary preferences.
               </p>
             </div>
             
             <div className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl text-center">
               <div className="text-4xl mb-4">📅</div>
-              <h3 className="text-xl font-bold text-[#3b82f6] mb-4">Planning Hebdomadaire</h3>
+              <h3 className="text-xl font-bold text-[#3b82f6] mb-4">Weekly Planning</h3>
               <p className="text-gray-300">
-                Organisez vos repas de la semaine avec des plats équilibrés pour chaque jour.
+                Organize your weekly meals with balanced dishes for every day.
               </p>
             </div>
             
             <div className="bg-[#2a2a2a] p-8 rounded-2xl shadow-xl text-center">
               <div className="text-4xl mb-4">🛒</div>
-              <h3 className="text-xl font-bold text-[#3b82f6] mb-4">Liste de Courses</h3>
+              <h3 className="text-xl font-bold text-[#3b82f6] mb-4">Shopping List</h3>
               <p className="text-gray-300">
-                Générez automatiquement vos listes de courses basées sur vos repas planifiés.
+                Automatically generate your shopping lists based on your planned meals.
               </p>
             </div>
           </section>
@@ -228,14 +228,14 @@ export default function Home() {
           {/* CTA Final */}
           <section className="bg-gradient-to-br from-[#3b82f6] to-[#64748b] p-12 text-center shadow-xl rounded-lg">
             <h2 className="text-3xl font-bold text-white mb-4">
-              Prêt à révolutionner votre alimentation ?
+              Ready to revolutionize your nutrition?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Rejoignez PlanEat dès maintenant et découvrez une nouvelle façon de cuisiner.
+              Join PlanEat now and discover a new way to cook.
             </p>
             <Link href="/login?mode=signup">
               <button className="bg-white text-[#3b82f6] px-8 py-4 border-none rounded-full text-lg font-bold cursor-pointer transition-all duration-300 ease-in-out shadow-xs hover:-translate-y-0.5 hover:shadow-lg">
-                Commencer gratuitement
+                Get Started Free
               </button>
             </Link>
           </section>
@@ -244,7 +244,7 @@ export default function Home() {
     );
   }
 
-  // Page d'accueil pour utilisateurs connectés (votre contenu original)
+  // Home page for logged-in users (your original content)
   const recipeCard = 'bg-gradient-to-br from-[#3a3a3a] to-gray-[#2d2d2d] rounded-xl overflow-hidden transition-all duration-300 ease-out border border-gray-600 hover:-translate-y-1 hover:shadow-2xl flex flex-col h-full max-sm:rounded-lg';
   const recipeImage = 'w-full h-40 sm:h-48 bg-gradient-to-br from-[#3b82f6] to-[#64748b] flex items-center justify-center text-4xl sm:text-6xl text-white flex-shrink-0';
   const recipeInfo = 'p-4 sm:p-6 flex flex-col flex-grow';
@@ -262,12 +262,12 @@ export default function Home() {
         {/* MAIN CONTAINER */}
         <section className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-12 text-center shadow-xl rounded-lg max-md:p-8 max-sm:p-6">
           <h1 className="welcome-title">
-            Planifier Vos Repas avec IA
+            Plan Your Meals with AI
           </h1>
 
           <p className="text-xl mb-8 opacity-90 max-w-[600px] ml-auto mr-auto max-sm:text-base">
-            Decouvez une nouvelle facon de planifier vos repas grace a notre Intelligence Artificielle.
-            Obtenez des suggestions personnalisees, optimisez vos courses et savourez chaque repas.
+            Discover a new way to plan your meals with our Artificial Intelligence.
+            Get personalized suggestions, optimize your shopping, and enjoy every meal.
           </p>
 
               <button 
@@ -295,17 +295,17 @@ export default function Home() {
           {recipesLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3b82f6] mx-auto mb-4"></div>
-              <p className="text-gray-300">Chargement des recettes...</p>
+              <p className="text-gray-300">Loading recipes...</p>
             </div>
           ) : recipes.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🍽️</div>
-              <p className="text-gray-300 mb-4">Aucune recette disponible pour le moment</p>
+              <p className="text-gray-300 mb-4">No recipes available at the moment</p>
               <button 
                 onClick={() => window.location.reload()}
                 className="text-[#3b82f6] hover:text-[#60a5fa] text-sm font-medium transition-colors"
               >
-                Recharger
+                Reload
               </button>
             </div>
           ) : (
@@ -330,8 +330,8 @@ export default function Home() {
                       </span>
                     </div>
                     <div className={ingredients}>
-                      <h4 className={ingredientsH4}>Ingrédients:</h4>
-                      <p className="text-[#b0b0b0] text-xs sm:text-sm mb-3 sm:mb-4 md:hidden">Touchez le + pour ajouter à votre liste</p>
+                      <h4 className={ingredientsH4}>Ingredients:</h4>
+                      <p className="text-[#b0b0b0] text-xs sm:text-sm mb-3 sm:mb-4 md:hidden">Tap + to add to your list</p>
                       <ul className={ingredientsul}>
                         {recipe.ingredients.slice(0, 5).map((ingredient, index) => (
                           <li key={index} className={`${ingredientli} flex items-start justify-between group gap-2 mb-2`}>
@@ -341,14 +341,14 @@ export default function Home() {
                             <button
                               onClick={() => addIngredientToShoppingList(ingredient)}
                               className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 bg-[#3b82f6] hover:bg-[#2563eb] text-white text-xs px-2 py-1 rounded flex-shrink-0 mt-0.5"
-                              title="Ajouter à la liste de courses"
+                              title="Add to shopping list"
                             >
                               +
                             </button>
                           </li>
                         ))}
                         {recipe.ingredients.length > 5 && (
-                          <li className={ingredientli}>... et {recipe.ingredients.length - 5} autres</li>
+                          <li className={ingredientli}>... and {recipe.ingredients.length - 5} more</li>
                         )}
                       </ul>
                     </div>
@@ -357,7 +357,7 @@ export default function Home() {
                         href={`/recipe/${recipe.id}`}
                         className="flex-1 bg-gradient-to-br from-[#10b981] to-[#059669] text-white border-none py-2 sm:py-3 px-4 sm:px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg text-center text-sm sm:text-base"
                       >
-                        Voir la recette
+                        View Recipe
                       </Link>
                     </div>
                   </div>
@@ -372,32 +372,32 @@ export default function Home() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-[#3b82f6] text-2xl font-bold flex items-center gap-2">
             <span className="text-2xl">🛒</span>
-            Liste de courses
+            Shopping List
           </h2>
           <Link 
             href="/shopping-list"
             className="text-[#3b82f6] hover:text-[#60a5fa] text-sm font-medium transition-colors"
           >
-            Voir tout
+            View All
           </Link>
         </div>
 
         {shoppingLoading ? (
           <div className="text-center text-[#888] p-8">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#3b82f6] mx-auto mb-2"></div>
-            Chargement...
+            Loading...
           </div>
         ) : shoppingItems.length === 0 ? (
           <div className="text-center text-[#888] italic p-8">
-            Votre liste de courses est vide.<br />
+            Your shopping list is empty.<br />
             <Link href="/shopping-list" className="text-[#3b82f6] hover:text-[#60a5fa] transition-colors">
-              Ajoutez des articles
-            </Link> pour commencer!
+              Add items
+            </Link> to get started!
           </div>
         ) : (
           <div className="space-y-2">
             <div className="text-sm text-[#b0b0b0] mb-3">
-              {shoppingItems.filter(item => !item.isCompleted).length} article(s) restant(s)
+              {shoppingItems.filter(item => !item.isCompleted).length} item(s) remaining
             </div>
             <ul className="list-none space-y-2">
               {shoppingItems
