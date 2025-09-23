@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IRecipe extends Document {
   id: string;
+  userId?: string; // ID de l'utilisateur qui a créé la recette (undefined pour les recettes du développeur)
   title: string;
   description: string;
   image: string;
@@ -31,6 +32,11 @@ export interface IRecipe extends Document {
 }
 
 const RecipeSchema = new Schema<IRecipe>({
+  userId: {
+    type: String,
+    ref: 'User',
+    required: false // Optionnel pour les recettes du développeur
+  },
   title: {
     type: String,
     required: [true, 'Le titre de la recette est requis'],

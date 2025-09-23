@@ -1,36 +1,64 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 
-type Props = {
-  onClose: () => void;
-  onRecipeCreated: () => void;
+interface RecipeData {
+  id: string;
+  userId?: string;
+  title: string;
+  description: string;
+  image: string;
+  emoji: string;
+  ingredients: {
+    name: string;
+    amount: string;
+    unit?: string;
+  }[];
+  instructions: string[];
+  prepTime: number;
+  cookTime: number;
+  servings: number;
+  difficulty: 'facile' | 'moyen' | 'difficile';
+  category: string;
+  tags: string[];
+  nutrition: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
 }
 
-const Modal = ({ onClose, onRecipeCreated }: Props) => {
+type Props = {
+  recipe: RecipeData;
+  onClose: () => void;
+  onRecipeUpdated: () => void;
+}
+
+const EditModal = ({ recipe, onClose, onRecipeUpdated }: Props) => {
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  // Form state
+  // Form state - initialiser avec les données de la recette
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: 'Plat principal',
-    prepTime: 15,
-    cookTime: 10,
-    servings: 4,
-    difficulty: 'facile' as 'facile' | 'moyen' | 'difficile',
-    calories: 350,
-    protein: 20,
-    carbs: 30,
-    fat: 15,
-    emoji: '🍽️'
+    title: recipe.title,
+    description: recipe.description,
+    category: recipe.category,
+    prepTime: recipe.prepTime,
+    cookTime: recipe.cookTime,
+    servings: recipe.servings,
+    difficulty: recipe.difficulty,
+    calories: recipe.nutrition.calories,
+    protein: recipe.nutrition.protein,
+    carbs: recipe.nutrition.carbs,
+    fat: recipe.nutrition.fat,
+    emoji: recipe.emoji
   });
 
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(recipe.tags);
   const [newTag, setNewTag] = useState('');
-  const [ingredients, setIngredients] = useState<{ name: string, amount: string, unit: string }[]>([]);
+  const [ingredients, setIngredients] = useState<{ name: string, amount: string, unit: string }[]>(recipe.ingredients);
   const [newIngredient, setNewIngredient] = useState({ name: '', amount: '', unit: '' });
-  const [instructions, setInstructions] = useState<string[]>([]);
+  const [instructions, setInstructions] = useState<string[]>(recipe.instructions);
   const [newInstruction, setNewInstruction] = useState('');
 
   // Style constants
@@ -85,7 +113,7 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
     e.preventDefault();
 
     if (!token) {
-      alert('Veuillez vous connecter pour créer une recette');
+      alert('Veuillez vous connecter pour modifier une recette');
       return;
     }
 
@@ -98,12 +126,13 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
 
     try {
       const response = await fetch('/api/recipes', {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
+          id: recipe.id,
           title: formData.title,
           description: formData.description,
           category: formData.category,
@@ -120,22 +149,21 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
             protein: formData.protein,
             carbs: formData.carbs,
             fat: formData.fat
-          },
-          image: 'https://images.unsplash.com/photo-1546069901-ba9599e7e5d0?w=400',
-          source: 'manual'
+          }
         })
       });
 
       if (response.ok) {
-        alert('Recette créée avec succès !');
-        onRecipeCreated();
+        alert('Recette modifiée avec succès !');
+        onRecipeUpdated();
+        onClose();
       } else {
         const error = await response.json();
-        alert(`Erreur: ${error.message || 'Impossible de créer la recette'}`);
+        alert(`Erreur: ${error.message || 'Impossible de modifier la recette'}`);
       }
     } catch (error) {
-      console.error('Erreur lors de la création de la recette:', error);
-      alert('Erreur lors de la création de la recette');
+      console.error('Erreur lors de la modification de la recette:', error);
+      alert('Erreur lors de la modification de la recette');
     } finally {
       setLoading(false);
     }
@@ -145,8 +173,8 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
     <div className='fixed top-0 left-0 w-full h-full bg-black/90 flex items-center justify-center z-[1001] p-8 max-md:p-4'>
       <div className='bg-linear-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-[20px] w-full max-w-[800px] max-h-[90vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-[#404040] relative'>
         {/* Header */}
-        <div className='bg-linear-to-br from-[#3b82f6] to-[#64748b] px-8 py-6 rounded-t-[20px] text-white flex justify-between items-center'>
-          <h2 className='text-[1.5rem] font-bold m-0'>🍳 Créer une nouvelle recette</h2>
+        <div className='bg-linear-to-br from-[#10b981] to-[#059669] px-8 py-6 rounded-t-[20px] text-white flex justify-between items-center'>
+          <h2 className='text-[1.5rem] font-bold m-0'>✏️ Modifier la recette</h2>
           <button
             onClick={onClose}
             className='bg-none border-none text-white text-[1.5rem] cursor-pointer p-2 rounded-full transition-colors duration-300 ease-in-out hover:bg-[rgba(255,255,255,0.2)]'
@@ -157,7 +185,7 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
 
         {/* Body */}
         <div className='p-8 text-[#e0e0e0] max-md:p-6'>
-          <form id="recipe-form" onSubmit={handleSubmit}>
+          <form id="edit-recipe-form" onSubmit={handleSubmit}>
             {/* Infos générales */}
             <div className={formSection}>
               <h3 className='text-[#3b82f6] mb-4 text-[1.2rem] flex items-center gap-2'>📝 Informations générales</h3>
@@ -326,7 +354,7 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
                 onClick={addIngredient}
                 className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white px-6 py-[0.8rem] rounded-[10px] font-bold mt-4 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'
               >
-                + Ajouter l ingrédient
+                + Ajouter l'ingrédient
               </button>
               <div className='bg-[#3a3a3a] border-2 border-[#404040] rounded-[10px] p-4 max-h-[200px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden mt-4'>
                 {ingredients.map((ingredient, index) => (
@@ -352,7 +380,7 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
                 onClick={addInstruction}
                 className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white px-6 py-[0.8rem] rounded-[10px] font-bold mt-4 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'
               >
-                + Ajouter l étape
+                + Ajouter l'étape
               </button>
               <div className='bg-[#3a3a3a] border-2 border-[#404040] rounded-[10px] p-4 max-h-[300px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden mt-4'>
                 {instructions.map((instruction, index) => (
@@ -369,7 +397,7 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
           </form>
         </div>
 
-        {/* Footer (à l'intérieur du container principal) */}
+        {/* Footer */}
         <div className='px-8 py-6 border-t border-[#404040] flex gap-4 justify-end max-md:flex-col max-md:gap-2'>
           <button
             type="button"
@@ -381,11 +409,11 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
           </button>
           <button
             type="submit"
-            form="recipe-form"
-            className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-[10px] font-bold transition-all duration-300 hover:-translate-y-[2px] hover:bg-gradient-to-br hover:from-[#3b82f6] hover:to-[#1e293b] max-md:w-full disabled:opacity-50 disabled:cursor-not-allowed'
+            form="edit-recipe-form"
+            className='bg-linear-to-br from-[#10b981] to-[#059669] text-white px-8 py-4 rounded-[10px] font-bold transition-all duration-300 hover:-translate-y-[2px] hover:bg-gradient-to-br hover:from-[#10b981] hover:to-[#047857] max-md:w-full disabled:opacity-50 disabled:cursor-not-allowed'
             disabled={loading}
           >
-            {loading ? '⏳ Création...' : '💾 Sauvegarder la recette'}
+            {loading ? '⏳ Modification...' : '💾 Sauvegarder les modifications'}
           </button>
         </div>
       </div>
@@ -393,4 +421,4 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
   )
 }
 
-export default Modal
+export default EditModal

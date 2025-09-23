@@ -44,7 +44,12 @@ const Page = () => {
   useEffect(() => {
     const loadRecipe = async () => {
       try {
-        const response = await fetch(`/api/recipes/${params.id}`);
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(`/api/recipes/${params.id}`, { headers });
         if (response.ok) {
           const data = await response.json();
           setRecipe(data.recipe);
@@ -61,7 +66,7 @@ const Page = () => {
     if (params.id) {
       loadRecipe();
     }
-  }, [params.id]);
+  }, [params.id, token]);
 
 
   const addIngredientToShoppingList = async (ingredient: { name: string; amount: string; unit?: string }) => {

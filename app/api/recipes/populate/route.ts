@@ -114,17 +114,20 @@ export async function POST(req: Request) {
     
     let totalAdded = 0;
 
-    // Ajouter des recettes manuelles
-    const manualRecipes = createManualRecipes();
-    for (const recipeData of manualRecipes) {
-      const existing = await Recipe.findOne({ title: recipeData.title });
-      if (!existing) {
-        const newRecipe = new Recipe(recipeData);
-        await newRecipe.save();
-        totalAdded++;
-        console.log(`Recette manuelle ajoutée: ${recipeData.title}`);
-      }
-    }
+        // Ajouter des recettes manuelles (sans userId = recettes du développeur)
+        const manualRecipes = createManualRecipes();
+        for (const recipeData of manualRecipes) {
+          const existing = await Recipe.findOne({ title: recipeData.title });
+          if (!existing) {
+            const newRecipe = new Recipe({
+              ...recipeData,
+              userId: undefined // Recettes du développeur
+            });
+            await newRecipe.save();
+            totalAdded++;
+            console.log(`Recette manuelle ajoutée: ${recipeData.title}`);
+          }
+        }
 
     console.log(`\n✅ Population terminée ! ${totalAdded} nouvelles recettes ajoutées.`);
     console.log(`Total de recettes dans la base: ${await Recipe.countDocuments()}`);

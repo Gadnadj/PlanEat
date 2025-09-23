@@ -14,10 +14,44 @@ export async function GET(req: Request) {
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
+    // Vérifier l'authentification pour filtrer les recettes
+    const authHeader = req.headers.get('authorization');
+    let userId = null;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.split(' ')[1];
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const jwt = require('jsonwebtoken');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.userId;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        console.log('Token invalide, affichage des recettes publiques uniquement');
+      }
+    }
+
     await connectToDatabase();
 
     // Construire les filtres
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filters: any = {};
+    
+    // Filtre principal : recettes publiques (sans userId) OU recettes de l'utilisateur connecté
+    if (userId) {
+      filters.$or = [
+        { userId: { $exists: false } }, // Recettes publiques (développeur)
+        { userId: null }, // Recettes publiques (développeur)
+        { userId: userId } // Recettes de l'utilisateur connecté
+      ];
+    } else {
+      // Si pas d'authentification, afficher seulement les recettes publiques
+      filters.$or = [
+        { userId: { $exists: false } },
+        { userId: null }
+      ];
+    }
+    
     if (category) filters.category = category;
     if (difficulty) filters.difficulty = difficulty;
     if (search) {
@@ -25,6 +59,7 @@ export async function GET(req: Request) {
     }
 
     // Construire l'ordre de tri
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sort: any = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
@@ -62,19 +97,145 @@ export async function POST(req: Request) {
   try {
     const recipeData = await req.json();
 
+    // Vérifier l'authentification
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ message: 'Token d\'authentification requis' }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+    
+
     await connectToDatabase();
 
-    const newRecipe = new Recipe(recipeData);
+    // Vérifier que l'userId est valide
+    if (!userId) {
+      console.error('userId est undefined ou null:', { decoded, userId });
+      return NextResponse.json({ message: 'Erreur d\'authentification: userId manquant' }, { status: 401 });
+    }
+
+    // Créer la recette avec l'userId
+    const newRecipe = new Recipe({
+      ...recipeData,
+      userId: userId
+    });
     await newRecipe.save();
+
+    // Convertir manuellement l'_id en id et s'assurer que userId est inclus
+    const recipeResponse = {
+      ...newRecipe.toObject(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      id: (newRecipe._id as any).toString()
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (recipeResponse as any)._id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (recipeResponse as any).__v;
 
     return NextResponse.json({
       success: true,
       message: 'Recette créée avec succès',
-      recipe: newRecipe
+      recipe: recipeResponse
     });
 
   } catch (error) {
     console.error('Erreur création recette:', error);
+    return NextResponse.json({ message: 'Erreur serveur' }, { status: 500 });
+  }
+}
+
+// PUT - Mettre à jour une recette
+export async function PUT(req: Request) {
+  try {
+    const { id, ...updateData } = await req.json();
+
+    // Vérifier l'authentification
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ message: 'Token d\'authentification requis' }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    await connectToDatabase();
+
+    // Vérifier que la recette existe et appartient à l'utilisateur
+    const recipe = await Recipe.findById(id);
+    if (!recipe) {
+      return NextResponse.json({ message: 'Recette non trouvée' }, { status: 404 });
+    }
+
+    if (recipe.userId !== userId) {
+      return NextResponse.json({ message: 'Vous ne pouvez pas modifier cette recette' }, { status: 403 });
+    }
+
+    // Mettre à jour la recette
+    const updatedRecipe = await Recipe.findByIdAndUpdate(id, updateData, { new: true });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Recette mise à jour avec succès',
+      recipe: updatedRecipe
+    });
+
+  } catch (error) {
+    console.error('Erreur mise à jour recette:', error);
+    return NextResponse.json({ message: 'Erreur serveur' }, { status: 500 });
+  }
+}
+
+// DELETE - Supprimer une recette
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ message: 'ID de recette requis' }, { status: 400 });
+    }
+
+    // Vérifier l'authentification
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ message: 'Token d\'authentification requis' }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    await connectToDatabase();
+
+    // Vérifier que la recette existe et appartient à l'utilisateur
+    const recipe = await Recipe.findById(id);
+    if (!recipe) {
+      return NextResponse.json({ message: 'Recette non trouvée' }, { status: 404 });
+    }
+
+    if (recipe.userId !== userId) {
+      return NextResponse.json({ message: 'Vous ne pouvez pas supprimer cette recette' }, { status: 403 });
+    }
+
+    // Supprimer la recette
+    await Recipe.findByIdAndDelete(id);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Recette supprimée avec succès'
+    });
+
+  } catch (error) {
+    console.error('Erreur suppression recette:', error);
     return NextResponse.json({ message: 'Erreur serveur' }, { status: 500 });
   }
 }

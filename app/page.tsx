@@ -16,6 +16,7 @@ interface ShoppingItemData {
 
 interface RecipeData {
   id: string;
+  userId?: string;
   title: string;
   description: string;
   image: string;
@@ -74,7 +75,12 @@ export default function Home() {
   const loadRecipes = useCallback(async () => {
     setRecipesLoading(true);
     try {
-      const response = await fetch('/api/recipes?limit=6&sortBy=createdAt&sortOrder=desc');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch('/api/recipes?limit=6&sortBy=createdAt&sortOrder=desc', { headers });
       
       if (response.ok) {
         const data = await response.json();
@@ -87,7 +93,7 @@ export default function Home() {
     } finally {
       setRecipesLoading(false);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     if (user && token) {
@@ -144,6 +150,7 @@ export default function Home() {
       alert('Erreur lors de l\'ajout à la liste de courses');
     }
   };
+
 
   const handleStartWithAI = async () => {
     // Rediriger vers la page de préférences
@@ -238,11 +245,11 @@ export default function Home() {
   }
 
   // Page d'accueil pour utilisateurs connectés (votre contenu original)
-  const recipeCard = 'bg-gradient-to-br from-[#3a3a3a] to-gray-[#2d2d2d] rounded-xl overflow-hidden transition-all duration-300 ease-out border border-gray-600 hover:-translate-y-1 hover:shadow-2xl';
-  const recipeImage = 'w-full h-50 bg-gradient-to-br from-[#3b82f6] to-[#64748b] flex items-center justify-center text-9xl text-white';
-  const recipeInfo = 'p-6';
+  const recipeCard = 'bg-gradient-to-br from-[#3a3a3a] to-gray-[#2d2d2d] rounded-xl overflow-hidden transition-all duration-300 ease-out border border-gray-600 hover:-translate-y-1 hover:shadow-2xl flex flex-col h-full';
+  const recipeImage = 'w-full h-48 bg-gradient-to-br from-[#3b82f6] to-[#64748b] flex items-center justify-center text-6xl text-white flex-shrink-0';
+  const recipeInfo = 'p-6 flex flex-col flex-grow';
   const recipeInfoH3 = 'text-[#3b82f6] mb-4 text-xl font-bold';
-  const ingredients = 'mb-6';
+  const ingredients = 'mb-4 flex-grow h-32 overflow-hidden';
   const ingredientsH4 = 'text-gray-300 mb-2 text-base font-bold';
   const ingredientsul = 'list-none pl-0';
   const ingredientli = "text-[#b0b0b0] mb-[0.3rem] pl-4 relative before:content-['•'] before:text-[#3b82f6] before:absolute before:left-0";
@@ -302,7 +309,7 @@ export default function Home() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6 max-md:grid-cols-1">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6 max-md:grid-cols-1" style={{ gridTemplateRows: '1fr' }}>
               {recipes.map((recipe) => (
                 <div key={recipe.id} className={recipeCard}>
                   <div className={recipeImage} style={{ backgroundImage: `url(${recipe.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
@@ -310,7 +317,7 @@ export default function Home() {
                   </div>
                   <div className={recipeInfo}>
                     <h3 className={recipeInfoH3}>{recipe.title}</h3>
-                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">{recipe.description}</p>
+                    <p className="text-gray-400 text-sm mb-4 line-clamp-2 h-10 overflow-hidden">{recipe.description}</p>
                     <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
                       <span>⏱️ {recipe.prepTime + recipe.cookTime} min</span>
                       <span>👥 {recipe.servings} pers.</span>
@@ -345,7 +352,7 @@ export default function Home() {
                         )}
                       </ul>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mt-auto">
                       <Link 
                         href={`/recipe/${recipe.id}`}
                         className="flex-1 bg-gradient-to-br from-[#10b981] to-[#059669] text-white border-none py-3 px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg text-center"
