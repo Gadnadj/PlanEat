@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { getIngredientCategory } from "@/lib/ingredientCategories";
 
 interface ShoppingItemData {
   id: string;
@@ -107,36 +108,37 @@ export default function Home() {
     return () => window.removeEventListener('focus', handleFocus);
   }, [user, token, loadShoppingItems]);
 
-  const addRecipeToShoppingList = async (recipe: RecipeData) => {
+
+  const addIngredientToShoppingList = async (ingredient: { name: string; amount: string; unit?: string }) => {
     if (!token) {
       alert('Veuillez vous connecter pour ajouter des articles à votre liste de courses');
       return;
     }
 
     try {
-      // Ajouter chaque ingrédient de la recette à la shopping list
-      for (const ingredient of recipe.ingredients) {
-        const response = await fetch('/api/shopping-list', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            name: ingredient.name,
-            category: 'Épicerie',
-            quantity: ingredient.amount + (ingredient.unit ? ` ${ingredient.unit}` : '')
-          })
-        });
+      const category = getIngredientCategory(ingredient.name);
+      
+      const response = await fetch('/api/shopping-list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: ingredient.name,
+          category: category,
+          quantity: ingredient.amount + (ingredient.unit ? ` ${ingredient.unit}` : '')
+        })
+      });
 
-        if (!response.ok) {
-          console.error(`Erreur lors de l'ajout de ${ingredient.name}`);
-        }
+      if (response.ok) {
+        // Recharger la shopping list
+        await loadShoppingItems();
+        alert(`${ingredient.name} ajouté à votre liste de courses (${category}) !`);
+      } else {
+        console.error(`Erreur lors de l'ajout de ${ingredient.name}`);
+        alert('Erreur lors de l\'ajout à la liste de courses');
       }
-
-      // Recharger la shopping list
-      await loadShoppingItems();
-      alert(`Ingrédients de "${recipe.title}" ajoutés à votre liste de courses !`);
     } catch (error) {
       console.error('Erreur lors de l\'ajout à la liste de courses:', error);
       alert('Erreur lors de l\'ajout à la liste de courses');
@@ -244,7 +246,7 @@ export default function Home() {
   const ingredientsH4 = 'text-gray-300 mb-2 text-base font-bold';
   const ingredientsul = 'list-none pl-0';
   const ingredientli = "text-[#b0b0b0] mb-[0.3rem] pl-4 relative before:content-['•'] before:text-[#3b82f6] before:absolute before:left-0";
-  const addToList = 'bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white border-none py-3 px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out w-full hover:-translate-y-0.5 hover:bg-gradient-to-br hover:blue-blue-600 hover:to-blue-700';
+  // const addToList = 'bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white border-none py-3 px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out w-full hover:-translate-y-0.5 hover:bg-gradient-to-br hover:blue-blue-600 hover:to-blue-700';
   const shoppingItem = 'bg-[#3a3a3a] p-4 mb-2 rounded-lg border-l-4 border-l-[#3b82f6] transition-all duration-300 ease-out hover:bg-[#404040] hover:-translate-x-[5px]'
 
   return (
@@ -322,10 +324,20 @@ export default function Home() {
                     </div>
                     <div className={ingredients}>
                       <h4 className={ingredientsH4}>Ingrédients:</h4>
+                      <p className="text-[#b0b0b0] text-sm mb-4 md:hidden">Touchez le + pour ajouter à votre liste</p>
                       <ul className={ingredientsul}>
                         {recipe.ingredients.slice(0, 5).map((ingredient, index) => (
-                          <li key={index} className={ingredientli}>
-                            {ingredient.name} {ingredient.amount} {ingredient.unit || ''}
+                          <li key={index} className={`${ingredientli} flex items-center justify-between group`}>
+                            <span>
+                              {ingredient.name} {ingredient.amount} {ingredient.unit || ''}
+                            </span>
+                            <button
+                              onClick={() => addIngredientToShoppingList(ingredient)}
+                              className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 bg-[#3b82f6] hover:bg-[#2563eb] text-white text-sm px-3 py-2 rounded ml-2 md:text-xs md:px-2 md:py-1"
+                              title="Ajouter à la liste de courses"
+                            >
+                              +
+                            </button>
                           </li>
                         ))}
                         {recipe.ingredients.length > 5 && (
@@ -333,12 +345,14 @@ export default function Home() {
                         )}
                       </ul>
                     </div>
-                    <button 
-                      className={addToList}
-                      onClick={() => addRecipeToShoppingList(recipe)}
-                    >
-                      Ajouter à la liste
-                    </button>
+                    <div className="flex gap-2">
+                      <Link 
+                        href={`/recipe/${recipe.id}`}
+                        className="flex-1 bg-gradient-to-br from-[#10b981] to-[#059669] text-white border-none py-3 px-6 rounded-full cursor-pointer font-bold transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg text-center"
+                      >
+                        Voir la recette
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}
