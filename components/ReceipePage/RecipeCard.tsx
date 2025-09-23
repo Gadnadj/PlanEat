@@ -33,10 +33,11 @@ interface RecipeCardProps {
   recipe: RecipeData;
   onDelete?: (recipeId: string) => void;
   onEdit?: (recipe: RecipeData) => void;
+  onAddToPlanning?: (recipe: RecipeData) => void;
   currentUserId?: string;
 }
 
-const RecipeCard = ({ recipe, onDelete, onEdit, currentUserId }: RecipeCardProps) => {
+const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }: RecipeCardProps) => {
     const router = useRouter();
     
 
@@ -100,6 +101,19 @@ const RecipeCard = ({ recipe, onDelete, onEdit, currentUserId }: RecipeCardProps
                     <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>
                         + Liste
                     </button>
+                    {onAddToPlanning && (
+                        <button 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onAddToPlanning(recipe);
+                            }}
+                            className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] bg-[#10b981] hover:bg-[#059669] text-white'
+                            title="Ajouter au planning"
+                        >
+                            📅 Planning
+                        </button>
+                    )}
                     {recipe.userId && currentUserId && String(recipe.userId) === String(currentUserId) && (
                         <>
                             {onEdit && (

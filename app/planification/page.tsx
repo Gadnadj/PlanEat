@@ -34,6 +34,7 @@ export default function PlanificationPage() {
   const [generatedPlan, setGeneratedPlan] = useState<MealPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const loadUserData = useCallback(async () => {
     if (!token) {
@@ -64,6 +65,7 @@ export default function PlanificationPage() {
       if (mealPlanResponse.ok) {
         const mealPlanData = await mealPlanResponse.json();
         if (mealPlanData.success) {
+          console.log('Planning chargé:', mealPlanData.mealPlan);
           setGeneratedPlan(mealPlanData.mealPlan);
         }
       }
@@ -76,7 +78,31 @@ export default function PlanificationPage() {
 
   useEffect(() => {
     loadUserData();
-  }, [loadUserData]);
+  }, [loadUserData, refreshTrigger]);
+
+  // Écouter les changements de planning depuis d'autres pages
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'planningUpdated') {
+        console.log('Planning mis à jour via storage');
+        setRefreshTrigger(prev => prev + 1);
+        localStorage.removeItem('planningUpdated');
+      }
+    };
+
+    const handlePlanningUpdate = () => {
+      console.log('Planning mis à jour via événement');
+      setRefreshTrigger(prev => prev + 1);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('planningUpdated', handlePlanningUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('planningUpdated', handlePlanningUpdate);
+    };
+  }, []);
 
 
   const regenerateMealPlan = async () => {
@@ -186,12 +212,20 @@ export default function PlanificationPage() {
             Votre planning hebdomadaire personnalisé avec des repas équilibrés pour chaque jour
           </p>
           
-          <Link
-            href="/preferences"
-            className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 mb-6 inline-block"
-          >
-            🤖 Configurer et générer avec l&apos;IA
-          </Link>
+            <div className="flex gap-4 justify-center mb-6">
+              <Link
+                href="/preferences"
+                className="bg-gradient-to-r from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 inline-block"
+              >
+                🤖 Configurer et générer avec l&apos;IA
+              </Link>
+              <button
+                onClick={() => setRefreshTrigger(prev => prev + 1)}
+                className="bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 inline-block"
+              >
+                🔄 Actualiser
+              </button>
+            </div>
           
           {preferences && (
             <div className="mt-4 bg-[#2a2a2a] rounded-lg p-4 max-w-2xl mx-auto">

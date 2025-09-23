@@ -33,10 +33,11 @@ interface RecipesListProps {
     loading: boolean;
     onDelete?: (recipeId: string) => void;
     onEdit?: (recipe: RecipeData) => void;
+    onAddToPlanning?: (recipe: RecipeData) => void;
     currentUserId?: string;
 }
 
-const RecipesList = ({ recipes, loading, onDelete, onEdit, currentUserId }: RecipesListProps) => {
+const RecipesList = ({ recipes, loading, onDelete, onEdit, onAddToPlanning, currentUserId }: RecipesListProps) => {
     if (loading) {
         return (
             <main className='max-w-[1400px] mx-auto pt-0 px-8 pb-8'>
@@ -69,6 +70,7 @@ const RecipesList = ({ recipes, loading, onDelete, onEdit, currentUserId }: Reci
                             recipe={recipe} 
                             onDelete={onDelete}
                             onEdit={onEdit}
+                            onAddToPlanning={onAddToPlanning}
                             currentUserId={currentUserId}
                         />
                         </Link>

@@ -1,12 +1,13 @@
 "use client"
 import Modal from '@/components/ModaleCreation/Modal'
 import EditModal from '@/components/ModaleCreation/EditModal'
+import PlanningModal from '@/components/PlanningModal/PlanningModal'
 import Header from '@/components/ReceipePage/Headers'
 import RecipesList from '@/components/ReceipePage/RecipesList'
 import Search from '@/components/ReceipePage/Search'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 interface RecipeData {
   id: string;
@@ -39,7 +40,9 @@ const Page = () => {
     const { user, token } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isPlanningModalOpen, setIsPlanningModalOpen] = useState(false);
     const [editingRecipe, setEditingRecipe] = useState<RecipeData | null>(null);
+    const [planningRecipe, setPlanningRecipe] = useState<RecipeData | null>(null);
     const [recipes, setRecipes] = useState<RecipeData[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -63,6 +66,15 @@ const Page = () => {
     const closeEditModal = () => {
         setIsEditModalOpen(false);
         setEditingRecipe(null);
+    }
+
+    const openPlanningModal = (recipe: RecipeData) => {
+        setPlanningRecipe(recipe);
+        setIsPlanningModalOpen(true);
+    }
+    const closePlanningModal = () => {
+        setIsPlanningModalOpen(false);
+        setPlanningRecipe(null);
     }
 
     const loadRecipes = async () => {
@@ -120,6 +132,41 @@ const Page = () => {
     const handleSortChange = (newSortBy: string, newSortOrder: string) => {
         setSortBy(newSortBy);
         setSortOrder(newSortOrder);
+    };
+
+    const handleAddToPlanning = async (recipeId: string, day: string, meal: string) => {
+        if (!token) {
+            alert('Veuillez vous connecter pour ajouter une recette au planning');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/meal-plans/add-recipe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    recipeId,
+                    day,
+                    meal
+                })
+            });
+
+            if (response.ok) {
+                alert('Recette ajoutée au planning avec succès !');
+                // Déclencher le rechargement de la page de planification
+                localStorage.setItem('planningUpdated', 'true');
+                window.dispatchEvent(new Event('planningUpdated'));
+            } else {
+                const error = await response.json();
+                alert(`Erreur: ${error.message || 'Impossible d\'ajouter la recette au planning'}`);
+            }
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout au planning:', error);
+            alert('Erreur lors de l\'ajout au planning');
+        }
     };
 
     const deleteRecipe = async (recipeId: string) => {
@@ -185,6 +232,14 @@ const Page = () => {
 
             {isModalOpen && <Modal onClose={closeModal} onRecipeCreated={handleRecipeCreated} />}
             {isEditModalOpen && editingRecipe && <EditModal recipe={editingRecipe} onClose={closeEditModal} onRecipeUpdated={handleRecipeUpdated} />}
+            {isPlanningModalOpen && planningRecipe && (
+                <PlanningModal 
+                    recipe={planningRecipe} 
+                    isOpen={isPlanningModalOpen} 
+                    onClose={closePlanningModal} 
+                    onAddToPlanning={handleAddToPlanning} 
+                />
+            )}
             <Header />
             <Search onSearchChange={handleSearchChange} onFilterChange={handleFilterChange} onSortChange={handleSortChange} />
             <RecipesList 
@@ -192,7 +247,8 @@ const Page = () => {
                 loading={loading}
                 onDelete={deleteRecipe}
                 onEdit={openEditModal}
-                currentUserId={user?.id}
+                onAddToPlanning={openPlanningModal}
+                currentUserId={user?.id} 
             />
             </div>
         </ProtectedRoute>

@@ -25,14 +25,12 @@ export default function PreferencesPage() {
     { value: "omnivore", label: "🥩 Omnivore", description: "Mange de tout" },
     { value: "vegetarian", label: "🥗 Végétarien", description: "Pas de viande ni poisson" },
     { value: "vegan", label: "🌱 Végan", description: "Pas de produits animaux" },
-    { value: "pescatarian", label: "🐟 Pescatarien", description: "Végétarien + poisson" },
-    { value: "keto", label: "🥓 Keto", description: "Riche en lipides, pauvre en glucides" },
-    { value: "paleo", label: "🦴 Paléo", description: "Aliments non transformés" }
+    { value: "pescatarian", label: "🐟 Pescatarien", description: "Végétarien + poisson" }
   ];
 
 
   const budgetOptions = [
-    { value: "économique", label: "💰 Économique", description: "Repas à petit budget" },
+    { value: "faible", label: "💰 Faible", description: "Repas à petit budget" },
     { value: "moyen", label: "💳 Moyen", description: "Budget standard" },
     { value: "élevé", label: "💎 Élevé", description: "Budget premium" }
   ];
