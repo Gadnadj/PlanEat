@@ -255,7 +255,66 @@ export default function PlanificationPage() {
     const mealEmoji = meal.emoji || '🍽️';
     const mealIngredients = meal.ingredients || [];
     const mealTime = meal.temps || meal.time || '30 min';
-    const mealNutrition = meal.nutrition;
+    let mealNutrition = meal.nutrition;
+    
+    // Debug: Log pour comprendre pourquoi les informations nutritionnelles ne s'affichent pas
+    console.log(`Meal ${day}-${time}:`, {
+      mealName,
+      hasNutrition: !!mealNutrition,
+      nutrition: mealNutrition,
+      fullMeal: meal
+    });
+    
+    // Fallback: générer des informations nutritionnelles si elles sont manquantes
+    if (!mealNutrition && mealIngredients.length > 0) {
+      const ingredientsText = mealIngredients.join(' ').toLowerCase();
+      let calories = 300, protein = 15, carbs = 35, fat = 10;
+      
+      // Ajustements basés sur les ingrédients (même logique que dans l'API)
+      if (ingredientsText.includes('chicken') || ingredientsText.includes('beef') || ingredientsText.includes('meat')) {
+        calories += 100; protein += 15; fat += 5;
+      }
+      if (ingredientsText.includes('salmon') || ingredientsText.includes('fish') || ingredientsText.includes('tuna')) {
+        calories += 80; protein += 12; fat += 8;
+      }
+      if (ingredientsText.includes('egg')) {
+        calories += 50; protein += 8; fat += 4;
+      }
+      if (ingredientsText.includes('oats') || ingredientsText.includes('rice') || ingredientsText.includes('quinoa')) {
+        calories += 60; carbs += 20; protein += 3;
+      }
+      if (ingredientsText.includes('olive oil') || ingredientsText.includes('butter') || ingredientsText.includes('oil')) {
+        calories += 120; fat += 14;
+      }
+      if (ingredientsText.includes('avocado')) {
+        calories += 80; fat += 8; protein += 2;
+      }
+      if (ingredientsText.includes('banana') || ingredientsText.includes('apple') || ingredientsText.includes('fruit')) {
+        calories += 40; carbs += 15;
+      }
+      if (ingredientsText.includes('cheese') || ingredientsText.includes('milk') || ingredientsText.includes('yogurt')) {
+        calories += 60; protein += 6; fat += 4;
+      }
+      if (ingredientsText.includes('pasta') || ingredientsText.includes('bread') || ingredientsText.includes('noodles')) {
+        calories += 80; carbs += 25; protein += 4;
+      }
+      
+      // Ajustements par moment de la journée
+      if (time === 'morning') {
+        calories = Math.max(calories * 0.8, 250); // Petit-déjeuner plus léger
+      } else if (time === 'dinner') {
+        calories = Math.max(calories * 1.1, 350); // Dîner plus consistant
+      }
+      
+      mealNutrition = { 
+        calories: Math.round(calories), 
+        protein: Math.round(protein), 
+        carbs: Math.round(carbs), 
+        fat: Math.round(fat) 
+      };
+      
+      console.log(`Generated fallback nutrition for ${mealName}:`, mealNutrition);
+    }
     
     const handleMealClick = () => {
       router.push(`/planning-recipe/${day}-${time}`);
