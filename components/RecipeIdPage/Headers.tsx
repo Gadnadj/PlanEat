@@ -78,7 +78,7 @@ const Header = ({ recipe, currentServings, onServingsChange }: HeaderProps) => {
                 <div className='grid [grid-template-columns:1fr_1fr_1fr_1fr] gap-4 mb-8 max-lg:grid-cols-2 max-sm:grid-cols-1'>
                     <div className={styles.statItem}>
                         {onServingsChange ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 justify-center">
                                 <button
                                     onClick={() => onServingsChange(Math.max(1, (currentServings || recipe.servings) - 1))}
                                     className="bg-[#3b82f6] hover:bg-[#2563eb] text-white w-8 h-8 rounded-full font-bold transition-colors"

@@ -2,10 +2,8 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Recipe from '@/models/Recipe';
 
-// GET - Récupérer une recette par ID
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
-    // Vérifier l'authentification pour filtrer les recettes
     const authHeader = req.headers.get('authorization');
     let userId = null;
     
@@ -24,20 +22,18 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
     await connectToDatabase();
 
-    // Construire les filtres de sécurité
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const resolvedParams = await params;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filters: any = { _id: resolvedParams.id };
     
-    // Filtre principal : recettes publiques (sans userId) OU recettes de l'utilisateur connecté
     if (userId) {
       filters.$or = [
-        { userId: { $exists: false } }, // Recettes publiques (développeur)
-        { userId: null }, // Recettes publiques (développeur)
-        { userId: userId } // Recettes de l'utilisateur connecté
+        { userId: { $exists: false } },
+        { userId: null },
+        { userId: userId }
       ];
     } else {
-      // Si pas d'authentification, afficher seulement les recettes publiques
       filters.$or = [
         { userId: { $exists: false } },
         { userId: null }
@@ -61,7 +57,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-// PUT - Mettre à jour une recette
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
     const updateData = await req.json();
@@ -90,7 +85,6 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-// DELETE - Supprimer une recette
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
     await connectToDatabase();
