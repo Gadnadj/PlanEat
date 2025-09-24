@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PWA - Plan-Eat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-item {
+            background: #2a2a2a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        .success { border-left-color: #10b981; }
+        .error { border-left-color: #ef4444; }
+        .warning { border-left-color: #f59e0b; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test PWA - Plan-Eat</h1>
+    <p>Cette page teste les fonctionnalités PWA de votre application.</p>
+    
+    <button onclick="testPWAFeatures()">🚀 Tester la PWA</button>
+    <button onclick="testServiceWorker()">⚙️ Tester Service Worker</button>
+    <button onclick="testManifest()">📋 Tester Manifest</button>
+    <button onclick="clearCache()">🗑️ Vider le cache</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-item ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testPWAFeatures() {
+            clearResults();
+            addResult('🔍 Test des fonctionnalités PWA en cours...', 'info');
+
+            // Test 1: Service Worker
+            if ('serviceWorker' in navigator) {
+                addResult('✅ Service Worker supporté', 'success');
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        addResult('✅ Service Worker enregistré', 'success');
+                    } else {
+                        addResult('⚠️ Service Worker non enregistré', 'warning');
+                    }
+                } catch (error) {
+                    addResult('❌ Erreur Service Worker: ' + error.message, 'error');
+                }
+            } else {
+                addResult('❌ Service Worker non supporté', 'error');
+            }
+
+            // Test 2: Manifest
+            try {
+                const response = await fetch('/manifest.json');
+                if (response.ok) {
+                    const manifest = await response.json();
+                    addResult('✅ Manifest accessible', 'success');
+                    addResult(`📱 Nom de l'app: ${manifest.name}`, 'info');
+                    addResult(`🎨 Couleur thème: ${manifest.theme_color}`, 'info');
+                    addResult(`📐 ${manifest.icons.length} icônes définies`, 'info');
+                } else {
+                    addResult('❌ Manifest inaccessible', 'error');
+                }
+            } catch (error) {
+                addResult('❌ Erreur Manifest: ' + error.message, 'error');
+            }
+
+            // Test 3: Installation
+            if ('beforeinstallprompt' in window || window.matchMedia('(display-mode: standalone)').matches) {
+                addResult('✅ Installation PWA supportée', 'success');
+            } else {
+                addResult('⚠️ Installation PWA limitée sur ce navigateur', 'warning');
+            }
+
+            // Test 4: Cache API
+            if ('caches' in window) {
+                addResult('✅ Cache API supporté', 'success');
+                try {
+                    const cacheNames = await caches.keys();
+                    if (cacheNames.length > 0) {
+                        addResult(`💾 ${cacheNames.length} cache(s) trouvé(s): ${cacheNames.join(', ')}`, 'info');
+                    } else {
+                        addResult('⚠️ Aucun cache trouvé', 'warning');
+                    }
+                } catch (error) {
+                    addResult('❌ Erreur Cache API: ' + error.message, 'error');
+                }
+            } else {
+                addResult('❌ Cache API non supporté', 'error');
+            }
+
+            // Test 5: Mode standalone
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                addResult('✅ Application lancée en mode standalone', 'success');
+            } else {
+                addResult('ℹ️ Application lancée dans le navigateur', 'info');
+            }
+
+            // Test 6: Connexion
+            if ('onLine' in navigator) {
+                if (navigator.onLine) {
+                    addResult('✅ Connexion internet active', 'success');
+                } else {
+                    addResult('📶 Mode hors-ligne détecté', 'warning');
+                }
+            }
+
+            addResult('🎉 Test PWA terminé !', 'success');
+        }
+
+        async function testServiceWorker() {
+            clearResults();
+            addResult('⚙️ Test du Service Worker...', 'info');
+
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    addResult('✅ Service Worker enregistré avec succès', 'success');
+                    addResult(`📍 Scope: ${registration.scope}`, 'info');
+                    
+                    if (registration.active) {
+                        addResult('✅ Service Worker actif', 'success');
+                    }
+                    if (registration.waiting) {
+                        addResult('⏳ Mise à jour en attente', 'warning');
+                    }
+                    if (registration.installing) {
+                        addResult('🔄 Installation en cours', 'info');
+                    }
+                } catch (error) {
+                    addResult('❌ Erreur d\'enregistrement: ' + error.message, 'error');
+                }
+            } else {
+                addResult('❌ Service Worker non supporté', 'error');
+            }
+        }
+
+        async function testManifest() {
+            clearResults();
+            addResult('📋 Test du Manifest...', 'info');
+
+            try {
+                const response = await fetch('/manifest.json');
+                const manifest = await response.json();
+                
+                addResult('✅ Manifest chargé avec succès', 'success');
+                addResult(`📱 Nom: ${manifest.name}`, 'info');
+                addResult(`📝 Description: ${manifest.description}`, 'info');
+                addResult(`🎨 Couleur thème: ${manifest.theme_color}`, 'info');
+                addResult(`🖼️ Couleur arrière-plan: ${manifest.background_color}`, 'info');
+                addResult(`📐 Mode d'affichage: ${manifest.display}`, 'info');
+                addResult(`🏠 URL de démarrage: ${manifest.start_url}`, 'info');
+                addResult(`📂 Scope: ${manifest.scope}`, 'info');
+                
+                // Test des icônes
+                addResult(`🖼️ ${manifest.icons.length} icônes définies:`, 'info');
+                for (const icon of manifest.icons) {
+                    const testResponse = await fetch(icon.src);
+                    if (testResponse.ok) {
+                        addResult(`  ✅ ${icon.sizes} - ${icon.src}`, 'success');
+                    } else {
+                        addResult(`  ❌ ${icon.sizes} - ${icon.src} (non trouvée)`, 'error');
+                    }
+                }
+                
+                // Test des raccourcis
+                if (manifest.shortcuts) {
+                    addResult(`⚡ ${manifest.shortcuts.length} raccourcis définis`, 'info');
+                }
+                
+            } catch (error) {
+                addResult('❌ Erreur lors du test du manifest: ' + error.message, 'error');
+            }
+        }
+
+        async function clearCache() {
+            clearResults();
+            addResult('🗑️ Suppression du cache...', 'info');
+
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    const deletePromises = cacheNames.map(cacheName => caches.delete(cacheName));
+                    await Promise.all(deletePromises);
+                    addResult(`✅ ${cacheNames.length} cache(s) supprimé(s)`, 'success');
+                    
+                    // Informer le service worker
+                    if (navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.controller.postMessage({ type: 'CACHE_CLEAR' });
+                        addResult('📨 Signal envoyé au Service Worker', 'info');
+                    }
+                    
+                    addResult('🔄 Rechargez la page pour voir les changements', 'warning');
+                } catch (error) {
+                    addResult('❌ Erreur lors de la suppression: ' + error.message, 'error');
+                }
+            } else {
+                addResult('❌ Cache API non supporté', 'error');
+            }
+        }
+
+        // Auto-test au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            addResult('🚀 Page de test PWA chargée', 'success');
+            addResult('💡 Cliquez sur les boutons pour tester les fonctionnalités', 'info');
+        });
+    </script>
+</body>
+</html>
