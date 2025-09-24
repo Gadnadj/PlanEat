@@ -70,7 +70,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setToken(savedToken);
         }
       }
-      setLoading(false);
+      // Add minimal delay to prevent flash
+      setTimeout(() => setLoading(false), 300);
     };
 
     checkAuth();

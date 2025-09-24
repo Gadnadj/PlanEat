@@ -75,7 +75,7 @@ export default function PlanificationPage() {
   const [generatedPlan, setGeneratedPlan] = useState<MealPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Translation function for day names (display only)
   const translateDayForDisplay = (dayKey: string): string => {
@@ -102,7 +102,11 @@ export default function PlanificationPage() {
 
   const loadUserData = useCallback(async () => {
     if (!token) {
-      setIsLoading(false);
+      // Add minimal delay to prevent flash
+      setTimeout(() => {
+        setIsLoading(false);
+        setHasInitialized(true);
+      }, 300);
       return;
     }
     
@@ -144,27 +148,29 @@ export default function PlanificationPage() {
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
-      setIsLoading(false);
+      // Add minimal delay to prevent flash of content
+      setTimeout(() => {
+        setIsLoading(false);
+        setHasInitialized(true);
+      }, 300);
     }
   }, [token]);
 
   useEffect(() => {
     loadUserData();
-  }, [loadUserData, refreshTrigger]);
+  }, [loadUserData]);
 
   // Listen for meal plan changes from other pages
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'planningUpdated') {
         console.log('Meal plan updated via storage');
-        setRefreshTrigger(prev => prev + 1);
         localStorage.removeItem('planningUpdated');
       }
     };
 
     const handlePlanningUpdate = () => {
       console.log('Meal plan updated via event');
-      setRefreshTrigger(prev => prev + 1);
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -369,12 +375,6 @@ export default function PlanificationPage() {
               >
                 🤖 Configure and Generate with AI
               </Link>
-              <button
-                onClick={() => setRefreshTrigger(prev => prev + 1)}
-                className="bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 inline-block"
-              >
-                🔄 Refresh
-              </button>
             </div>
           
           {preferences && (
@@ -390,7 +390,7 @@ export default function PlanificationPage() {
         </div>
 
         {/* Empty state if no generated plan */}
-        {!weeklyMealPlan ? (
+        {hasInitialized && !weeklyMealPlan ? (
           <div className="bg-[#2a2a2a] rounded-2xl p-12 shadow-xl text-center">
             <div className="text-6xl mb-6">🍽️</div>
             <h2 className="text-3xl font-bold text-white mb-4">
@@ -415,7 +415,7 @@ export default function PlanificationPage() {
               🚀 Start Configuration
             </Link>
           </div>
-        ) : (
+        ) : hasInitialized && weeklyMealPlan ? (
           <>
             {/* Day navigation */}
             <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -485,7 +485,7 @@ export default function PlanificationPage() {
               </div>
             </div>
           </>
-        )}
+        ) : null}
 
         {/* Actions */}
         <div className="flex flex-wrap justify-center gap-4 mt-8">

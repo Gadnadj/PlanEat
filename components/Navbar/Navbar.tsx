@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext'
 const Navbar = () => {
     const linkClasses = 'nav-link cursor-pointer text-[#e0e0e0] no-underline font-medium transition-colors duration-300 ease-in-out relative hover:text-[#3b82f6]'
     const mobileLinkClasses = 'block px-4 py-3 text-[#e0e0e0] hover:text-[#3b82f6] hover:bg-gray-700/50 transition-all duration-300 no-underline'
-    const { user, logout } = useAuth()
+    const { user, logout, loading } = useAuth()
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     const toggleMobileMenu = () => {
@@ -40,7 +40,11 @@ const Navbar = () => {
                         <li>
                             <Link className={linkClasses} href={'/shopping-list'}>Shopping List</Link>
                         </li>
-                        {user ? (
+                        {loading ? (
+                            <li className='flex items-center'>
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#3b82f6]"></div>
+                            </li>
+                        ) : user ? (
                             <li className='flex items-center gap-4'>
                                 <span className='text-gray-300 text-sm'>
                                     Hello, {user.name}
@@ -95,7 +99,11 @@ const Navbar = () => {
                                     🛒 Shopping List
                                 </Link>
                             </li>
-                            {user ? (
+                            {loading ? (
+                                <li className='px-4 py-3 border-t border-gray-600 mt-2 pt-4 flex justify-center'>
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#3b82f6]"></div>
+                                </li>
+                            ) : user ? (
                                 <>
                                     <li className='px-4 py-2 text-gray-300 text-sm border-t border-gray-600 mt-2 pt-4'>
                                         Hello, {user.name}
