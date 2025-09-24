@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface RecipeData {
@@ -36,6 +36,25 @@ type Props = {
 const EditModal = ({ recipe, onClose, onRecipeUpdated }: Props) => {
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    // Save current scroll position
+    const scrollY = window.scrollY;
+    
+    // Prevent scroll
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    
+    return () => {
+      // Restore scroll
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
 
   // Form state - initialize with recipe data
   const [formData, setFormData] = useState({

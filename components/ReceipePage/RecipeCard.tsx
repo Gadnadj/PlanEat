@@ -97,9 +97,6 @@ const RecipeCard = ({ recipe, onDelete, onEdit, onAddToPlanning, currentUserId }
                     >
                         View Recipe
                     </button>
-                    <button className='flex-1 p-[0.8rem] border-none rounded-[8px] font-bold cursor-pointer transition0-all duration-300 ease-in-out text-[0.9rem] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#505050] bg-[#404040] text-[#e0e0e0]'>
-                        + List
-                    </button>
                     {onAddToPlanning && (
                         <button 
                             onClick={(e) => {

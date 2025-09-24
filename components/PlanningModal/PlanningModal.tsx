@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface RecipeData {
   id: string;
@@ -29,20 +29,41 @@ const PlanningModal = ({ recipe, isOpen, onClose, onAddToPlanning }: PlanningMod
   const [selectedDay, setSelectedDay] = useState('monday');
   const [selectedMeal, setSelectedMeal] = useState('lunch');
 
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      
+      // Prevent scroll
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      
+      return () => {
+        // Restore scroll
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
+
   const days = [
-    { value: 'monday', label: 'Lundi' },
-    { value: 'tuesday', label: 'Mardi' },
-    { value: 'wednesday', label: 'Mercredi' },
-    { value: 'thursday', label: 'Jeudi' },
-    { value: 'friday', label: 'Vendredi' },
-    { value: 'saturday', label: 'Samedi' },
-    { value: 'sunday', label: 'Dimanche' }
+    { value: 'monday', label: 'Monday' },
+    { value: 'tuesday', label: 'Tuesday' },
+    { value: 'wednesday', label: 'Wednesday' },
+    { value: 'thursday', label: 'Thursday' },
+    { value: 'friday', label: 'Friday' },
+    { value: 'saturday', label: 'Saturday' },
+    { value: 'sunday', label: 'Sunday' }
   ];
 
   const meals = [
-    { value: 'morning', label: 'Matin', emoji: '🌅' },
-    { value: 'lunch', label: 'Midi', emoji: '☀️' },
-    { value: 'dinner', label: 'Soir', emoji: '🌙' }
+    { value: 'morning', label: 'Morning', emoji: '🌅' },
+    { value: 'lunch', label: 'Lunch', emoji: '☀️' },
+    { value: 'dinner', label: 'Dinner', emoji: '🌙' }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -68,7 +89,7 @@ const PlanningModal = ({ recipe, isOpen, onClose, onAddToPlanning }: PlanningMod
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-white font-medium mb-3">Choisir le jour</label>
+            <label className="block text-white font-medium mb-3">Choose the day</label>
             <div className="grid grid-cols-2 gap-2">
               {days.map((day) => (
                 <button
@@ -88,7 +109,7 @@ const PlanningModal = ({ recipe, isOpen, onClose, onAddToPlanning }: PlanningMod
           </div>
 
           <div>
-            <label className="block text-white font-medium mb-3">Choisir le moment</label>
+            <label className="block text-white font-medium mb-3">Choose the time</label>
             <div className="space-y-2">
               {meals.map((meal) => (
                 <button
@@ -114,13 +135,13 @@ const PlanningModal = ({ recipe, isOpen, onClose, onAddToPlanning }: PlanningMod
               onClick={onClose}
               className="flex-1 px-6 py-3 bg-[#6b7280] text-white rounded-lg font-medium hover:bg-[#5a6268] transition-colors"
             >
-              Annuler
+              Cancel
             </button>
             <button
               type="submit"
               className="flex-1 px-6 py-3 bg-[#3b82f6] text-white rounded-lg font-medium hover:bg-[#2563eb] transition-colors"
             >
-              Ajouter au planning
+              Add to planning
             </button>
           </div>
         </form>
