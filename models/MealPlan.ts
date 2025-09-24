@@ -61,7 +61,8 @@ const MealPlanSchema = new Schema<IMealPlan>({
       type: Number,
       required: [true, 'Number of people is required'],
       min: [1, 'Number of people must be at least 1'],
-      max: [20, 'Number of people cannot exceed 20']
+      max: [20, 'Number of people cannot exceed 20'],
+      default: 1
     },
     budget: {
       type: String,

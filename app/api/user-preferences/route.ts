@@ -31,7 +31,7 @@ export async function GET(req: Request) {
         dietType: 'omnivore',
         allergies: [],
         dislikes: [],
-        numberOfPeople: 2,
+        numberOfPeople: 1,
         budget: 'medium',
         cookingTime: 'medium'
       }

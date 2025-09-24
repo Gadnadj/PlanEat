@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const prompt = `Create a weekly meal plan in JSON with these preferences:
 
 Diet: ${preferences.dietType}
-People: ${preferences.numberOfPeople}
+People: 1
 Budget: ${preferences.budget}
 Time: ${preferences.cookingTime}
 Allergies: ${allergiesText}

@@ -57,7 +57,7 @@ const UserSchema = new Schema<IUser>({
       type: Number,
       min: 1,
       max: 20,
-      default: 2
+      default: 1
     },
     budget: {
       type: String,

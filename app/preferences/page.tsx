@@ -12,7 +12,6 @@ export default function PreferencesPage() {
     dietType: "",
     allergies: [] as string[],
     dislikes: [] as string[],
-    numberOfPeople: 1,
     budget: "medium",
     cookingTime: "medium"
   });
@@ -108,7 +107,12 @@ export default function PreferencesPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ preferences }),
+        body: JSON.stringify({ 
+          preferences: {
+            ...preferences,
+            numberOfPeople: 1
+          }
+        }),
       });
 
       if (!preferencesResponse.ok) {
@@ -124,7 +128,13 @@ export default function PreferencesPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ preferences }),
+        body: JSON.stringify({ 
+          preferences: {
+            ...preferences,
+            numberOfPeople: 1
+          },
+          token
+        }),
       });
 
       setGenerationStatus('Processing AI response...');
@@ -344,29 +354,6 @@ export default function PreferencesPage() {
             </div>
           </section>
 
-          {/* Nombre de personnes */}
-          <section>
-            <h2 className="text-2xl font-bold text-[#3b82f6] mb-4">
-              👥 Number of People
-            </h2>
-            <div className="flex gap-4 items-center">
-              <button
-                onClick={() => setPreferences(prev => ({ ...prev, numberOfPeople: Math.max(1, prev.numberOfPeople - 1) }))}
-                className="bg-[#3b82f6] text-white w-10 h-10 rounded-lg font-bold hover:bg-[#2563eb] transition-colors"
-              >
-                -
-              </button>
-              <span className="text-2xl font-bold text-white min-w-[3rem] text-center">
-                {preferences.numberOfPeople}
-              </span>
-              <button
-                onClick={() => setPreferences(prev => ({ ...prev, numberOfPeople: Math.min(8, prev.numberOfPeople + 1) }))}
-                className="bg-[#3b82f6] text-white w-10 h-10 rounded-lg font-bold hover:bg-[#2563eb] transition-colors"
-              >
-                +
-              </button>
-            </div>
-          </section>
 
           {/* Budget */}
           <section>
@@ -420,7 +407,7 @@ export default function PreferencesPage() {
               <h3 className="text-xl font-bold text-[#3b82f6] mb-4">📋 Summary of your preferences</h3>
               <div className="space-y-2 text-gray-300">
                 <p><strong>Diet:</strong> {dietTypes.find(d => d.value === preferences.dietType)?.label}</p>
-                <p><strong>People:</strong> {preferences.numberOfPeople}</p>
+                <p><strong>People:</strong> 1 (adjustable per recipe)</p>
                 <p><strong>Budget:</strong> {budgetOptions.find(b => b.value === preferences.budget)?.label}</p>
                 <p><strong>Cooking time:</strong> {cookingTimeOptions.find(t => t.value === preferences.cookingTime)?.label}</p>
                 {preferences.allergies.length > 0 && (

@@ -39,6 +39,7 @@ export async function POST(req: Request) {
     };
 
     // Enrich all meals in the plan
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const enrichedPlan: any = {};
     
     for (const day of Object.keys(mealPlan)) {
@@ -70,12 +71,36 @@ export async function POST(req: Request) {
             ],
             difficulty: enrichedData?.difficulty || 'medium',
             emoji: enrichedData?.emoji || '🍽️',
-            nutrition: enrichedData?.nutrition || {
-              calories: 300,
-              protein: 15,
-              carbs: 35,
-              fat: 10
-            },
+            nutrition: enrichedData?.nutrition || (() => {
+              // Calcul simple basé sur les ingrédients
+              const ingredientsText = (meal.ingredients || []).join('').toLowerCase();
+              let calories = 300, protein = 15, carbs = 35, fat = 10;
+              
+              // Ajustements basés sur les ingrédients principaux
+              if (ingredientsText.includes('chicken') || ingredientsText.includes('beef')) {
+                calories += 100; protein += 15; fat += 5;
+              }
+              if (ingredientsText.includes('salmon') || ingredientsText.includes('fish')) {
+                calories += 80; protein += 12; fat += 8;
+              }
+              if (ingredientsText.includes('egg')) {
+                calories += 50; protein += 8; fat += 4;
+              }
+              if (ingredientsText.includes('oats') || ingredientsText.includes('rice')) {
+                calories += 60; carbs += 20; protein += 3;
+              }
+              if (ingredientsText.includes('olive oil') || ingredientsText.includes('butter')) {
+                calories += 120; fat += 14;
+              }
+              if (ingredientsText.includes('avocado')) {
+                calories += 80; fat += 8; protein += 2;
+              }
+              if (ingredientsText.includes('banana') || ingredientsText.includes('apple')) {
+                calories += 40; carbs += 15;
+              }
+              
+              return { calories, protein, carbs, fat };
+            })(),
             category: enrichedData?.category || 'Main Course',
             tags: enrichedData?.tags || ['homemade'],
             servings: meal.servings || 2

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { preferences } = await req.json();
+    const { preferences, token } = await req.json();
 
     if (!preferences) {
       return NextResponse.json({ message: 'Missing preferences' }, { status: 400 });
@@ -14,29 +14,59 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Missing OpenAI API key' }, { status: 500 });
     }
 
+    // Get previous meals to avoid repetition
+    let previousMealNames: string[] = [];
+    if (token) {
+      try {
+        const baseUrl = process.env.NODE_ENV === 'development' 
+          ? 'http://localhost:3000' 
+          : (process.env.NEXTAUTH_URL || 'http://localhost:3000');
+        const previousMealsResponse = await fetch(`${baseUrl}/api/meal-plans?previous=true`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (previousMealsResponse.ok) {
+          const previousData = await previousMealsResponse.json();
+          if (previousData.success && previousData.previousMealNames) {
+            previousMealNames = previousData.previousMealNames;
+          }
+        }
+      } catch (error) {
+        console.warn('Could not fetch previous meals for diversification:', error);
+      }
+    }
+
     // Build prompt for ChatGPT
     const allergiesText = preferences.allergies.length > 0 ? preferences.allergies.join(', ') : 'None';
     const dislikesText = preferences.dislikes.length > 0 ? preferences.dislikes.join(', ') : 'None';
+    const previousMealsText = previousMealNames.length > 0 ? previousMealNames.join(', ') : 'None';
     
     const prompt = `You are a nutrition and meal planning expert. Create a personalized weekly meal plan in JSON with these preferences:
 
 Diet type: ${preferences.dietType}
-Number of people: ${preferences.numberOfPeople}
+Number of people: 1
 Budget: ${preferences.budget}
 Cooking time: ${preferences.cookingTime}
 Allergies: ${allergiesText}
 Foods to avoid: ${dislikesText}
+Previous meals to avoid (for variety): ${previousMealsText}
 
 IMPORTANT - STRICT RULES TO FOLLOW:
 - ABSOLUTE PROHIBITION of including foods mentioned in allergies
 - ABSOLUTE PROHIBITION of including foods mentioned in foods to avoid
+- CRITICAL: AVOID repeating any meal names from previous meals listed above
+- Create COMPLETELY DIFFERENT meals than previously generated
+- Use DIFFERENT cuisines, cooking methods, and ingredients
+- Prioritize MAXIMUM VARIETY and NOVELTY in meal selection
 - Check each ingredient to avoid allergens
 - If allergy is "fruits", include NO fruits in meals
 - If allergy is "nuts", include NO nuts, almonds, hazelnuts, etc.
 - If allergy is "lactose", include NO dairy products
 - Strictly respect the chosen diet type
 
-Return ONLY valid JSON with this structure, INCLUDING PRECISE QUANTITIES for ${preferences.numberOfPeople} person(s):
+Return ONLY valid JSON with this structure, INCLUDING PRECISE QUANTITIES for 1 person:
 {
   "monday": {
     "morning": { "name": "Meal name", "ingredients": ["200g oats", "1 banana", "2 tbsp honey"], "time": "X min" },
@@ -53,7 +83,7 @@ Return ONLY valid JSON with this structure, INCLUDING PRECISE QUANTITIES for ${p
 
 IMPORTANT RULES FOR QUANTITIES:
 - Always include precise quantities (grams, ml, pieces, tbsp, tsp, cups)
-- Scale quantities for exactly ${preferences.numberOfPeople} person(s)
+- Scale quantities for exactly 1 person
 - Use appropriate units: solids in grams (g), liquids in ml, spices in tsp/tbsp
 - Examples: "300g chicken", "200ml milk", "2 tbsp olive oil", "1 tsp salt", "2 eggs"
 Make sure meals are varied, balanced and ABSOLUTELY respect allergies and dietary preferences.`;
@@ -114,7 +144,9 @@ Make sure meals are varied, balanced and ABSOLUTELY respect allergies and dietar
 
     // Enrich the meal plan with detailed descriptions and instructions
     try {
-      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      const baseUrl = process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:3000' 
+        : (process.env.NEXTAUTH_URL || 'http://localhost:3000');
       const enrichResponse = await fetch(`${baseUrl}/api/enrich-meal-plan`, {
         method: 'POST',
         headers: {
@@ -258,7 +290,7 @@ async function regenerateWithStricterPrompt(preferences: any, apiKey: string) {
   const strictPrompt = `WARNING: The previous plan contained allergens. You MUST create a new plan ABSOLUTELY respecting these constraints:
 
 Diet type: ${preferences.dietType}
-Number of people: ${preferences.numberOfPeople}
+Number of people: 1
 Budget: ${preferences.budget}
 Cooking time: ${preferences.cookingTime}
 STRICT Allergies: ${allergiesText}
@@ -267,12 +299,14 @@ STRICT Foods to avoid: ${dislikesText}
 ABSOLUTE RULES:
 - TOTAL PROHIBITION of allergenic foods
 - TOTAL PROHIBITION of foods to avoid
+- CRITICAL: Create COMPLETELY DIFFERENT and VARIED meals
+- Use DIFFERENT cuisines and cooking methods for maximum variety
 - Check each ingredient individually
 - If allergy "fruits" → NO fruits, berries, citrus, etc.
 - If allergy "nuts" → NO nuts, almonds, hazelnuts, pistachios, etc.
 - If allergy "lactose" → NO milk, cheese, yogurt, butter, etc.
 
-Return ONLY valid JSON with this structure, INCLUDING PRECISE QUANTITIES for ${preferences.numberOfPeople} person(s):
+Return ONLY valid JSON with this structure, INCLUDING PRECISE QUANTITIES for 1 person:
 {
   "monday": {
     "morning": { "name": "Meal name", "ingredients": ["200g oats", "1 banana", "2 tbsp honey"], "time": "X min" },
@@ -287,7 +321,7 @@ Return ONLY valid JSON with this structure, INCLUDING PRECISE QUANTITIES for ${p
   "sunday": { ... }
 }
 
-IMPORTANT: Always include precise quantities (grams, ml, pieces, tbsp, tsp) scaled for ${preferences.numberOfPeople} person(s).`;
+IMPORTANT: Always include precise quantities (grams, ml, pieces, tbsp, tsp) scaled for 1 person.`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {

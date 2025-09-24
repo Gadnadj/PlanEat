@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     }
 
     // Récupérer le planning de l'utilisateur
-    let mealPlan = await MealPlan.findOne({ userId: user._id });
+    const mealPlan = await MealPlan.findOne({ userId: user._id });
     
     if (!mealPlan) {
       // Si aucun planning n'existe, retourner une erreur
@@ -66,12 +66,24 @@ export async function POST(req: Request) {
       mealPlanData[day] = {};
     }
     
-    // Ajouter la recette avec la bonne structure
+    // Ajouter la recette avec la bonne structure (y compris la nutrition existante)
     mealPlanData[day][meal] = {
       name: recipe.title,
       ingredients: recipe.ingredients.map(ing => `${ing.amount}${ing.unit ? ' ' + ing.unit : ''} ${ing.name}`),
       time: `${recipe.prepTime} min`,
-      emoji: recipe.emoji
+      emoji: recipe.emoji,
+      nutrition: recipe.nutrition || {
+        calories: 300,
+        protein: 15,
+        carbs: 35,
+        fat: 10
+      },
+      description: recipe.description || `Delicious ${recipe.title} prepared with fresh ingredients.`,
+      instructions: recipe.instructions || ['Follow the recipe instructions'],
+      difficulty: recipe.difficulty || 'medium',
+      category: recipe.category || 'Main Course',
+      tags: recipe.tags || ['homemade'],
+      servings: recipe.servings || 1
     };
 
     // Marquer le champ comme modifié pour forcer la sauvegarde

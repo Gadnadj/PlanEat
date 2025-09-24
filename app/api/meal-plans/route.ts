@@ -4,7 +4,7 @@ import MealPlan from '@/models/MealPlan';
 import User from '@/models/User';
 import { verifyToken } from '@/lib/auth';
 
-// GET - Retrieve user's meal plan
+// GET - Retrieve user's meal plan or previous meals for diversification
 export async function GET(req: Request) {
   try {
     const authHeader = req.headers.get('authorization');
@@ -24,6 +24,38 @@ export async function GET(req: Request) {
     const user = await User.findById(decoded.userId);
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+
+    // Check if we want previous meals for diversification
+    const url = new URL(req.url);
+    const getPrevious = url.searchParams.get('previous') === 'true';
+    
+    if (getPrevious) {
+      // Get previous meal plans to extract meal names for diversification
+      const previousMealPlans = await MealPlan.find({ userId: user._id })
+        .sort({ createdAt: -1 })
+        .limit(3); // Get last 3 meal plans
+      
+      const previousMealNames: string[] = [];
+      
+      previousMealPlans.forEach(plan => {
+        if (plan.mealPlan && typeof plan.mealPlan === 'object') {
+          Object.values(plan.mealPlan).forEach((dayMeals: any) => {
+            if (dayMeals && typeof dayMeals === 'object') {
+              Object.values(dayMeals).forEach((meal: any) => {
+                if (meal && meal.name && typeof meal.name === 'string') {
+                  previousMealNames.push(meal.name);
+                }
+              });
+            }
+          });
+        }
+      });
+      
+      return NextResponse.json({ 
+        success: true, 
+        previousMealNames: [...new Set(previousMealNames)] // Remove duplicates
+      });
     }
 
     // Get the user's most recent meal plan
@@ -73,12 +105,15 @@ export async function POST(req: Request) {
     }
 
     // Vérifier que les champs obligatoires des préférences sont présents
-    const requiredPreferenceFields = ['dietType', 'numberOfPeople', 'budget', 'cookingTime'];
+    const requiredPreferenceFields = ['dietType', 'budget', 'cookingTime'];
     for (const field of requiredPreferenceFields) {
       if (!preferences[field]) {
         return NextResponse.json({ message: `Missing required preference: ${field}` }, { status: 400 });
       }
     }
+    
+    // Ensure numberOfPeople is always set to 1 for consistency
+    preferences.numberOfPeople = 1;
 
     // Vérifier que le meal plan contient des données
     if (Object.keys(mealPlan).length === 0) {
