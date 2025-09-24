@@ -160,9 +160,9 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
 
   return (
     <div className='fixed top-0 left-0 w-full h-full bg-black/90 flex items-center justify-center z-[1001] p-8 max-md:p-4'>
-      <div className='bg-linear-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-[20px] w-full max-w-[800px] max-h-[90vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-[#404040] relative'>
+      <div className='bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-[20px] w-full max-w-[800px] max-h-[90vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-[#404040] relative'>
         {/* Header */}
-        <div className='bg-linear-to-br from-[#3b82f6] to-[#64748b] px-8 py-6 rounded-t-[20px] text-white flex justify-between items-center'>
+        <div className='bg-gradient-to-br from-[#3b82f6] to-[#64748b] px-8 py-6 rounded-t-[20px] text-white flex justify-between items-center'>
           <h2 className='text-[1.5rem] font-bold m-0'>🍳 Create New Recipe</h2>
           <button
             onClick={onClose}
@@ -330,7 +330,7 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
               <button
                 type="button"
                 onClick={addIngredient}
-                className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white px-6 py-[0.8rem] rounded-[10px] font-bold mt-4 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'
+                className='bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white px-6 py-[0.8rem] rounded-[10px] font-bold mt-4 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'
               >
                 + Add Ingredient
               </button>
@@ -356,7 +356,7 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
               <button
                 type="button"
                 onClick={addInstruction}
-                className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white px-6 py-[0.8rem] rounded-[10px] font-bold mt-4 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'
+                className='bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white px-6 py-[0.8rem] rounded-[10px] font-bold mt-4 transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_4px_15px_rgba(124,179,66,0.3)]'
               >
                 + Add Step
               </button>
@@ -388,7 +388,7 @@ const Modal = ({ onClose, onRecipeCreated }: Props) => {
           <button
             type="submit"
             form="recipe-form"
-            className='bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-[10px] font-bold transition-all duration-300 hover:-translate-y-[2px] hover:bg-gradient-to-br hover:from-[#3b82f6] hover:to-[#1e293b] max-md:w-full disabled:opacity-50 disabled:cursor-not-allowed'
+            className='bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white px-8 py-4 rounded-[10px] font-bold transition-all duration-300 hover:-translate-y-[2px] hover:bg-gradient-to-br hover:from-[#3b82f6] hover:to-[#1e293b] max-md:w-full disabled:opacity-50 disabled:cursor-not-allowed'
             disabled={loading}
           >
             {loading ? '⏳ Creating...' : '💾 Save Recipe'}

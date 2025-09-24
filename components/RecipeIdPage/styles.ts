@@ -7,7 +7,7 @@ export const styles = {
 
     // Boutons
     buttonAction: 'flex-1 py-4 px-6 border-none font-bold cursor-pointer transition-all duration-300 ease-in-out text-[1rem] hover:-translate-y-(2px) hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)]',
-    buttonPrimary: 'bg-linear-to-br from-[#3b82f6] to-[#64748b] text-white hover:bg-linear-to-br hover:from-blue-500 hover:to-blue-600',
+    buttonPrimary: 'bg-gradient-to-br from-[#3b82f6] to-[#64748b] text-white hover:bg-gradient-to-br hover:from-blue-500 hover:to-blue-600',
     buttonSecondary: 'bg-[#404040] text-[#e0e0e0] border-2 border-[#505050] hover:bg-[#505050] hover:border-[#606060]',
 
     // Ingrédients
