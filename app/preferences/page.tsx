@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -22,6 +22,27 @@ export default function PreferencesPage() {
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generationTime, setGenerationTime] = useState(0);
   const [generationStatus, setGenerationStatus] = useState('');
+
+  // Prevent background scroll when generating
+  useEffect(() => {
+    if (isGenerating) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      
+      // Prevent scroll
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      
+      return () => {
+        // Restore scroll
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isGenerating]);
 
   const dietTypes = [
     { value: "omnivore", label: "🥩 Omnivore", description: "Eats everything" },
@@ -463,47 +484,79 @@ export default function PreferencesPage() {
           </button>
           <Link 
             href="/" 
-            className="bg-gradient-to-r from-[#6b7280] to-[#4b5563] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            className={`bg-gradient-to-r from-[#6b7280] to-[#4b5563] text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${
+              isGenerating ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''
+            }`}
+            onClick={(e) => isGenerating && e.preventDefault()}
           >
             ← Back to Home
           </Link>
         </div>
 
-        {/* Indicateur de progression détaillé */}
+        {/* Overlay avec barre de progression centrale */}
         {isGenerating && (
-          <div className="mt-8 bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
-            <div className="text-center">
-              <h3 className="text-xl font-bold text-white mb-4">
-                {generationStatus}
-              </h3>
-              
-              {/* Barre de progression */}
-              <div className="w-full bg-gray-700 rounded-full h-3 mb-4">
-                <div 
-                  className="bg-gradient-to-r from-[#3b82f6] to-[#10b981] h-3 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${generationProgress}%` }}
-                ></div>
+          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
+            <div className="bg-[#2a2a2a] rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-600">
+              <div className="text-center">
+                {/* Icône de chargement */}
+                <div className="flex justify-center mb-6">
+                  <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-300 border-t-[#3b82f6]"></div>
+                </div>
+                
+                {/* Titre */}
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  🤖 AI Meal Plan Generation
+                </h3>
+                
+                {/* Status */}
+                <p className="text-lg text-[#3b82f6] font-medium mb-6">
+                  {generationStatus}
+                </p>
+                
+                {/* Barre de progression principale */}
+                <div className="w-full bg-gray-700 rounded-full h-4 mb-4 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-[#3b82f6] to-[#10b981] h-4 rounded-full transition-all duration-500 ease-out"
+                    style={{ width: `${generationProgress}%` }}
+                  ></div>
+                </div>
+                
+                {/* Pourcentage en gros */}
+                <div className="text-3xl font-bold text-white mb-4">
+                  {generationProgress}%
+                </div>
+                
+                {/* Temps et étapes */}
+                <div className="flex justify-between items-center text-sm text-gray-300 mb-6">
+                  <span className="flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {generationTime}s elapsed
+                  </span>
+                  <span>
+                    Step {Math.ceil(generationProgress / 25)}/4
+                  </span>
+                </div>
+                
+                {/* Messages par étape */}
+                <div className="bg-[#1a1a1a] rounded-lg p-4 mb-6">
+                  <p className="text-gray-300 text-sm">
+                    {generationProgress < 30 && "🔍 Analyzing your dietary preferences and restrictions..."}
+                    {generationProgress >= 30 && generationProgress < 70 && "🍽️ AI is crafting your personalized weekly meal plan..."}
+                    {generationProgress >= 70 && generationProgress < 90 && "⚡ Processing nutritional data and balancing meals..."}
+                    {generationProgress >= 90 && generationProgress < 100 && "✨ Finalizing your meal plan and saving..."}
+                    {generationProgress === 100 && "🎉 Complete! Redirecting to your meal plan..."}
+                  </p>
+                </div>
+                
+                {/* Message d'avertissement */}
+                <div className="p-3 bg-orange-500/20 border border-orange-500/50 rounded-lg">
+                  <p className="text-orange-300 text-xs font-medium">
+                    ⚠️ Please do not close this window or navigate away during generation
+                  </p>
+                </div>
               </div>
-              
-              {/* Pourcentage et temps */}
-              <div className="flex justify-between items-center text-sm text-gray-300">
-                <span>{generationProgress}%</span>
-                <span className="flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {generationTime}s
-                </span>
-              </div>
-              
-              {/* Message d'information */}
-              <p className="text-gray-400 text-sm mt-3">
-                {generationProgress < 30 && "AI is analyzing your preferences..."}
-                {generationProgress >= 30 && generationProgress < 70 && "AI is generating your personalized meal plan..."}
-                {generationProgress >= 70 && generationProgress < 90 && "Processing data..."}
-                {generationProgress >= 90 && generationProgress < 100 && "Finalizing..."}
-                {generationProgress === 100 && "Done! Redirecting..."}
-              </p>
             </div>
           </div>
         )}
