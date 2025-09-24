@@ -99,8 +99,11 @@ export default function PWAManager() {
     }
   };
 
+  // Forcer l'affichage en développement (temporaire)
+  const showForDev = process.env.NODE_ENV === 'development';
+  
   // Bouton d'installation personnalisé
-  if (isInstallable && !isInstalled) {
+  if ((isInstallable && !isInstalled) || showForDev) {
     return (
       <div className="fixed bottom-4 right-4 z-50">
         <button
