@@ -38,6 +38,24 @@ interface PlanningRecipeModalProps {
 const PlanningRecipeModal = ({ meal, isOpen, onClose }: PlanningRecipeModalProps) => {
   if (!isOpen || !meal) return null;
 
+  // Fonction pour convertir la difficulté française vers anglaise
+  const convertDifficulty = (difficulty?: string): 'easy' | 'medium' | 'hard' => {
+    switch (difficulty) {
+      case 'facile':
+        return 'easy';
+      case 'moyen':
+        return 'medium';
+      case 'difficile':
+        return 'hard';
+      case 'easy':
+      case 'medium':
+      case 'hard':
+        return difficulty;
+      default:
+        return 'medium';
+    }
+  };
+
   // Convertir le format du planning vers le format de recette
   const recipeData = {
     id: 'planning-recipe',
@@ -49,7 +67,7 @@ const PlanningRecipeModal = ({ meal, isOpen, onClose }: PlanningRecipeModalProps
     instructions: meal.instructions || ['Instructions détaillées non disponibles'],
     prepTime: parseInt(meal.temps?.replace(' min', '') || meal.time?.replace(' min', '') || '30'),
     servings: meal.servings || 4,
-    difficulty: meal.difficulty || 'facile' as 'facile' | 'moyen' | 'difficile',
+    difficulty: convertDifficulty(meal.difficulty),
     category: meal.category || 'Plat principal',
     tags: meal.tags || [],
     nutrition: meal.nutrition || {

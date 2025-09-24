@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Recipe from '@/models/Recipe';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authHeader = req.headers.get('authorization');
     let userId = null;
@@ -57,14 +57,15 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const updateData = await req.json();
 
     await connectToDatabase();
 
+    const resolvedParams = await params;
     const updatedRecipe = await Recipe.findByIdAndUpdate(
-      params.id,
+      resolvedParams.id,
       updateData,
       { new: true }
     );
@@ -85,11 +86,12 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectToDatabase();
 
-    const deletedRecipe = await Recipe.findByIdAndDelete(params.id);
+    const resolvedParams = await params;
+    const deletedRecipe = await Recipe.findByIdAndDelete(resolvedParams.id);
 
     if (!deletedRecipe) {
       return NextResponse.json({ message: 'Recette non trouvée' }, { status: 404 });

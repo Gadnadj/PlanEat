@@ -5,7 +5,7 @@ import User from '@/models/User';
 import { verifyToken } from '@/lib/auth';
 
 // PUT - Mettre à jour un article (toggle completed, modifier, etc.)
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authHeader = req.headers.get('authorization');
     const token = authHeader?.replace('Bearer ', '');
@@ -29,12 +29,14 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 
     // Vérifier que l'article appartient à l'utilisateur
-    const item = await ShoppingItem.findOne({ _id: params.id, userId: user._id });
+    const resolvedParams = await params;
+    const item = await ShoppingItem.findOne({ _id: resolvedParams.id, userId: user._id });
     if (!item) {
       return NextResponse.json({ message: 'Article non trouvé' }, { status: 404 });
     }
 
     // Mettre à jour l'article
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
     if (category !== undefined) updateData.category = category;
@@ -42,7 +44,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     if (isCompleted !== undefined) updateData.isCompleted = isCompleted;
 
     const updatedItem = await ShoppingItem.findByIdAndUpdate(
-      params.id, 
+      resolvedParams.id, 
       updateData, 
       { new: true }
     );
@@ -60,7 +62,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 }
 
 // DELETE - Supprimer un article
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authHeader = req.headers.get('authorization');
     const token = authHeader?.replace('Bearer ', '');
@@ -82,8 +84,9 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     }
 
     // Vérifier que l'article appartient à l'utilisateur et le supprimer
+    const resolvedParams = await params;
     const deletedItem = await ShoppingItem.findOneAndDelete({ 
-      _id: params.id, 
+      _id: resolvedParams.id, 
       userId: user._id 
     });
 

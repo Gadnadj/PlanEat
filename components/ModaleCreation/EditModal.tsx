@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface RecipeData {
@@ -54,7 +54,7 @@ const EditModal = ({ recipe, onClose, onRecipeUpdated }: Props) => {
 
   const [tags, setTags] = useState<string[]>(recipe.tags);
   const [newTag, setNewTag] = useState('');
-  const [ingredients, setIngredients] = useState<{ name: string, amount: string, unit: string }[]>(recipe.ingredients);
+  const [ingredients, setIngredients] = useState<{ name: string, amount: string, unit?: string }[]>(recipe.ingredients);
   const [newIngredient, setNewIngredient] = useState({ name: '', amount: '', unit: '' });
   const [instructions, setInstructions] = useState<string[]>(recipe.instructions);
   const [newInstruction, setNewInstruction] = useState('');
