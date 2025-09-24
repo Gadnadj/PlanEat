@@ -4,7 +4,7 @@
   "description": "Your AI-powered meal planning assistant. Generate personalized weekly meal plans based on your dietary preferences and manage your shopping lists.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1a1a",
+  "background_color": "#0f172a",
   "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
   "categories": ["food", "health", "lifestyle", "productivity"],

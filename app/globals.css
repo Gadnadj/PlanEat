@@ -19,9 +19,10 @@ body {
   scroll-behavior: smooth;
 }
 
+/* Variables CSS fixes - même thème pour tous */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0f172a;
+  --foreground: #ffffff;
 }
 
 @theme inline {
@@ -31,20 +32,40 @@ body {
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* Forcer le même thème peu importe les préférences système */
+@media (prefers-color-scheme: light) {
   :root {
-    --background: #1a1a1a;
-    --foreground: #e0e0e0;
+    --background: #0f172a;
+    --foreground: #ffffff;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f172a;
+    --foreground: #ffffff;
+  }
+}
+
+/* Styles de base unifiés */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Verdana, sans-serif;
   line-height: 1.6;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+}
+
+/* Surcharger toute préférence de couleur système */
+body {
+  background: #0f172a !important;
+  color: #ffffff !important;
 }
 
 .nav-link::after {
@@ -102,3 +123,4 @@ body {
     @apply bg-[rgba(76,175,80,0.1)] border border-[rgba(76,175,80,0.3)] text-[#4caf50];
   }
 }
+

@@ -247,7 +247,7 @@ export default function Home() {
   const recipeCard = 'bg-gradient-to-br from-[#3a3a3a] to-gray-[#2d2d2d] rounded-xl overflow-hidden transition-all duration-300 ease-out border border-gray-600 hover:-translate-y-1 hover:shadow-2xl flex flex-col h-full max-sm:rounded-lg';
   const recipeImage = 'relative w-full h-40 sm:h-48 bg-gradient-to-br from-[#3b82f6] to-[#64748b] flex items-center justify-center text-4xl sm:text-6xl text-white flex-shrink-0';
   const recipeInfo = 'p-4 sm:p-6 flex flex-col flex-grow';
-  const recipeInfoH3 = 'text-[#3b82f6] mb-3 sm:mb-4 text-lg sm:text-xl font-bold leading-tight';
+  // const recipeInfoH3 = 'text-[#3b82f6] mb-3 sm:mb-4 text-lg sm:text-xl font-bold leading-tight';
   const ingredients = 'mb-4 flex-grow min-h-28 sm:min-h-32';
   const ingredientsH4 = 'text-gray-300 mb-2 text-sm sm:text-base font-bold';
   const ingredientsul = 'list-none pl-0';

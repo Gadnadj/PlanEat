@@ -81,9 +81,21 @@ export default function RootLayout({
 }>) {
 
   return (
-    <html lang="en">
+    <html lang="en" style={{ colorScheme: 'dark', backgroundColor: '#0f172a', color: '#ffffff' }}>
+      <head>
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            * { color-scheme: dark !important; }
+            html, body { 
+              background-color: #0f172a !important; 
+              color: #ffffff !important; 
+            }
+          `
+        }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ backgroundColor: '#0f172a', color: '#ffffff' }}
       >
         <AuthProvider>
           <ScrollToTop />
