@@ -388,11 +388,11 @@ const ShoppingListPage = () => {
             <Headers />
 
             <section className='max-w-[1400px] mx-auto pt-0 px-8 pb-8 flex gap-4 items-center justify-between flex-wrap max-md:flex-col max-md:gap-4  max-sm:pl-4 max-sm:pr-4'>
-                <StatSection 
+                {/* <StatSection 
                     totalItems={items.length}
                     completedItems={completedCount}
                     remainingItems={remainingCount}
-                />
+                /> */}
                 <ActionButton onDeleteAll={deleteAllItems} onPrint={printList} />
             </section>
 
