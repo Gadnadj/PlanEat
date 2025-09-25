@@ -232,13 +232,26 @@ const Page = () => {
                   if (typeof ingredient === 'string') {
                     // Try to extract quantity, unit and name from the ingredient string
                     // Updated regex to handle fractions like 1/2, 3/4, mixed numbers like 1 1/2, and decimals
-                    const match = ingredient.match(/^(\d+(?:[.,]\d+)?(?:\/\d+)?|\d+\s+\d+\/\d+)\s*([a-zA-Zé]*)\s*(.+)$/);
-                    if (match) {
-                      const [, amount, unit, name] = match;
+                    // First try with common units (g, kg, ml, l, tbsp, tsp, cup, cups, oz, lb, etc.)
+                    const unitMatch = ingredient.match(/^(\d+(?:[.,]\d+)?(?:\/\d+)?|\d+\s+\d+\/\d+)\s*(g|kg|ml|l|tbsp|tsp|cup|cups|oz|lb|lbs|pound|pounds|ounce|ounces|tablespoon|tablespoons|teaspoon|teaspoons|gram|grams|kilogram|kilograms|liter|liters|milliliter|milliliters)\s*(.+)$/i);
+                    
+                    if (unitMatch) {
+                      const [, amount, unit, name] = unitMatch;
                       return {
                         name: name.trim(),
                         amount: amount.replace(',', '.').trim(),
                         unit: unit || ''
+                      };
+                    }
+                    
+                    // If no unit found, try without unit (just quantity and name)
+                    const noUnitMatch = ingredient.match(/^(\d+(?:[.,]\d+)?(?:\/\d+)?|\d+\s+\d+\/\d+)\s*(.+)$/);
+                    if (noUnitMatch) {
+                      const [, amount, name] = noUnitMatch;
+                      return {
+                        name: name.trim(),
+                        amount: amount.replace(',', '.').trim(),
+                        unit: ''
                       };
                     }
                     
