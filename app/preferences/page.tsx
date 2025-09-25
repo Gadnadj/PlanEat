@@ -164,6 +164,11 @@ export default function PreferencesPage() {
       const data = await response.json();
       console.log('Generated meal plan data:', data);
       
+      // Gérer le cas où l'API est temporairement indisponible
+      if (!response.ok || data.error === 'OFFLINE') {
+        throw new Error(data.message || 'Service temporarily unavailable');
+      }
+      
       if (data.success && data.mealPlan) {
         setGenerationStatus('Saving meal plan...');
         setGenerationProgress(90);

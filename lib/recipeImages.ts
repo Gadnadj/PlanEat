@@ -6,13 +6,13 @@ export const recipeImages = {
   
   // Recettes existantes (françaises)
   'salade-mditerranenne': 'salade-medi.png',
-  'ptes-au-pesto': 'pates-pesto.png',
+  'ptes-au-pesto': 'pesto.png',
   
   // Nouvelles recettes (anglaises) - correspondant aux fichiers existants
   'honey-garlic-salmon': 'honey-garlic-salmon.png',
   'avocado-toast-supreme': 'avocado-toast.png',
   'chicken-teriyaki-bowl': 'chicken-teriyaki.png',
-  'mediterranean-quinoa-salad': 'mediteraneen-salad.png',
+  'mediterranean-quinoa-salad': 'medit.png',
   'beef-tacos-with-lime-crema': 'beef-tacos-lime.png',
   'creamy-mushroom-risotto': 'risotto-mushroom.png',
   'greek-yogurt-parfait': 'greek-yogurt.png',

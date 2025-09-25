@@ -1,7 +1,8 @@
-// Plan-Eat Service Worker
-const CACHE_NAME = 'plan-eat-v1';
-const STATIC_CACHE = 'plan-eat-static-v1';
-const DYNAMIC_CACHE = 'plan-eat-dynamic-v1';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// Plan-Eat Service Worker - Updated for API error handling
+const CACHE_NAME = 'plan-eat-v2';
+const STATIC_CACHE = 'plan-eat-static-v2';
+const DYNAMIC_CACHE = 'plan-eat-dynamic-v2';
 
 // Ressources à mettre en cache lors de l'installation
 const STATIC_ASSETS = [
@@ -98,7 +99,7 @@ self.addEventListener('fetch', (event) => {
       Promise.race([
         fetch(request),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout')), 5000)
+          setTimeout(() => reject(new Error('Timeout')), 100000) // 30 secondes pour les API
         )
       ])
         .then((response) => {
@@ -115,8 +116,18 @@ self.addEventListener('fetch', (event) => {
           if (request.method === 'GET') {
             return caches.match(request);
           }
-          // Pour les autres méthodes, retourner une erreur
-          return new Response('Offline', { status: 503 });
+          // Pour les autres méthodes, retourner une erreur JSON valide
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              message: 'Service temporarily unavailable - please try again',
+              error: 'OFFLINE'
+            }), 
+            { 
+              status: 503,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
         })
     );
     return;
