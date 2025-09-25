@@ -43,6 +43,28 @@ const Page = () => {
   const [currentServings, setCurrentServings] = useState<number>(1);
   const [originalIngredients, setOriginalIngredients] = useState<RecipeData['ingredients']>([]);
 
+
+  // Function to convert fractions to decimal
+  const fractionToDecimal = (fraction: string): number => {
+    // Check if it's already a decimal number
+    const decimal = parseFloat(fraction);
+    if (!isNaN(decimal)) return decimal;
+    
+    // Check if it's a fraction like "1/2", "3/4", etc.
+    if (fraction.includes('/')) {
+      const parts = fraction.split('/');
+      if (parts.length === 2) {
+        const numerator = parseFloat(parts[0]);
+        const denominator = parseFloat(parts[1]);
+        if (!isNaN(numerator) && !isNaN(denominator) && denominator !== 0) {
+          return numerator / denominator;
+        }
+      }
+    }
+    
+    return NaN;
+  };
+
   // Function to scale ingredient quantities
   const scaleIngredients = (ingredients: RecipeData['ingredients'], originalServings: number, newServings: number) => {
     if (originalServings === 0) return ingredients;
@@ -50,7 +72,7 @@ const Page = () => {
     const multiplier = newServings / originalServings;
     
     return ingredients.map(ingredient => {
-      const amount = parseFloat(ingredient.amount);
+      const amount = fractionToDecimal(ingredient.amount);
       if (isNaN(amount)) return ingredient;
       
       const scaledAmount = (amount * multiplier).toFixed(1);
