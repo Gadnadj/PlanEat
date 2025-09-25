@@ -14,22 +14,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Missing OpenAI API key' }, { status: 500 });
     }
 
-    const prompt = `Generate detailed information for this meal in JSON format:
+    const prompt = `You are a professional chef. Create SPECIFIC step-by-step cooking instructions for this exact meal:
 
 Meal Name: ${mealName}
 Ingredients: ${Array.isArray(ingredients) ? ingredients.join(', ') : ingredients}
 Preparation Time: ${prepTime}
 
-IMPORTANT: Generate ALL content in ENGLISH language only.
+CRITICAL: The instructions must be SPECIFIC to "${mealName}" and use the actual ingredients listed above. NO GENERIC instructions allowed.
 
 Return ONLY valid JSON with this exact structure:
 {
   "description": "A detailed, appetizing description of the meal (2-3 sentences)",
   "instructions": [
-    "Step-by-step cooking instructions",
-    "Each step should be clear and actionable",
-    "Include cooking times and temperatures where relevant",
-    "End with serving suggestions"
+    "Specific step 1 mentioning actual ingredients for ${mealName}",
+    "Specific step 2 with cooking method for ${mealName}",
+    "Specific step 3 with timing and technique for ${mealName}",
+    "Specific step 4 for seasoning/final touches for ${mealName}",
+    "Specific serving suggestion for ${mealName}"
   ],
   "difficulty": "easy",
   "emoji": "🍳",
@@ -43,18 +44,29 @@ Return ONLY valid JSON with this exact structure:
   "tags": ["healthy", "quick"]
 }
 
-Requirements:
-- Description must be engaging and highlight key flavors/benefits
-- Instructions must be detailed and easy to follow
-- Difficulty should be "easy", "medium", or "hard"
-- Choose appropriate emoji for the meal type
-- Calculate accurate nutrition values based on ingredients and portions:
-  * calories: total calories per serving
-  * protein: protein in grams
-  * carbs: carbohydrates in grams
-  * fat: total fat in grams
-- Select appropriate category: "Breakfast", "Lunch", "Dinner", "Snack", "Dessert"
-- Add relevant tags like "healthy", "quick", "vegetarian", "protein-rich", "low-carb", "high-fiber", etc.`;
+EXAMPLE for "Turkey Taco Lettuce Wraps":
+{
+  "description": "Fresh and healthy turkey taco lettuce wraps featuring seasoned ground turkey wrapped in crisp lettuce leaves.",
+  "instructions": [
+    "Heat a large skillet over medium-high heat and cook the ground turkey, breaking it apart with a spoon, for 5-7 minutes until browned.",
+    "Add diced onion and bell pepper to the skillet and cook for 3-4 minutes until softened.",
+    "Season the turkey mixture with chili powder, paprika, salt and pepper, cooking for another 2 minutes until fragrant.",
+    "Remove from heat and let cool slightly while washing and separating the lettuce leaves.",
+    "Spoon the turkey mixture into lettuce cups and serve immediately with desired toppings."
+  ],
+  "difficulty": "easy",
+  "emoji": "🌮",
+  "nutrition": { "calories": 250, "protein": 25, "carbs": 8, "fat": 12 },
+  "category": "Lunch",
+  "tags": ["healthy", "low-carb", "protein-rich"]
+}
+
+Requirements for ${mealName}:
+- Instructions MUST mention specific ingredients from the list above
+- Instructions MUST be tailored to the cooking method for "${mealName}"
+- Include specific cooking times and temperatures where relevant
+- Each step should build logically on the previous one
+- End with appropriate serving suggestion for "${mealName}"`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -67,15 +79,15 @@ Requirements:
         messages: [
           {
             role: 'system',
-            content: 'You are an expert chef and certified nutritionist with extensive knowledge of food composition and nutritional analysis. Generate detailed, accurate meal information in JSON format. Calculate precise nutritional values based on actual ingredient composition and serving sizes. Always respond with valid JSON only, no additional text. All content must be in English.'
+            content: 'You are an expert chef specializing in creating specific, detailed cooking instructions. You MUST respond with valid JSON only, no additional text. Never provide generic instructions - always tailor them to the specific dish and ingredients provided. All content must be in English.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        max_tokens: 1000,
-        temperature: 0.7,
+        max_tokens: 1200,
+        temperature: 0.5,
       }),
     });
 
@@ -96,19 +108,22 @@ Requirements:
     let enrichedData;
     try {
       // Clean the response to extract JSON
-      const jsonMatch = enrichmentContent.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in response');
+      let jsonString = enrichmentContent.trim();
+      
+      // If response contains extra text, extract only the JSON part
+      const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonString = jsonMatch[0];
       }
       
-      let jsonString = jsonMatch[0];
+      // Enhanced JSON cleaning
+      jsonString = jsonString.replace(/[\x00-\x1F\x7F]/g, ''); // Remove control characters
+      jsonString = jsonString.replace(/[""]/g, '"'); // Replace smart quotes
+      jsonString = jsonString.replace(/['']/g, "'"); // Replace smart apostrophes  
+      jsonString = jsonString.replace(/,(\s*[}\]])/g, '$1'); // Remove trailing commas
+      jsonString = jsonString.replace(/([{,]\s*)(\w+):/g, '$1"$2":'); // Quote unquoted keys
       
-      // Clean JSON string
-      jsonString = jsonString.replace(/[\x00-\x1F\x7F]/g, '');
-      jsonString = jsonString.replace(/[""]/g, '"');
-      jsonString = jsonString.replace(/['']/g, "'");
-      jsonString = jsonString.replace(/,(\s*[}\]])/g, '$1');
-      
+      // Try to parse
       enrichedData = JSON.parse(jsonString);
       
       // Validate required fields
@@ -120,15 +135,18 @@ Requirements:
       console.error('JSON parsing error:', parseError);
       console.error('Problematic content:', enrichmentContent);
       
-      // Fallback enriched data
+      // Enhanced fallback with specific ingredients
+      const ingredientsList = Array.isArray(ingredients) ? ingredients : [ingredients];
+      const mainIngredients = ingredientsList.slice(0, 3);
+      
       enrichedData = {
-        description: `Delicious ${mealName} prepared with ${Array.isArray(ingredients) ? ingredients.slice(0, 3).join(', ') : ingredients}. A flavorful and nutritious meal perfect for any time of day.`,
+        description: `Delicious ${mealName} prepared with ${mainIngredients.join(', ')}. A flavorful and nutritious meal perfect for any time of day.`,
         instructions: [
-          'Gather and prepare all ingredients.',
-          'Follow standard cooking techniques for each ingredient.',
-          `Cook for approximately ${prepTime}, monitoring for doneness.`,
-          'Season to taste and serve hot.',
-          'Enjoy your delicious homemade meal!'
+          `Prepare and organize your ingredients: ${mainIngredients.join(', ')}.`,
+          `Heat your cooking surface and begin preparing the main components for ${mealName}.`,
+          `Cook the ingredients according to their requirements, approximately ${prepTime} total.`,
+          `Combine and season the ${mealName} to taste, adjusting flavors as needed.`,
+          `Serve your ${mealName} immediately while fresh and hot for best results.`
         ],
         difficulty: 'medium',
         emoji: '🍽️',
