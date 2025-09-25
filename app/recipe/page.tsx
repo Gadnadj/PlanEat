@@ -294,7 +294,7 @@ const Page = () => {
                 />
             )}
             <Header />
-            <Search onSearchChange={handleSearchChange} onFilterChange={handleFilterChange} onSortChange={handleSortChange} />
+            <Search searchTerm={searchTerm} onSearchChange={handleSearchChange} onFilterChange={handleFilterChange} onSortChange={handleSortChange} />
             <RecipesList 
                 recipes={filteredRecipes} 
                 loading={loading}

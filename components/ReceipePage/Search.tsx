@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { styles } from "./styles";
 
 interface SearchProps {
+    searchTerm: string;
     onSearchChange: (searchTerm: string) => void;
     onFilterChange: (filters: {
         category: string;
@@ -13,8 +14,7 @@ interface SearchProps {
     onSortChange: (sortBy: string, sortOrder: string) => void;
 }
 
-const Search = ({ onSearchChange, onFilterChange, onSortChange }: SearchProps) => {
-    const [searchTerm, setSearchTerm] = useState('');
+const Search = ({ searchTerm, onSearchChange, onFilterChange, onSortChange }: SearchProps) => {
     const [filters, setFilters] = useState({
         category: 'All',
         prepTime: 'All',
@@ -48,7 +48,6 @@ const Search = ({ onSearchChange, onFilterChange, onSortChange }: SearchProps) =
             diet: 'All',
             tags: []
         };
-        setSearchTerm('');
         setFilters(defaultFilters);
         onSearchChange('');
         onFilterChange(defaultFilters);
@@ -71,10 +70,7 @@ const Search = ({ onSearchChange, onFilterChange, onSortChange }: SearchProps) =
                     type="text" 
                     placeholder='Search for a recipe, ingredient...' 
                     value={searchTerm}
-                    onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        onSearchChange(e.target.value);
-                    }}
+                    onChange={(e) => onSearchChange(e.target.value)}
                 />
                 <button 
                     onClick={resetFilters}

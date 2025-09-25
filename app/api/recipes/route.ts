@@ -68,6 +68,25 @@ export async function GET(req: Request) {
         sortObj.createdAt = -1; // Par défaut
       }
       
+      // Construire le filtre prepTime
+      let prepTimeFilter = {};
+      if (prepTime) {
+        switch (prepTime) {
+          case 'Moins de 15 min':
+            prepTimeFilter = { prepTime: { $lt: 15 } };
+            break;
+          case '15-30 min':
+            prepTimeFilter = { prepTime: { $gte: 15, $lte: 30 } };
+            break;
+          case '30-60 min':
+            prepTimeFilter = { prepTime: { $gte: 30, $lte: 60 } };
+            break;
+          case 'Plus de 1 heure':
+            prepTimeFilter = { prepTime: { $gt: 60 } };
+            break;
+        }
+      }
+
       // Pour utilisateur connecté: récupérer recettes publiques ET recettes utilisateur séparément
       const publicRecipes = await Recipe.find({
         $or: [
@@ -78,7 +97,8 @@ export async function GET(req: Request) {
         ...(difficulty && { difficulty }),
         ...(search && {
           title: { $regex: search, $options: 'i' }
-        })
+        }),
+        ...prepTimeFilter
       }).sort(sortObj);
       
       const userRecipes = await Recipe.find({
@@ -87,7 +107,8 @@ export async function GET(req: Request) {
         ...(difficulty && { difficulty }),
         ...(search && {
           title: { $regex: search, $options: 'i' }
-        })
+        }),
+        ...prepTimeFilter
       }).sort(sortObj);
       
       // Combiner et trier - mettre les recettes utilisateur en premier
