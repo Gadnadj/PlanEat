@@ -3,7 +3,7 @@ import ActionButton from '@/components/ShoppingList/ActionButtons'
 import Headers from '@/components/ShoppingList/Headers'
 import CategoryFilters from '@/components/ShoppingList/ShoppingList/CategoryFilters'
 import ShoppingItem from '@/components/ShoppingList/ShoppingList/ShoppingItem'
-import StatSection from '@/components/ShoppingList/StatSection'
+// import StatSection from '@/components/ShoppingList/StatSection'
 import Summary from '@/components/ShoppingList/Summary'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
@@ -367,7 +367,7 @@ const ShoppingListPage = () => {
         : items.filter(item => item.category === selectedCategory);
 
     const completedCount = items.filter(item => item.isCompleted).length;
-    const remainingCount = items.length - completedCount;
+    // const remainingCount = items.length - completedCount;
 
     if (loading) {
         return (
