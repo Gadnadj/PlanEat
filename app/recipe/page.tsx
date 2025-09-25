@@ -248,7 +248,14 @@ const Page = () => {
     // Scroll vers le haut quand la page change
     useEffect(() => {
         if (shouldScrollToTop) {
+            // Méthode robuste pour mobile et desktop
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Fallback pour les navigateurs qui ne supportent pas behavior: 'smooth'
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 100);
+            
             setShouldScrollToTop(false);
         }
     }, [shouldScrollToTop]);
