@@ -40,10 +40,11 @@ export async function GET(req: Request) {
     const filters: any = {};
     
     // Filtre principal : recettes publiques (sans userId) OU recettes de l'utilisateur connecté
+    console.log('Building filter for userId:', userId, 'type:', typeof userId);
     const userFilter = userId ? [
       { userId: { $exists: false } }, // Recettes publiques (développeur)
-      { userId: null }, // Recettes publiques (développeur)
-      { userId: userId } // Recettes de l'utilisateur connecté
+      { userId: null }, // Recettes publiques (développeur)  
+      { userId: { $eq: userId } } // Recettes de l'utilisateur connecté
     ] : [
       { userId: { $exists: false } },
       { userId: null }
@@ -52,8 +53,87 @@ export async function GET(req: Request) {
     if (category) filters.category = category;
     if (difficulty) filters.difficulty = difficulty;
     
-    // Gérer la recherche avec les filtres utilisateur
-    if (search) {
+    // SOLUTION ALTERNATIVE: Appliquer le filtre différemment
+    if (userId) {
+      // Construire l'objet de tri
+      const sortObj: any = {};
+      if (sortBy === 'createdAt') {
+        sortObj.createdAt = sortOrder === 'desc' ? -1 : 1;
+      } else if (sortBy === 'title') {
+        sortObj.title = sortOrder === 'desc' ? -1 : 1;
+      } else if (sortBy === 'prepTime') {
+        sortObj.prepTime = sortOrder === 'desc' ? -1 : 1;
+      } else {
+        sortObj.createdAt = -1; // Par défaut
+      }
+      
+      // Pour utilisateur connecté: récupérer recettes publiques ET recettes utilisateur séparément
+      const publicRecipes = await Recipe.find({
+        $or: [
+          { userId: { $exists: false } },
+          { userId: null }
+        ],
+        ...(category && { category }),
+        ...(difficulty && { difficulty }),
+        ...(search && {
+          $or: [
+            { title: { $regex: search, $options: 'i' } },
+            { description: { $regex: search, $options: 'i' } },
+            { tags: { $in: [new RegExp(search, 'i')] } }
+          ]
+        })
+      }).sort(sortObj);
+      
+      const userRecipes = await Recipe.find({
+        userId: userId,
+        ...(category && { category }),
+        ...(difficulty && { difficulty }),
+        ...(search && {
+          $or: [
+            { title: { $regex: search, $options: 'i' } },
+            { description: { $regex: search, $options: 'i' } },
+            { tags: { $in: [new RegExp(search, 'i')] } }
+          ]
+        })
+      }).sort(sortObj);
+      
+      // Combiner et trier - mettre les recettes utilisateur en premier
+      let allRecipes = [...userRecipes, ...publicRecipes];
+      if (sortBy === 'difficulty') {
+        const difficultyOrder = { 'easy': 1, 'medium': 2, 'hard': 3 };
+        allRecipes = allRecipes.sort((a, b) => {
+          const orderA = difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
+          const orderB = difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;
+          return sortOrder === 'desc' ? orderB - orderA : orderA - orderB;
+        });
+      }
+      
+      // Appliquer pagination
+      const total = allRecipes.length;
+      const skip = (page - 1) * limit;
+      const recipes = allRecipes.slice(skip, skip + limit);
+      
+      
+      return NextResponse.json({
+        success: true,
+        recipes,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      });
+    } else {
+      // Pour utilisateur non connecté: filtre simple
+      filters.$or = [
+        { userId: { $exists: false } },
+        { userId: null }
+      ];
+    }
+    
+    // Gérer la recherche avec les filtres utilisateur (pour utilisateur non connecté)
+    if (search && !userId) {
       const searchFilter = [
         { title: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
@@ -65,7 +145,7 @@ export async function GET(req: Request) {
         { $or: userFilter },
         { $or: searchFilter }
       ];
-    } else {
+    } else if (!userId) {
       filters.$or = userFilter;
     }
     
@@ -111,12 +191,27 @@ export async function GET(req: Request) {
 
     // Calculer la pagination
     const skip = (page - 1) * limit;
+    
+    console.log('Final MongoDB filters:', JSON.stringify(filters, null, 2));
 
     // Récupérer les recettes
     let recipes = await Recipe.find(filters)
       .sort(sort)
       .skip(skip)
       .limit(limit);
+    
+    console.log('MongoDB found recipes:', recipes.map(r => ({ title: r.title, userId: r.userId, rawUserId: r._doc?.userId })));
+    
+    // Test direct: chercher toutes les recettes avec cet userId spécifique
+    if (userId) {
+      const directTest = await Recipe.find({ userId: userId }).limit(5);
+      console.log('Direct search for userId:', userId, 'found:', directTest.map(r => ({ title: r.title, userId: r.userId })));
+      
+      // Test du filtre $or en isolation
+      const orTest = await Recipe.find({ $or: userFilter }).limit(20);
+      console.log('OR filter test found:', orTest.length, 'recipes');
+      console.log('OR filter user recipes:', orTest.filter(r => r.userId === userId).map(r => ({ title: r.title, userId: r.userId })));
+    }
 
     // Tri personnalisé pour la difficulté si nécessaire
     if (sortBy === 'difficulty') {
