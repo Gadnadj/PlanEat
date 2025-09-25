@@ -56,6 +56,7 @@ export async function GET(req: Request) {
     // SOLUTION ALTERNATIVE: Appliquer le filtre différemment
     if (userId) {
       // Construire l'objet de tri
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sortObj: any = {};
       if (sortBy === 'createdAt') {
         sortObj.createdAt = sortOrder === 'desc' ? -1 : 1;
@@ -76,11 +77,7 @@ export async function GET(req: Request) {
         ...(category && { category }),
         ...(difficulty && { difficulty }),
         ...(search && {
-          $or: [
-            { title: { $regex: search, $options: 'i' } },
-            { description: { $regex: search, $options: 'i' } },
-            { tags: { $in: [new RegExp(search, 'i')] } }
-          ]
+          title: { $regex: search, $options: 'i' }
         })
       }).sort(sortObj);
       
@@ -89,11 +86,7 @@ export async function GET(req: Request) {
         ...(category && { category }),
         ...(difficulty && { difficulty }),
         ...(search && {
-          $or: [
-            { title: { $regex: search, $options: 'i' } },
-            { description: { $regex: search, $options: 'i' } },
-            { tags: { $in: [new RegExp(search, 'i')] } }
-          ]
+          title: { $regex: search, $options: 'i' }
         })
       }).sort(sortObj);
       
@@ -134,17 +127,9 @@ export async function GET(req: Request) {
     
     // Gérer la recherche avec les filtres utilisateur (pour utilisateur non connecté)
     if (search && !userId) {
-      const searchFilter = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { tags: { $in: [new RegExp(search, 'i')] } }
-      ];
-      
-      // Combiner les filtres utilisateur et de recherche
-      filters.$and = [
-        { $or: userFilter },
-        { $or: searchFilter }
-      ];
+      // Recherche uniquement dans le titre
+      filters.title = { $regex: search, $options: 'i' };
+      filters.$or = userFilter;
     } else if (!userId) {
       filters.$or = userFilter;
     }
@@ -200,7 +185,7 @@ export async function GET(req: Request) {
       .skip(skip)
       .limit(limit);
     
-    console.log('MongoDB found recipes:', recipes.map(r => ({ title: r.title, userId: r.userId, rawUserId: r._doc?.userId })));
+    console.log('MongoDB found recipes:', recipes.map(r => ({ title: r.title, userId: r.userId })));
     
     // Test direct: chercher toutes les recettes avec cet userId spécifique
     if (userId) {

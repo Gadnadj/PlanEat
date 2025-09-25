@@ -99,7 +99,7 @@ const Page = () => {
             params.append('page', currentPage.toString());
             params.append('limit', '12');
             
-            // console.log('Chargement des recettes avec:', { sortBy, sortOrder, params: params.toString() });
+            console.log('Loading recipes with searchTerm:', searchTerm, 'params:', params.toString());
             
             const response = await fetch(`/api/recipes?${params.toString()}`, { headers });
             if (response.ok) {
@@ -158,6 +158,7 @@ const Page = () => {
     };
 
     const handleSearchChange = (newSearchTerm: string) => {
+        console.log('Search term changed:', newSearchTerm);
         setSearchTerm(newSearchTerm);
         resetToFirstPage();
     };
@@ -242,7 +243,7 @@ const Page = () => {
         if (!authLoading) {
             loadRecipes();
         }
-    }, [authLoading, currentPage]);
+    }, [authLoading, currentPage, searchTerm, filters, sortBy, sortOrder]);
 
     // Scroll vers le haut quand la page change
     useEffect(() => {
