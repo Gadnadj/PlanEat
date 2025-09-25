@@ -14,6 +14,7 @@ interface SearchProps {
 }
 
 const Search = ({ onSearchChange, onFilterChange, onSortChange }: SearchProps) => {
+    const [searchTerm, setSearchTerm] = useState('');
     const [filters, setFilters] = useState({
         category: 'All',
         prepTime: 'All',
@@ -47,7 +48,9 @@ const Search = ({ onSearchChange, onFilterChange, onSortChange }: SearchProps) =
             diet: 'All',
             tags: []
         };
+        setSearchTerm('');
         setFilters(defaultFilters);
+        onSearchChange('');
         onFilterChange(defaultFilters);
     };
 
@@ -67,7 +70,11 @@ const Search = ({ onSearchChange, onFilterChange, onSortChange }: SearchProps) =
                     className='flex-1 px-6 py-4 bg-[#3a3a3a] border-2 border-[#404040] rounded-[10px] text-[#e0e0e0] text-base transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]' 
                     type="text" 
                     placeholder='Search for a recipe, ingredient...' 
-                    onChange={(e) => onSearchChange(e.target.value)}
+                    value={searchTerm}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        onSearchChange(e.target.value);
+                    }}
                 />
                 <button 
                     onClick={resetFilters}
