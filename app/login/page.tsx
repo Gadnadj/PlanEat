@@ -176,7 +176,7 @@ const Page = () => {
                                     <input className=' w-[18px] h-[18px] accent-[#3b82f6]' type="checkbox" />
                                     <label>Remember me</label>
                                 </div>
-                                <Link href={'/forget-password'} className='text-[#3b82f6] no-underline transition-all duration0300 ease-out hover:text-[#64748b]'>Forgot Password?</Link>
+                                {/* <Link href={'/forget-password'} className='text-[#3b82f6] no-underline transition-all duration0300 ease-out hover:text-[#64748b]'>Forgot Password?</Link> */}
                             </div>
                             <button type='submit' className={confirmButton} disabled={loading}>
                                 {loading ? 'Logging in...' : 'Login'}
