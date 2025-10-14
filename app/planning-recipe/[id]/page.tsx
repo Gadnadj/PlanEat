@@ -150,7 +150,9 @@ const Page = () => {
             };
             
             const dayData = data.mealPlan[day];
+            console.log('Day data for', day, ':', dayData);
             const mealData = dayData ? getMealData(dayData, meal) : null;
+            console.log('Raw meal data for', day, meal, ':', mealData);
             
             if (mealData && typeof mealData === 'object') {
               const typedMealData = mealData as {

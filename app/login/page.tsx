@@ -23,12 +23,15 @@ const Page = () => {
     // States for login form
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
+    const [showLoginPassword, setShowLoginPassword] = useState(false);
 
     // States for signup form
     const [signupName, setSignupName] = useState('');
     const [signupEmail, setSignupEmail] = useState('');
     const [signupPassword, setSignupPassword] = useState('');
     const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+    const [showSignupPassword, setShowSignupPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -152,13 +155,19 @@ const Page = () => {
                                 <div className={passwordContainer}>
                                     <input 
                                         className={formInput} 
-                                        type="password" 
+                                        type={showLoginPassword ? "text" : "password"} 
                                         placeholder='********'
                                         value={loginPassword}
                                         onChange={(e) => setLoginPassword(e.target.value)}
                                         required
                                     />
-                                    <button className={passwordToogle} type='button'>👁️</button>
+                                    <button 
+                                        className={passwordToogle} 
+                                        type='button'
+                                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                                    >
+                                        {showLoginPassword ? '🙈' : '👁️'}
+                                    </button>
                                 </div>
                             </div>
 
@@ -207,13 +216,19 @@ const Page = () => {
                                 <div className={passwordContainer}>
                                     <input 
                                         className={formInput} 
-                                        type="password" 
+                                        type={showSignupPassword ? "text" : "password"} 
                                         placeholder='********'
                                         value={signupPassword}
                                         onChange={(e) => setSignupPassword(e.target.value)}
                                         required
                                     />
-                                    <button className={passwordToogle}>👁️</button>
+                                    <button 
+                                        className={passwordToogle}
+                                        type='button'
+                                        onClick={() => setShowSignupPassword(!showSignupPassword)}
+                                    >
+                                        {showSignupPassword ? '🙈' : '👁️'}
+                                    </button>
                                 </div>
                             </div>
 
@@ -222,13 +237,19 @@ const Page = () => {
                                 <div className={passwordContainer}>
                                     <input 
                                         className={formInput} 
-                                        type="password" 
+                                        type={showConfirmPassword ? "text" : "password"} 
                                         placeholder='********'
                                         value={signupConfirmPassword}
                                         onChange={(e) => setSignupConfirmPassword(e.target.value)}
                                         required
                                     />
-                                    <button className={passwordToogle}>👁️</button>
+                                    <button 
+                                        className={passwordToogle}
+                                        type='button'
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    >
+                                        {showConfirmPassword ? '🙈' : '👁️'}
+                                    </button>
                                 </div>
                             </div>
                             <div className={formOptions}>
@@ -246,12 +267,12 @@ const Page = () => {
                     {/* SEPARATOR */}
                     <div className='flex items-center my-8 text-[#888] text-sm'>
                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#404040] to-transparent"></div>
-                        <span className='px-4'>or continue with</span>
+                        {/* <span className='px-4'>or continue with</span> */}
                         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#404040] to-transparent"></div>
                     </div>
-                    <div className='flex gap-4 mb-8'>
+                    {/* <div className='flex gap-4 mb-8'>
                         <button className='flex-1 p-3 bg-[rgba(64,64,64,0.8)] border border-[rgba(30,41,59,0.2)] rounded-[8px] text-[#e0e0e0] cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center gap-2 text-sm hover:bg-[rgba(30,41,59,0.6)] hover:border-[#3b82f6] max-sm:py-2'>Google</button>
-                    </div>
+                    </div> */}
                 </div >
             </div>
         </div>

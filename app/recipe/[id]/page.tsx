@@ -43,6 +43,9 @@ const Page = () => {
   const [currentServings, setCurrentServings] = useState<number>(1);
   const [originalIngredients, setOriginalIngredients] = useState<RecipeData['ingredients']>([]);
 
+  console.log(params);
+  console.log('fskjdnfbkjsdbjkfhdsjkfkjsfdsjgfhjgsdfhgsdhgjfghsdgfkjghhhghfsdghjfghjsdfghjsdfhgfgjh');
+
 
   // Function to convert fractions to decimal
   const fractionToDecimal = (fraction: string): number => {
