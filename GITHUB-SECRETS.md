@@ -22,5 +22,4 @@ your-test-jwt-secret-here
 ```
 
 ## Après l'ajout
-
-Une fois les secrets ajoutés, les tests s'exécuteront automatiquement à chaque push sur les branches `main` et `develop`.
+test tests s'exécuteront automatiquement à chaque push sur les branches `main` et `develop`.
