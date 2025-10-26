@@ -15,7 +15,7 @@ describe('Authentication utilities', () => {
       const hashed = await hashPassword(password);
 
       expect(hashed).toBeDefined();
-      expect(hashed).toBe(password);
+      expect(hashed).not.toBe(password);
       expect(hashed.length).toBeGreaterThan(0);
     });
 
