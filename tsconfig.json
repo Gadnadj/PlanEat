@@ -14,7 +14,7 @@
     "jsx": "preserve",
     "incremental": true,
     "skipDefaultLibCheck": true,
-    "types": [],
+    "types": ["jest", "@types/jest"],
     "plugins": [
       {
         "name": "next"
