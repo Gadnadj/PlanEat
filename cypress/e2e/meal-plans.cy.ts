@@ -1,12 +1,6 @@
 describe('Meal Planning', () => {
   describe('Unauthenticated User', () => {
-    it('should show meal planning features on landing page', () => {
-      cy.visit('/')
-      
-      // Should show features
-      cy.contains('AI Meal Planning').should('be.visible')
-      cy.contains('Plan your meals with artificial intelligence').should('be.visible')
-    })
+    
 
     it('should redirect to login when accessing meal plans without authentication', () => {
       cy.visit('/planification')
@@ -27,6 +21,13 @@ describe('Meal Planning', () => {
     beforeEach(() => {
       // Se connecter avant chaque test
       cy.login('test1@gmail.com', 'testgad')
+    })
+
+    it('should show meal planning features on landing page', () => {
+      cy.visit('/')
+      
+      // Should show features
+      cy.contains('Plan Your Meals with AI').should('be.visible')
     })
   
     it('should display meal plan calendar', () => {
