@@ -32,7 +32,7 @@ describe('Shopping List', () => {
       cy.contains('My Shopping List').should('be.visible')
       
       // Check action buttons
-      cy.contains('button', 'Delete All').should('be.visible')
+      cy.contains('button', 'Clear All').should('be.visible')
       cy.contains('button', 'Print').should('be.visible')
     })
 
@@ -50,8 +50,8 @@ describe('Shopping List', () => {
       cy.visit('/shopping-list')
       
       // Check add item inputs
-      cy.get('input[placeholder*="Add an item"]').should('be.visible')
-      cy.get('input[placeholder*="Quantity"]').should('be.visible')
+      cy.get('input[placeholder*="Qty"]').should('be.visible')
+      cy.contains('button', 'Add').should('be.visible')
       
       // Check category select
       cy.get('select').should('be.visible')
@@ -70,11 +70,14 @@ describe('Shopping List', () => {
     it('should be able to add a new item', () => {
       cy.visit('/shopping-list')
       
-      // Fill in the form
-      cy.get('input[placeholder*="Add an item"]').type('Tomatoes')
-      cy.get('input[placeholder*="Quantity"]').type('2 kg')
+      // Wait for page to load
+      cy.wait(1000)
       
-      // Select category
+      // Fill in the form
+      cy.get('input[placeholder*="Item name"]').type('Tomatoes')
+      cy.get('input[placeholder*="Qty"]').type('2 kg')
+      
+      // Select category - use the select element directly
       cy.get('select').select('Fruits & Vegetables')
       
       // Click add button
