@@ -1,0 +1,34 @@
+{
+  "name": "Pasta Carbonara",
+  "description": "Classic Italian pasta dish",
+  "prepTime": 20,
+  "servings": 4,
+  "ingredients": [
+    {
+      "name": "Spaghetti",
+      "quantity": 400,
+      "unit": "g"
+    },
+    {
+      "name": "Eggs",
+      "quantity": 4,
+      "unit": "pieces"
+    },
+    {
+      "name": "Pancetta",
+      "quantity": 200,
+      "unit": "g"
+    },
+    {
+      "name": "Parmesan",
+      "quantity": 100,
+      "unit": "g"
+    }
+  ],
+  "instructions": [
+    "Cook spaghetti according to package directions",
+    "Fry pancetta until crispy",
+    "Beat eggs with parmesan",
+    "Mix everything together off heat"
+  ]
+}
