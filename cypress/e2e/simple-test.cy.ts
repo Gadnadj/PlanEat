@@ -23,12 +23,14 @@ describe('Landing Page', () => {
     // Test navigation to login
     cy.contains('Sign In').click()
     cy.url().should('include', '/login')
+    cy.contains('Welcome Back').should('be.visible')
     
     // Go back
     cy.visit('/')
     
-    // Test navigation to signup
+    // Test navigation to signup (goes to login page)
     cy.contains('Create Account').click()
-    cy.url().should('include', '/login?mode=signup')
+    cy.url().should('include', '/login')
+    cy.contains('Welcome').should('be.visible')
   })
 })
