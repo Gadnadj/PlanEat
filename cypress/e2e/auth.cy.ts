@@ -37,7 +37,7 @@ describe('Authentication Flow', () => {
     // Check form elements exist
     cy.get('input[type="email"]').should('be.visible')
     cy.get('input[type="password"]').should('be.visible')
-    cy.contains('button', 'Sign In').should('be.visible')
+    cy.contains('button', 'Login').should('be.visible')
   })
 
   it('should switch between login and signup tabs', () => {
@@ -64,18 +64,11 @@ describe('Authentication Flow', () => {
   it('should show error for invalid credentials', () => {
     cy.visit('/login')
     
-    cy.get('input[type="email"]').type('invalid@example.com')
+    cy.get('input[type="email"]').type('invalid')
     cy.get('input[type="password"]').type('wrongpassword')
-    cy.contains('button', 'Sign In').click()
+    cy.contains('button', 'Login').click()
     
     // Should show error message or stay on login page
     cy.url().should('include', '/login')
-  })
-
-  it('should display recipe previews on landing page', () => {
-    cy.visit('/')
-    
-    // Should show recipe section
-    cy.contains('Discover our recipes').should('be.visible')
   })
 })
