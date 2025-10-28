@@ -96,15 +96,14 @@ describe('Shopping List', () => {
       // Wait for items to load
       cy.wait(1000)
       
-      // Click on a category filter
-      cy.contains('Fruits & Vegetables').click()
+      // Click on a category filter button (not the select option)
+      cy.contains('button', '🥕 Fruits & Vegetables').click()
       
-      // The filter should be applied (we can't verify the exact content without knowing the data)
-      // But we can verify the filter button is clickable
-      cy.contains('Fruits & Vegetables').should('be.visible')
+      // The filter should be applied
+      cy.contains('button', '🥕 Fruits & Vegetables').should('be.visible')
       
       // Switch back to All
-      cy.contains('All').click()
+      cy.contains('button', '📋 All').click()
     })
 
     it('should be able to toggle item completion', () => {
@@ -144,7 +143,7 @@ describe('Shopping List', () => {
       cy.visit('/shopping-list')
       
       // First add an item to make sure we have something to delete
-      cy.get('input[placeholder*="Add an item"]').type('Test Item')
+      cy.get('input[placeholder*="Item name..."]').type('Test Item')
       cy.contains('button', 'Add').click()
       cy.wait(1000)
       
@@ -175,7 +174,7 @@ describe('Shopping List', () => {
       cy.visit('/shopping-list')
       
       // Check delete all button exists
-      cy.contains('button', 'Delete All').should('be.visible')
+      cy.contains('button', 'Clear All').should('be.visible')
       
       // We won't actually click it to avoid deleting all data
     })
