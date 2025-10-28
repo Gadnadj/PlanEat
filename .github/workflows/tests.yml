@@ -7,7 +7,8 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  test:
+  jest-tests:
+    name: Jest Tests (Unit & Integration)
     runs-on: ubuntu-latest
 
     steps:
@@ -22,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run tests
+    - name: Run Jest tests
       run: npm test
       env:
         MONGODB_URI: ${{ secrets.MONGODB_URI }}
@@ -35,3 +36,45 @@ jobs:
         file: ./coverage/lcov.info
         flags: unittests
         name: codecov-umbrella
+
+  cypress-tests:
+    name: Cypress E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Cypress tests
+      uses: cypress-io/github-action@v6
+      with:
+        start: npm run dev
+        wait-on: 'http://localhost:3000'
+        wait-on-timeout: 120
+        browser: chrome
+        record: false
+      env:
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+    - name: Upload Cypress screenshots (on failure)
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: cypress/screenshots
+
+    - name: Upload Cypress videos
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: cypress-videos
+        path: cypress/videos
