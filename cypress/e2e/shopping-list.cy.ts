@@ -178,6 +178,30 @@ describe('Shopping List', () => {
       
       // We won't actually click it to avoid deleting all data
     })
+
+    it('should delete all items from shopping list (cleanup)', () => {
+      cy.visit('/shopping-list')
+      
+      // Wait for items to load
+      cy.wait(1000)
+      
+      // Check if there are any items
+      cy.get('body').then(($body) => {
+        if (!$body.text().includes('No items in your list')) {
+          // If there are items, delete them all
+          cy.contains('button', 'Clear All').click()
+          
+          // Wait for deletion
+          cy.wait(1000)
+          
+          // Should show empty state
+          cy.contains('No items in your list').should('be.visible')
+        } else {
+          // Already empty
+          cy.contains('No items in your list').should('be.visible')
+        }
+      })
+    })
   })
 })
 
