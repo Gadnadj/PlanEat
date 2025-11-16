@@ -145,7 +145,7 @@ const ShoppingListPage = () => {
 
     const deleteItem = async (id: string) => {
         if (!token) return;
-
+    
         try {
             const response = await fetch(`/api/shopping-list/${id}`, {
                 method: 'DELETE',
@@ -153,9 +153,16 @@ const ShoppingListPage = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-
+    
             if (response.ok) {
                 setItems(prev => prev.filter(item => item.id !== id));
+    
+                // 👇 IMPORTANT : enlever le focus du bouton delete
+                setTimeout(() => {
+                    if (document.activeElement instanceof HTMLElement) {
+                        document.activeElement.blur();
+                    }
+                }, 0);
             }
         } catch (error) {
             console.error('Error deleting item:', error);
