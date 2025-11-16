@@ -11,6 +11,9 @@ export const styles = {
 
     actionButtonDanger:
         'bg-gradient-to-br from-[#d32d2d] to-[#b71c1c] hover:bg-gradient-to-br hover:from-[#f44336] hover:to-[#d32d2d]',
+    
+    actionButtonWarning:
+        'bg-gradient-to-br from-[#f59e0b] to-[#d97706] hover:bg-gradient-to-br hover:from-[#fbbf24] hover:to-[#f59e0b]',
 
     categoryButton:
         'bg-[#3a3a3a] text-[#b0b0b0] border-none py-2 px-4 rounded-[10px] cursor-pointer text-[0.8rem] transition-all duration-300 ease-in-out hover:bg-gradient-to-br hover:from-[#3b82f6] hover:to-[#64748b] hover:text-white',

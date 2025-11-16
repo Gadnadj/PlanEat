@@ -3,10 +3,12 @@ import ActionButton from '@/components/ShoppingList/ActionButtons'
 import Headers from '@/components/ShoppingList/Headers'
 import CategoryFilters from '@/components/ShoppingList/ShoppingList/CategoryFilters'
 import ShoppingItem from '@/components/ShoppingList/ShoppingList/ShoppingItem'
+import AutocompleteInput from '@/components/ShoppingList/AutocompleteInput'
 // import StatSection from '@/components/ShoppingList/StatSection'
 import Summary from '@/components/ShoppingList/Summary'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
+import { getIngredientCategory } from '@/lib/ingredientCategories'
 import React, { useState, useEffect, useCallback } from 'react'
 
 interface ShoppingItemData {
@@ -64,6 +66,12 @@ const ShoppingListPage = () => {
     const addItem = async () => {
         if (!newItemName.trim() || !token) return;
 
+        // Si la catégorie est toujours "Other", essayer de deviner la catégorie
+        let categoryToUse = newItemCategory;
+        if (categoryToUse === 'Other' && newItemName.trim()) {
+            categoryToUse = getIngredientCategory(newItemName.trim());
+        }
+
         try {
             const response = await fetch('/api/shopping-list', {
                 method: 'POST',
@@ -73,7 +81,7 @@ const ShoppingListPage = () => {
                 },
                 body: JSON.stringify({
                     name: newItemName.trim(),
-                    category: newItemCategory,
+                    category: categoryToUse,
                     quantity: newItemQuantity.trim() || undefined
                 })
             });
@@ -89,6 +97,26 @@ const ShoppingListPage = () => {
             }
         } catch (error) {
             console.error('Error adding item:', error);
+        }
+    };
+
+    const handleIngredientSelect = (name: string, category: string) => {
+        setNewItemName(name);
+        setNewItemCategory(category);
+    };
+
+    const handleNameChange = (value: string) => {
+        setNewItemName(value);
+        // Si l'utilisateur tape un nouveau nom, essayer de deviner la catégorie automatiquement
+        if (value.trim().length > 2) {
+            const guessedCategory = getIngredientCategory(value.trim());
+            // Mettre à jour la catégorie seulement si elle est différente de la catégorie par défaut
+            // ou si la catégorie devinée n'est pas "Groceries" (qui est trop générique)
+            if (guessedCategory !== 'Groceries') {
+                setNewItemCategory(guessedCategory);
+            } else if (newItemCategory === 'Other') {
+                setNewItemCategory(guessedCategory);
+            }
         }
     };
 
@@ -150,6 +178,36 @@ const ShoppingListPage = () => {
             }
         } catch (error) {
             console.error('Error deleting all items:', error);
+        }
+    };
+
+    const deleteCompletedItems = async () => {
+        if (!token) return;
+
+        const completedCount = items.filter(item => item.isCompleted).length;
+        if (completedCount === 0) {
+            alert('Aucun ingrédient coché à supprimer');
+            return;
+        }
+
+        if (!confirm(`Êtes-vous sûr de vouloir supprimer ${completedCount} ingrédient(s) coché(s) ?`)) return;
+
+        try {
+            const response = await fetch('/api/shopping-list/completed', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    setItems(prev => prev.filter(item => !item.isCompleted));
+                }
+            }
+        } catch (error) {
+            console.error('Error deleting completed items:', error);
         }
     };
 
@@ -393,7 +451,7 @@ const ShoppingListPage = () => {
                     completedItems={completedCount}
                     remainingItems={remainingCount}
                 /> */}
-                <ActionButton onDeleteAll={deleteAllItems} onPrint={printList} />
+                <ActionButton onDeleteAll={deleteAllItems} onDeleteCompleted={deleteCompletedItems} onPrint={printList} completedCount={completedCount} />
             </section>
 
             <div className='max-w-[1400px] mx-auto pt-0 py-8 px-8 grid grid-cols-[1fr_300px] gap-8 max-lg:grid-cols-1 max-md:pt-0 max-md:px-4 max-md:pb-8  max-sm:pl-4 max-sm:pr-4'>
@@ -403,12 +461,13 @@ const ShoppingListPage = () => {
                     </div>
 
                     <div className='flex gap-2 mb-8 max-sm:flex-col'>
-                        <input 
-                            className='flex-1 bg-[#3a3a3a] border-2 border-[#505050] rounded-[10px] p-[0.8rem] text-[#e0e0e0] text-[1rem] transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]' 
-                            type="text" 
-                            placeholder="Item name..." 
+                        <AutocompleteInput
                             value={newItemName}
-                            onChange={(e) => setNewItemName(e.target.value)}
+                            onChange={handleNameChange}
+                            onSelect={handleIngredientSelect}
+                            token={token}
+                            placeholder="Item name..."
+                            className='flex-1 bg-[#3a3a3a] border-2 border-[#505050] rounded-[10px] p-[0.8rem] text-[#e0e0e0] text-[1rem] transition-colors duration-300 ease-in-out focus:outline-none focus:border-[#3b82f6]'
                             onKeyPress={(e) => e.key === 'Enter' && addItem()}
                         />
                         <select 

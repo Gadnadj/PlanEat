@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import ShoppingItem from '@/models/ShoppingList';
+import IngredientHistory from '@/models/IngredientHistory';
 import User from '@/models/User';
 import { verifyToken } from '@/lib/auth';
 
@@ -77,6 +78,20 @@ export async function POST(req: Request) {
     });
 
     await newItem.save();
+
+    // Ajouter ou mettre à jour l'historique des ingrédients
+    const nameLower = name.toLowerCase().trim();
+    await IngredientHistory.findOneAndUpdate(
+      { userId: user._id, name: nameLower },
+      { 
+        $set: { 
+          category,
+          lastUsedAt: new Date()
+        },
+        $inc: { usageCount: 1 }
+      },
+      { upsert: true, new: true }
+    );
 
     return NextResponse.json({ 
       success: true, 
