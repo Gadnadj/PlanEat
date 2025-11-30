@@ -19,6 +19,7 @@ export const recipeImages = {
   'thai-basil-chicken': 'thai-basil.png',
   'chocolate-chip-cookies': 'chocolate-chip.png',
   'caesar-salad-with-grilled-chicken': 'grille-chicken-caesar.png',
+  'lemon-pasta': 'lemon-pasta.png',
   
   // Tu peux ajouter d'autres recettes ici
   // Format recommandé : nom-de-la-recette.png
